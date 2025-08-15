@@ -13,6 +13,13 @@ import { FilterBooksDto } from './dto/filtering-books.dto';
 export class BooksService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Paginate books with optional search by title.
+   * @param page Page number (default 1)
+   * @param limit Items per page (default 10)
+   * @param search Optional search string to filter by title
+   * @returns Paginated books with metadata
+   */
   async paginate(page = 1, limit = 10, search?: string) {
     const skip = (page - 1) * limit;
 
@@ -28,7 +35,6 @@ export class BooksService {
     const [books, total] = await this.prisma.$transaction([
       this.prisma.book.findMany({
         where,
-        include: { author: true, category: true },
         skip,
         take: limit,
         orderBy: { dateCreated: 'desc' },
@@ -46,6 +52,11 @@ export class BooksService {
     };
   }
 
+  /**
+   * Create a new book.
+   * @param data Book data
+   * @returns The created Book
+   */
   async create(data: CreateBookDto): Promise<Book> {
     const author = await this.prisma.author.findUnique({
       where: { id: data.authorId },
@@ -53,7 +64,6 @@ export class BooksService {
     if (!author)
       throw new NotFoundException(`Author with ID ${data.authorId} not found`);
 
-    // Validate category
     const category = await this.prisma.category.findUnique({
       where: { id: data.categoryId },
     });
@@ -89,26 +99,35 @@ export class BooksService {
     });
   }
 
+  /**
+   * Find all books (fast, without relations).
+   * @returns List of all books
+   */
   findAll(): Promise<Book[]> {
-    return this.prisma.book.findMany({
-      include: { author: true, category: true },
-    });
+    return this.prisma.book.findMany();
   }
 
+  /**
+   * Find one book by ID.
+   * @param id Book ID
+   * @returns Book if found
+   */
   async findOne(id: number): Promise<Book> {
-    const book = await this.prisma.book.findUnique({
-      where: { id },
-      include: { author: true, category: true },
-    });
+    const book = await this.prisma.book.findUnique({ where: { id } });
     if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
     return book;
   }
 
+  /**
+   * Update a book by ID.
+   * @param id Book ID
+   * @param data Updated book data
+   * @returns Updated book
+   */
   async update(id: number, data: UpdateBookDto): Promise<Book> {
     const existing = await this.prisma.book.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Book with ID ${id} not found`);
 
-    // Validate author/category if provided
     if (data.authorId) {
       const author = await this.prisma.author.findUnique({
         where: { id: data.authorId },
@@ -129,7 +148,6 @@ export class BooksService {
         );
     }
 
-    // Validate ISBN uniqueness
     if (data.isbn && data.isbn !== existing.isbn) {
       const isbnExists = await this.prisma.book.findUnique({
         where: { isbn: data.isbn },
@@ -138,18 +156,18 @@ export class BooksService {
         throw new BadRequestException(`ISBN ${data.isbn} already exists`);
     }
 
-    // Validate quantity
     if (data.quantity !== undefined && data.quantity < 0) {
       throw new BadRequestException(`Quantity cannot be negative`);
     }
 
-    return this.prisma.book.update({
-      where: { id },
-      data,
-      include: { author: true, category: true },
-    });
+    return this.prisma.book.update({ where: { id }, data });
   }
 
+  /**
+   * Remove a book by ID.
+   * @param id Book ID
+   * @returns Deleted book
+   */
   async remove(id: number): Promise<Book> {
     const existing = await this.prisma.book.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Book with ID ${id} not found`);
@@ -157,36 +175,34 @@ export class BooksService {
     return this.prisma.book.delete({ where: { id } });
   }
 
+  /**
+   * Search books by query in multiple fields.
+   * @param query Search string
+   * @param page Page number
+   * @param limit Items per page
+   * @returns Paginated search results
+   */
   async search(query: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
+    const where = {
+      OR: [
+        { title: { contains: query } },
+        { description: { contains: query } },
+        { isbn: { contains: query } },
+        { authorId: Number(query) || undefined },
+        { categoryId: Number(query) || undefined },
+      ].filter(Boolean),
+    };
+
     const [books, total] = await this.prisma.$transaction([
       this.prisma.book.findMany({
-        where: {
-          OR: [
-            { title: { contains: query } },
-            { description: { contains: query } },
-            { isbn: { contains: query } },
-            { author: { name: { contains: query } } },
-            { category: { name: { contains: query } } },
-          ],
-        },
-        include: { author: true, category: true },
+        where,
         skip,
         take: limit,
         orderBy: { dateCreated: 'desc' },
       }),
-      this.prisma.book.count({
-        where: {
-          OR: [
-            { title: { contains: query } },
-            { description: { contains: query } },
-            { isbn: { contains: query } },
-            { author: { name: { contains: query } } },
-            { category: { name: { contains: query } } },
-          ],
-        },
-      }),
+      this.prisma.book.count({ where }),
     ]);
 
     return {
@@ -199,6 +215,11 @@ export class BooksService {
     };
   }
 
+  /**
+   * Filter books with multiple criteria.
+   * @param filterDto Filtering parameters
+   * @returns Filtered books with pagination
+   */
   async filterBooks(filterDto: FilterBooksDto) {
     const {
       title,
@@ -231,7 +252,6 @@ export class BooksService {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { dateCreated: 'desc' },
-      include: { author: true, category: true },
     });
 
     const total = await this.prisma.book.count({ where });
@@ -247,25 +267,32 @@ export class BooksService {
     };
   }
 
+  /**
+   * Find all available books.
+   * @returns List of available books
+   */
   async findAvailable() {
-    return this.prisma.book.findMany({
-      where: { isAviable: true },
-      include: { author: true, category: true },
-    });
+    return this.prisma.book.findMany({ where: { isAviable: true } });
   }
 
+  /**
+   * Find all unavailable books.
+   * @returns List of unavailable books
+   */
   async findUnavailable() {
-    return this.prisma.book.findMany({
-      where: { isAviable: false },
-      include: { author: true, category: true },
-    });
+    return this.prisma.book.findMany({ where: { isAviable: false } });
   }
 
+  /**
+   * Update availability of a book.
+   * @param id Book ID
+   * @param isAvailable Availability flag
+   * @returns Updated book
+   */
   async updateAvailability(id: number, isAvailable: boolean) {
     return this.prisma.book.update({
       where: { id },
       data: { isAviable: isAvailable },
-      include: { author: true, category: true },
     });
   }
 }

@@ -1,4 +1,9 @@
-import { Injectable, PipeTransform, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  PipeTransform,
+  ArgumentMetadata,
+  BadRequestException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -13,14 +18,21 @@ export class AdvancedValidationPipe implements PipeTransform<any> {
     const object = plainToInstance(metatype, value);
 
     // Validuje objekt
-    const errors = await validate(object, { whitelist: true, forbidNonWhitelisted: true });
+    const errors = await validate(object, {
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    });
 
     if (errors.length > 0) {
-      const messages = errors.map(err => {
-        const constraints = err.constraints ? Object.values(err.constraints).join(', ') : '';
+      const messages = errors.map((err) => {
+        const constraints = err.constraints
+          ? Object.values(err.constraints).join(', ')
+          : '';
         return `${err.property} - ${constraints}`;
       });
-      throw new BadRequestException(`Validation failed: ${messages.join('; ')}`);
+      throw new BadRequestException(
+        `Validation failed: ${messages.join('; ')}`,
+      );
     }
 
     return object;
