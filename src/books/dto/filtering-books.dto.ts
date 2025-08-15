@@ -4,7 +4,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 export class FilterBooksDto {
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ description: 'Filter by book title', example: 'Harry Potter' })
+  @ApiPropertyOptional({
+    description: 'Filter by book title',
+    example: 'Harry Potter',
+  })
   title?: string;
 
   @IsOptional()
@@ -19,27 +22,42 @@ export class FilterBooksDto {
 
   @IsOptional()
   @IsInt()
-  @ApiPropertyOptional({ description: 'Filter by published year', example: 2020 })
+  @ApiPropertyOptional({
+    description: 'Filter by published year',
+    example: 2020,
+  })
   publishedYear?: number;
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ description: 'Filter by language', example: 'English' })
+  @ApiPropertyOptional({
+    description: 'Filter by language',
+    example: 'English',
+  })
   language?: string;
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ description: 'Filter books created from this date', example: '2025-01-01' })
+  @ApiPropertyOptional({
+    description: 'Filter books created from this date',
+    example: '2025-01-01',
+  })
   dateFrom?: string;
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ description: 'Filter books created until this date', example: '2025-08-01' })
+  @ApiPropertyOptional({
+    description: 'Filter books created until this date',
+    example: '2025-08-01',
+  })
   dateTo?: string;
 
   @IsOptional()
   @IsInt()
-  @ApiPropertyOptional({ description: 'Page number for pagination', example: 1 })
+  @ApiPropertyOptional({
+    description: 'Page number for pagination',
+    example: 1,
+  })
   page?: number;
 
   @IsOptional()

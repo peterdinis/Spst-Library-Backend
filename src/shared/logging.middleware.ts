@@ -11,8 +11,15 @@ export class LoggingMiddleware implements NestMiddleware {
       const duration = (Date.now() - start) / 1000;
       const timestamp = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
+      const ip = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('user-agent') || 'Unknown';
+      const queryCount = Object.keys(req.query || {}).length;
+      const bodyCount = Object.keys(req.body || {}).length;
+
       console.log(
-        `[${timestamp}] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration.toFixed(3)}s`
+        `[${timestamp}] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration.toFixed(
+          3,
+        )}s - IP: ${ip} - UA: ${userAgent} - QueryParams: ${queryCount} - BodyParams: ${bodyCount}`,
       );
     });
 
