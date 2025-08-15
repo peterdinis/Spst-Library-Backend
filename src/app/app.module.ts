@@ -6,9 +6,10 @@ import { BooksModule } from 'src/books/books.module';
 import { LoggingMiddleware } from 'src/shared/middleware/logging.middleware';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
+import { EmailsModule } from './emails/emails.module';
 
 @Module({
-  imports: [PrismaModule, BooksModule, CategoriesModule, ConfigModule.forRoot({
+  imports: [PrismaModule, BooksModule, EmailsModule, CategoriesModule, ConfigModule.forRoot({
     isGlobal: true,
     envFilePath: ".env"
   })],
