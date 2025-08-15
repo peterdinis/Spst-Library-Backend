@@ -8,7 +8,7 @@ export class LoggingMiddleware implements NestMiddleware {
     const start = Date.now();
 
     res.on('finish', () => {
-      const duration = (Date.now() - start) / 1000;
+      const duration = Date.now() - start; // v ms
       const timestamp = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
       const ip = req.ip || req.connection.remoteAddress;
@@ -17,9 +17,7 @@ export class LoggingMiddleware implements NestMiddleware {
       const bodyCount = Object.keys(req.body || {}).length;
 
       console.log(
-        `[${timestamp}] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration.toFixed(
-          3,
-        )}s - IP: ${ip} - UA: ${userAgent} - QueryParams: ${queryCount} - BodyParams: ${bodyCount}`,
+        `[${timestamp}] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms - IP: ${ip} - UA: ${userAgent} - QueryParams: ${queryCount} - BodyParams: ${bodyCount}`,
       );
     });
 
