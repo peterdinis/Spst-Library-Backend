@@ -41,6 +41,11 @@ model Book {
   author   Author   @relation(fields: [authorId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])
   orders   Order[]
+
+  @@index([title])                
+  @@index([authorId])             
+  @@index([categoryId])           
+  @@index([publishedYear])        
 }
 
 model Account {
