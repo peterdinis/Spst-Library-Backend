@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from '@prisma/client';
+import { FilterBooksDto } from './dto/filtering-books.dto';
 
 @Injectable()
 export class BooksService {
@@ -46,7 +47,6 @@ export class BooksService {
     }
 
     async create(data: CreateBookDto): Promise<Book> {
-        // Validate author
         const author = await this.prisma.author.findUnique({
             where: { id: data.authorId },
         });
@@ -62,7 +62,6 @@ export class BooksService {
                 `Category with ID ${data.categoryId} not found`,
             );
 
-        // Validate ISBN uniqueness if provided
         if (data.isbn) {
             const existing = await this.prisma.book.findUnique({
                 where: { isbn: data.isbn },
@@ -71,7 +70,6 @@ export class BooksService {
                 throw new BadRequestException(`ISBN ${data.isbn} already exists`);
         }
 
-        // Validate quantity
         if (data.quantity < 0)
             throw new BadRequestException(`Quantity cannot be negative`);
 
@@ -97,7 +95,6 @@ export class BooksService {
         });
     }
 
-    // READ ONE
     async findOne(id: number): Promise<Book> {
         const book = await this.prisma.book.findUnique({
             where: { id },
@@ -204,5 +201,75 @@ export class BooksService {
                 lastPage: Math.ceil(total / limit),
             },
         };
+    }
+
+    async filterBooks(filterDto: FilterBooksDto) {
+        const {
+            title,
+            authorId,
+            categoryId,
+            publishedYear,
+            language,
+            dateFrom,
+            dateTo,
+            page = 1,
+            limit = 10,
+        } = filterDto;
+
+        const where: any = {};
+
+        if (title) where.title = { contains: title, mode: 'insensitive' };
+        if (authorId) where.authorId = authorId;
+        if (categoryId) where.categoryId = categoryId;
+        if (publishedYear) where.publishedYear = publishedYear;
+        if (language) where.language = { contains: language, mode: 'insensitive' };
+
+        if (dateFrom || dateTo) {
+            where.dateCreated = {};
+            if (dateFrom) where.dateCreated.gte = new Date(dateFrom);
+            if (dateTo) where.dateCreated.lte = new Date(dateTo);
+        }
+
+        const books = await this.prisma.book.findMany({
+            where,
+            skip: (page - 1) * limit,
+            take: limit,
+            orderBy: { dateCreated: 'desc' },
+            include: { author: true, category: true },
+        });
+
+        const total = await this.prisma.book.count({ where });
+
+        return {
+            data: books,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            },
+        }
+    }
+
+    async findAvailable() {
+        return this.prisma.book.findMany({
+            where: { isAviable: true },
+            include: { author: true, category: true },
+        });
+    }
+    
+    async findUnavailable() {
+        return this.prisma.book.findMany({
+            where: { isAviable: false },
+            include: { author: true, category: true },
+        });
+    }
+
+    async updateAvailability(id: number, isAvailable: boolean) {
+        return this.prisma.book.update({
+            where: { id },
+            data: { isAviable: isAvailable },
+            include: { author: true, category: true },
+        });
     }
 }

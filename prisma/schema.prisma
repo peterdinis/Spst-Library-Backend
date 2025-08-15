@@ -32,7 +32,9 @@ model Book {
   categoryId    Int
   publisherName String
   isbn          String?  @unique
+  isAviable     Boolean  @default(true)
   dateCreated   DateTime @default(now())
+  isBorrowed    Boolean  @default(false)
   publishedYear Int?
   description   String?
   coverImageUrl String?

@@ -4,6 +4,13 @@ import { faker } from '@faker-js/faker';
 const prisma = new PrismaClient();
 
 async function main() {
+  // ❗ Odstránenie existujúcich dát
+  await prisma.order.deleteMany({});
+  await prisma.book.deleteMany({});
+  await prisma.author.deleteMany({});
+  await prisma.category.deleteMany({});
+  await prisma.account.deleteMany({});
+
   // Create Categories
   const categories = await Promise.all(
     ['Fiction', 'Non-fiction', 'Science', 'History', 'Poetry', 'Drama'].map(name =>
@@ -27,7 +34,7 @@ async function main() {
     )
   );
 
-  // Create Books
+  // Create Books s novými stĺpcami
   const books = await Promise.all(
     Array.from({ length: 200 }).map(() =>
       prisma.book.create({
@@ -42,6 +49,8 @@ async function main() {
           description: faker.lorem.paragraph(),
           coverImageUrl: faker.image.urlLoremFlickr({ category: 'books' }),
           language: faker.helpers.arrayElement(['English', 'Slovak', 'German', 'French']),
+          isAviable: faker.datatype.boolean(),
+          isBorrowed: faker.datatype.boolean(), 
         },
       })
     )
@@ -76,7 +85,7 @@ async function main() {
     )
   );
 
-  console.log('✅ Database seeded!');
+  console.log('✅ Database seeded with isAvailable and isBorrowed!');
 }
 
 main()
