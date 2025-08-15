@@ -290,6 +290,9 @@ export class BooksService {
    * @returns Updated book
    */
   async updateAvailability(id: number, isAvailable: boolean) {
-    return this.prisma.book.update({ where: { id }, data: { isAviable: isAvailable } });
+    return this.prisma.book.update({
+      where: { id },
+      data: { isAviable: isAvailable },
+    });
   }
 }
