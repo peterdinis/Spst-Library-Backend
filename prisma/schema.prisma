@@ -6,3 +6,76 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model Author {
+  id          Int       @id @default(autoincrement())
+  name        String
+  litPeriod   String?
+  dateBorn    DateTime?
+  dateDeath   DateTime?
+  nationality String?
+  bio         String?
+  books       Book[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  books Book[]
+}
+
+model Book {
+  id            Int      @id @default(autoincrement())
+  title         String
+  quantity      Int      @default(1)
+  authorId      Int
+  categoryId    Int
+  publisherName String
+  isbn          String?  @unique
+  dateCreated   DateTime @default(now())
+  publishedYear Int?
+  description   String?
+  coverImageUrl String?
+  language      String?
+
+  author   Author   @relation(fields: [authorId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+  orders   Order[]
+}
+
+model Account {
+  id         Int      @id @default(autoincrement())
+  name       String
+  username   String   @unique
+  email      String   @unique
+  password   String
+  role       Role     @default(STUDENT)
+  dateJoined DateTime @default(now())
+  isActive   Boolean  @default(true)
+
+  orders Order[]
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  accountId Int
+  bookId    Int
+  createdAt DateTime    @default(now())
+  status    OrderStatus @default(PENDING)
+
+  account Account @relation(fields: [accountId], references: [id])
+  book    Book    @relation(fields: [bookId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+}
