@@ -37,12 +37,17 @@ export class CategoryService {
    * @param {string} [params.search] - Search term for category name.
    * @returns {Promise<{ data: Category[]; total: number }>} A list of categories and the total count.
    */
-  async findAll(params: FindAllCategoriesDto): Promise<{ data: Category[]; total: number }> {
+  async findAll(
+    params: FindAllCategoriesDto,
+  ): Promise<{ data: Category[]; total: number }> {
     const { skip = 0, take = 10, search = '' } = params;
     const cacheKey = `categories:all:${skip}:${take}:${search}`;
 
     // Check cache first
-    const cached = await this.cacheManager.get<{ data: Category[]; total: number }>(cacheKey);
+    const cached = await this.cacheManager.get<{
+      data: Category[];
+      total: number;
+    }>(cacheKey);
     if (cached) {
       return cached;
     }

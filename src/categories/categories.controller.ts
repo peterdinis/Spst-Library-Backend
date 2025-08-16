@@ -11,7 +11,13 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -28,7 +34,11 @@ export class CategoryController {
    */
   @Post()
   @ApiOperation({ summary: 'Create a category' })
-  @ApiResponse({ status: 201, description: 'Category successfully created', type: Object })
+  @ApiResponse({
+    status: 201,
+    description: 'Category successfully created',
+    type: Object,
+  })
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
@@ -40,10 +50,29 @@ export class CategoryController {
    */
   @Get()
   @ApiOperation({ summary: 'Get all categories (with pagination & search)' })
-  @ApiQuery({ name: 'skip', required: false, type: Number, description: 'Number of records to skip' })
-  @ApiQuery({ name: 'take', required: false, type: Number, description: 'Number of records to take' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term for category name' })
-  @ApiResponse({ status: 200, description: 'List of categories with total count', type: Object })
+  @ApiQuery({
+    name: 'skip',
+    required: false,
+    type: Number,
+    description: 'Number of records to skip',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: Number,
+    description: 'Number of records to take',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search term for category name',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of categories with total count',
+    type: Object,
+  })
   @UsePipes(new ValidationPipe({ transform: true }))
   findAll(@Query() query: FindAllCategoriesDto) {
     return this.categoryService.findAll(query);
