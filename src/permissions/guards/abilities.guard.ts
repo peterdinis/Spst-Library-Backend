@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { CaslAbilityFactory } from './casl-ability-factory';
+import { CaslAbilityFactory } from '../casl/casl-ability-factory';
 import { CHECK_ABILITY } from './check.ability.guard';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class AbilitiesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!abilityData) return true; // route nemá @CheckAbility → povolíme
+    if (!abilityData) return true;
 
     const { user } = context.switchToHttp().getRequest();
     if (!user) throw new ForbiddenException('Not authenticated');
