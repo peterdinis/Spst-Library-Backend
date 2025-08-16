@@ -60,7 +60,6 @@ model Account {
   role       Role     @default(STUDENT)
   dateJoined DateTime @default(now())
   isActive   Boolean  @default(true)
-
   orders Order[]
 }
 

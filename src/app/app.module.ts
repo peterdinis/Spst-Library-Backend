@@ -8,6 +8,7 @@ import { CategoriesModule } from 'src/categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
 import { EmailsModule } from './emails/emails.module';
 import { AuthorsModule } from 'src/authors/authors.module';
+import { StudentsModule } from 'src/students/students.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthorsModule } from 'src/authors/authors.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    StudentsModule
   ],
   controllers: [AppController],
   providers: [AppService],
