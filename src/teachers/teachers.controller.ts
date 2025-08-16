@@ -13,16 +13,16 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { StudentsService } from './students.service';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { TeachersService } from './teachers.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
-@ApiTags('students')
-@Controller('students')
-export class StudentsController {
-  constructor(private readonly studentsService: StudentsService) {}
+@ApiTags('teachers')
+@Controller('teachers')
+export class TeachersController {
+  constructor(private readonly teachersService: TeachersService) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Register a new student account' })
+  @ApiOperation({ summary: 'Register a new teacher account' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -37,7 +37,7 @@ export class StudentsController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Student account created successfully',
+    description: 'Teacher account created successfully',
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
   async register(
@@ -49,7 +49,7 @@ export class StudentsController {
       password: string;
     },
   ) {
-    return this.studentsService.registerStudent(
+    return this.teachersService.registerTeacher(
       body.name,
       body.username,
       body.email,
@@ -58,7 +58,7 @@ export class StudentsController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Login student and receive JWT token' })
+  @ApiOperation({ summary: 'Login teacher and receive JWT token' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -78,7 +78,7 @@ export class StudentsController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() body: { username: string; password: string }) {
-    return this.studentsService.login(body.username, body.password);
+    return this.teachersService.login(body.username, body.password);
   }
 
   @Get('profile')
@@ -105,6 +105,6 @@ export class StudentsController {
     description: 'Unauthorized - invalid or missing JWT',
   })
   async profile(@Request() req: any) {
-    return this.studentsService.getProfile(req.user.sub);
+    return this.teachersService.getProfile(req.user.sub);
   }
 }
