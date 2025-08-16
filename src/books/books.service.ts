@@ -33,7 +33,12 @@ export class BooksService {
       : {};
 
     const [books, total] = await this.prisma.$transaction([
-      this.prisma.book.findMany({ where, skip, take: limit, orderBy: { dateCreated: 'desc' } }),
+      this.prisma.book.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { dateCreated: 'desc' },
+      }),
       this.prisma.book.count({ where }),
     ]);
 
@@ -50,18 +55,30 @@ export class BooksService {
    * Create a new book.
    */
   async create(data: CreateBookDto): Promise<Book> {
-    const author = await this.prisma.author.findUnique({ where: { id: data.authorId } });
-    if (!author) throw new NotFoundException(`Author with ID ${data.authorId} not found`);
+    const author = await this.prisma.author.findUnique({
+      where: { id: data.authorId },
+    });
+    if (!author)
+      throw new NotFoundException(`Author with ID ${data.authorId} not found`);
 
-    const category = await this.prisma.category.findUnique({ where: { id: data.categoryId } });
-    if (!category) throw new NotFoundException(`Category with ID ${data.categoryId} not found`);
+    const category = await this.prisma.category.findUnique({
+      where: { id: data.categoryId },
+    });
+    if (!category)
+      throw new NotFoundException(
+        `Category with ID ${data.categoryId} not found`,
+      );
 
     if (data.isbn) {
-      const existing = await this.prisma.book.findUnique({ where: { isbn: data.isbn } });
-      if (existing) throw new BadRequestException(`ISBN ${data.isbn} already exists`);
+      const existing = await this.prisma.book.findUnique({
+        where: { isbn: data.isbn },
+      });
+      if (existing)
+        throw new BadRequestException(`ISBN ${data.isbn} already exists`);
     }
 
-    if (data.quantity < 0) throw new BadRequestException(`Quantity cannot be negative`);
+    if (data.quantity < 0)
+      throw new BadRequestException(`Quantity cannot be negative`);
 
     const book = await this.prisma.book.create({
       data: {
@@ -112,18 +129,31 @@ export class BooksService {
     if (!existing) throw new NotFoundException(`Book with ID ${id} not found`);
 
     if (data.authorId) {
-      const author = await this.prisma.author.findUnique({ where: { id: data.authorId } });
-      if (!author) throw new NotFoundException(`Author with ID ${data.authorId} not found`);
+      const author = await this.prisma.author.findUnique({
+        where: { id: data.authorId },
+      });
+      if (!author)
+        throw new NotFoundException(
+          `Author with ID ${data.authorId} not found`,
+        );
     }
 
     if (data.categoryId) {
-      const category = await this.prisma.category.findUnique({ where: { id: data.categoryId } });
-      if (!category) throw new NotFoundException(`Category with ID ${data.categoryId} not found`);
+      const category = await this.prisma.category.findUnique({
+        where: { id: data.categoryId },
+      });
+      if (!category)
+        throw new NotFoundException(
+          `Category with ID ${data.categoryId} not found`,
+        );
     }
 
     if (data.isbn && data.isbn !== existing.isbn) {
-      const isbnExists = await this.prisma.book.findUnique({ where: { isbn: data.isbn } });
-      if (isbnExists) throw new BadRequestException(`ISBN ${data.isbn} already exists`);
+      const isbnExists = await this.prisma.book.findUnique({
+        where: { isbn: data.isbn },
+      });
+      if (isbnExists)
+        throw new BadRequestException(`ISBN ${data.isbn} already exists`);
     }
 
     if (data.quantity !== undefined && data.quantity < 0) {
@@ -167,7 +197,12 @@ export class BooksService {
     };
 
     const [books, total] = await this.prisma.$transaction([
-      this.prisma.book.findMany({ where, skip, take: limit, orderBy: { dateCreated: 'desc' } }),
+      this.prisma.book.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { dateCreated: 'desc' },
+      }),
       this.prisma.book.count({ where }),
     ]);
 
@@ -188,7 +223,17 @@ export class BooksService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const { title, authorId, categoryId, publishedYear, language, dateFrom, dateTo, page = 1, limit = 10 } = filterDto;
+    const {
+      title,
+      authorId,
+      categoryId,
+      publishedYear,
+      language,
+      dateFrom,
+      dateTo,
+      page = 1,
+      limit = 10,
+    } = filterDto;
     const where: any = {};
 
     if (title) where.title = { contains: title, mode: 'insensitive' };
@@ -238,7 +283,10 @@ export class BooksService {
    * Update availability.
    */
   async updateAvailability(id: number, isAvailable: boolean) {
-    const book = await this.prisma.book.update({ where: { id }, data: { isAviable: isAvailable } });
+    const book = await this.prisma.book.update({
+      where: { id },
+      data: { isAviable: isAvailable },
+    });
     await (this.cacheManager as any).reset();
     return book;
   }

@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  
+
   app.enableCors();
   app.useGlobalPipes(new AdvancedValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter());

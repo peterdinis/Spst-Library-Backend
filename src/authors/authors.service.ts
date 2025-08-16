@@ -35,11 +35,16 @@ export class AuthorsService {
    * @param {string} [params.search] - Search term for author name or bio.
    * @returns {Promise<{ data: Author[]; total: number }>} A list of authors and the total count.
    */
-  async findAll(params: FindAllAuthorsDto): Promise<{ data: Author[]; total: number }> {
+  async findAll(
+    params: FindAllAuthorsDto,
+  ): Promise<{ data: Author[]; total: number }> {
     const { skip = 0, take = 10, search = '' } = params;
     const cacheKey = `authors:paginate:${skip}:${take}:${search || 'all'}`;
 
-    const cached = await this.cacheManager.get<{ data: Author[]; total: number }>(cacheKey);
+    const cached = await this.cacheManager.get<{
+      data: Author[];
+      total: number;
+    }>(cacheKey);
     if (cached) return cached;
 
     const where = search
