@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EmailsModule } from './emails/emails.module';
 import { AuthorsModule } from 'src/authors/authors.module';
 import { StudentsModule } from 'src/students/students.module';
+import { TeachersModule } from 'src/teachers/teachers.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { StudentsModule } from 'src/students/students.module';
       envFilePath: '.env',
     }),
     StudentsModule,
+    TeachersModule
   ],
   controllers: [AppController],
   providers: [AppService],
