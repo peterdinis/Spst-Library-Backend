@@ -1,13 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FindAllCategoriesDto } from './dto/find-all-categories.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   /**
    * Create a new category.
@@ -15,7 +20,13 @@ export class CategoryService {
    * @returns {Promise<Category>} The newly created category.
    */
   async create(data: CreateCategoryDto): Promise<Category> {
-    return this.prisma.category.create({ data });
+    const category = await this.prisma.category.create({ data });
+
+    // Invalidate category caches after creation
+    await this.cacheManager.del('categories:all');
+    await this.cacheManager.del(`category:${category.id}`);
+
+    return category;
   }
 
   /**
@@ -28,6 +39,13 @@ export class CategoryService {
    */
   async findAll(params: FindAllCategoriesDto): Promise<{ data: Category[]; total: number }> {
     const { skip = 0, take = 10, search = '' } = params;
+    const cacheKey = `categories:all:${skip}:${take}:${search}`;
+
+    // Check cache first
+    const cached = await this.cacheManager.get<{ data: Category[]; total: number }>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
     const where = search
       ? { name: { contains: search, mode: 'insensitive' } }
@@ -38,7 +56,12 @@ export class CategoryService {
       this.prisma.category.count({ where }),
     ]);
 
-    return { data, total };
+    const result = { data, total };
+
+    // Cache result for 60 seconds
+    await this.cacheManager.set(cacheKey, result, 60);
+
+    return result;
   }
 
   /**
@@ -47,7 +70,21 @@ export class CategoryService {
    * @returns {Promise<Category | null>} The category if found, otherwise null.
    */
   async findOne(id: number): Promise<Category | null> {
-    return this.prisma.category.findUnique({ where: { id } });
+    const cacheKey = `category:${id}`;
+
+    // Try cache first
+    const cached = await this.cacheManager.get<Category>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const category = await this.prisma.category.findUnique({ where: { id } });
+
+    if (category) {
+      await this.cacheManager.set(cacheKey, category, 60);
+    }
+
+    return category;
   }
 
   /**
@@ -57,7 +94,13 @@ export class CategoryService {
    * @returns {Promise<Category>} The updated category.
    */
   async update(id: number, data: UpdateCategoryDto): Promise<Category> {
-    return this.prisma.category.update({ where: { id }, data });
+    const category = await this.prisma.category.update({ where: { id }, data });
+
+    // Invalidate caches
+    await this.cacheManager.del('categories:all');
+    await this.cacheManager.del(`category:${id}`);
+
+    return category;
   }
 
   /**
@@ -66,6 +109,12 @@ export class CategoryService {
    * @returns {Promise<Category>} The deleted category.
    */
   async remove(id: number): Promise<Category> {
-    return this.prisma.category.delete({ where: { id } });
+    const category = await this.prisma.category.delete({ where: { id } });
+
+    // Invalidate caches
+    await this.cacheManager.del('categories:all');
+    await this.cacheManager.del(`category:${id}`);
+
+    return category;
   }
 }
