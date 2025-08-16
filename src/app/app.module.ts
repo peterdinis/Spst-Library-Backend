@@ -23,7 +23,7 @@ import { TeachersModule } from 'src/teachers/teachers.module';
       envFilePath: '.env',
     }),
     StudentsModule,
-    TeachersModule
+    TeachersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
