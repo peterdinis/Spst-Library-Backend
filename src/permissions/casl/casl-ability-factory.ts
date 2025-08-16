@@ -38,15 +38,15 @@ export class CaslAbilityFactory {
         can(Actions.Read, 'Category');
         can(Actions.Read, 'Book');
         can(Actions.Create, 'Order');
-        cannot(Actions.Create, "Author")
-        cannot(Actions.Update, "Author")
-        cannot(Actions.Delete, "Author")
-        cannot(Actions.Create, "Book")
-        cannot(Actions.Update, "Book")
-        cannot(Actions.Delete, "Book")
-        cannot(Actions.Create, "Category")
-        cannot(Actions.Update, "Category")
-        cannot(Actions.Delete, "Category")
+        cannot(Actions.Create, 'Author');
+        cannot(Actions.Update, 'Author');
+        cannot(Actions.Delete, 'Author');
+        cannot(Actions.Create, 'Book');
+        cannot(Actions.Update, 'Book');
+        cannot(Actions.Delete, 'Book');
+        cannot(Actions.Create, 'Category');
+        cannot(Actions.Update, 'Category');
+        cannot(Actions.Delete, 'Category');
         break;
 
       case Role.TEACHER:

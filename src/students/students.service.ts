@@ -1,14 +1,14 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
-import { PrismaService } from "../prisma/prisma.service";
-import { Account, Role } from "@prisma/client";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
+import { Account, Role } from '@prisma/client';
 
 @Injectable()
 export class StudentsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   /**
@@ -23,8 +23,8 @@ export class StudentsService {
     name: string,
     username: string,
     email: string,
-    password: string
-  ): Promise<Omit<Account, "password">> {
+    password: string,
+  ): Promise<Omit<Account, 'password'>> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const student = await this.prisma.account.create({
@@ -48,13 +48,22 @@ export class StudentsService {
    * @param password - Raw password for verification
    * @returns JWT token object { access_token: string }
    */
-  async login(username: string, password: string): Promise<{ access_token: string }> {
-    const student = await this.prisma.account.findUnique({ where: { username } });
+  async login(
+    username: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
+    const student = await this.prisma.account.findUnique({
+      where: { username },
+    });
     if (!student || !(await bcrypt.compare(password, student.password))) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: student.id, role: student.role, username: student.username };
+    const payload = {
+      sub: student.id,
+      role: student.role,
+      username: student.username,
+    };
     const token = this.jwtService.sign(payload);
 
     return { access_token: token };
@@ -65,11 +74,11 @@ export class StudentsService {
    * @param studentId - The id of the student extracted from JWT
    * @returns Student account without password
    */
-  async getProfile(studentId: number): Promise<Omit<Account, "password">> {
+  async getProfile(studentId: number): Promise<Omit<Account, 'password'>> {
     const student = await this.prisma.account.findUnique({
       where: { id: studentId },
     });
-    if (!student) throw new UnauthorizedException("Student not found");
+    if (!student) throw new UnauthorizedException('Student not found');
 
     const { password, ...result } = student;
     return result;

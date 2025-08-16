@@ -21,7 +21,7 @@ import { StudentsModule } from 'src/students/students.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    StudentsModule
+    StudentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
