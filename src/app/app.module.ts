@@ -10,6 +10,7 @@ import { EmailsModule } from '../emails/emails.module';
 import { AuthorsModule } from 'src/authors/authors.module';
 import { StudentsModule } from 'src/students/students.module';
 import { TeachersModule } from 'src/teachers/teachers.module';
+import { OrdersModule } from 'src/orders/orders.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TeachersModule } from 'src/teachers/teachers.module';
     }),
     StudentsModule,
     TeachersModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
