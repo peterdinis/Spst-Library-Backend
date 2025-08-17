@@ -14,7 +14,11 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { FindAllOrdersDto } from './dto/find-all-orders.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { AdminGuard, StudentGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
+import {
+  AdminGuard,
+  StudentGuard,
+  TeacherGuard,
+} from 'src/permissions/guards/roles.guard';
 
 @ApiTags('orders')
 @Controller('orders')

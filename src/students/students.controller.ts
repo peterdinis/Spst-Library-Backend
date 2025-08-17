@@ -56,7 +56,7 @@ export class StudentsController {
       body.password,
     );
   }
-  
+
   @Post('login')
   @ApiOperation({ summary: 'Login student and receive JWT token' })
   @ApiBody({
