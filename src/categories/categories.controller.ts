@@ -10,7 +10,6 @@ import {
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,7 +23,6 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FindAllCategoriesDto } from './dto/find-all-categories.dto';
 import { CategoryService } from './categories.service';
-import { AdminGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
 import { Public } from 'src/permissions/decorators/is-public.decorator';
 
 @ApiTags('Categories')
@@ -36,7 +34,6 @@ export class CategoryController {
    * Create a new category.
    */
 
-  @UseGuards(TeacherGuard, AdminGuard)
   @Post()
   @ApiOperation({ summary: 'Create a category' })
   @ApiResponse({
@@ -100,7 +97,6 @@ export class CategoryController {
   /**
    * Update a category by ID.
    */
-  @UseGuards(TeacherGuard, AdminGuard)
   @Put(':id')
   @ApiOperation({ summary: 'Update category by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Category ID' })
@@ -118,7 +114,6 @@ export class CategoryController {
   /**
    * Delete a category by ID.
    */
-  @UseGuards(TeacherGuard, AdminGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete category by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Category ID' })
