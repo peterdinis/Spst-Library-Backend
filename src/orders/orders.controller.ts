@@ -7,12 +7,14 @@ import {
   Delete,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { FindAllOrdersDto } from './dto/find-all-orders.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { AdminGuard } from 'src/permissions/guards/roles.guard';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -30,6 +32,7 @@ export class OrdersController {
     );
   }
 
+  @UseGuards(AdminGuard)
   @Get()
   @ApiOperation({ summary: 'Retrieve all orders with optional filters' })
   @ApiResponse({
@@ -49,6 +52,7 @@ export class OrdersController {
     return this.ordersService.findOne(+id);
   }
 
+  @UseGuards(AdminGuard)
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update the status of an order' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the order' })
@@ -64,6 +68,7 @@ export class OrdersController {
     return this.ordersService.updateStatus(+id, updateOrderDto.status);
   }
 
+  @UseGuards(AdminGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an order' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the order' })
