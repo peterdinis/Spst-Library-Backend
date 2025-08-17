@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
@@ -21,6 +22,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { Author } from '@prisma/client';
+import { AdminGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
 
 @ApiTags('authors')
 @Controller('authors')
@@ -32,6 +34,7 @@ export class AuthorsController {
    * @param {CreateAuthorDto} createAuthorDto - The payload for creating an author.
    * @returns {Promise<Author>} The created author.
    */
+  @UseGuards(TeacherGuard, AdminGuard)
   @Post()
   @ApiOperation({ summary: 'Create a new author' })
   @ApiResponse({ status: 201, description: 'Author successfully created.' })
@@ -92,6 +95,7 @@ export class AuthorsController {
    * @param {UpdateAuthorDto} updateAuthorDto - The update payload.
    * @returns {Promise<Author>} The updated author.
    */
+  @UseGuards(TeacherGuard, AdminGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update an author by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Author ID' })
@@ -109,6 +113,7 @@ export class AuthorsController {
    * @param {number} id - The ID of the author.
    * @returns {Promise<Author>} The deleted author.
    */
+  @UseGuards(TeacherGuard, AdminGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an author by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Author ID' })
