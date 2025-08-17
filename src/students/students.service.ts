@@ -9,7 +9,7 @@ export class StudentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   /**
    * Registers a new student in the system
@@ -81,6 +81,62 @@ export class StudentsService {
     if (!student) throw new UnauthorizedException('Student not found');
 
     const { password, ...result } = student;
+    return result;
+  }
+
+  /** 
+ * Get all books borrowed by a student 
+ * @param studentId - The id of the student
+ * @returns Array of borrowed books with order info
+ */
+  async getBorrowedBooks(studentId: number) {
+    const borrowed = await this.prisma.order.findMany({
+      where: {
+        accountId: studentId,
+        status: {
+          in: ['APPROVED', 'RETURNED'],
+        },
+      },
+      include: {
+        book: true,
+      },
+    });
+
+    return borrowed.map(order => ({
+      orderId: order.id,
+      status: order.status,
+      borrowedAt: order.createdAt,
+      book: {
+        id: order.book.id,
+        title: order.book.title,
+        authorId: order.book.authorId,
+        categoryId: order.book.categoryId,
+        publisherName: order.book.publisherName,
+        isbn: order.book.isbn,
+        coverImageUrl: order.book.coverImageUrl,
+        isBorrowed: order.book.isBorrowed,
+        publishedYear: order.book.publishedYear,
+        language: order.book.language,
+      },
+    }));
+  }
+
+  /**
+ * Updates a student's profile
+ * @param studentId - Student ID from JWT
+ * @param data - Fields to update (name, lastName, classRoom, email, etc.)
+ * @returns Updated student account without password
+ */
+  async updateProfile(
+    studentId: number,
+    data: Partial<Pick<Account, 'name' | 'lastName' | 'classRoom' | 'email'>>,
+  ): Promise<Omit<Account, 'password'>> {
+    const updated = await this.prisma.account.update({
+      where: { id: studentId },
+      data,
+    });
+
+    const { password, ...result } = updated;
     return result;
   }
 }
