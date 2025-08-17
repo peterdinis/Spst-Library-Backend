@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Patch, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { FindAllOrdersDto } from './dto/find-all-orders.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('orders')
@@ -18,10 +19,10 @@ export class OrdersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all orders' })
+  @ApiOperation({ summary: 'Retrieve all orders with optional filters' })
   @ApiResponse({ status: 200, description: 'List of orders returned successfully' })
-  findAll() {
-    return this.ordersService.findAll();
+  findAll(@Query() query: FindAllOrdersDto) {
+    return this.ordersService.findAll(query);
   }
 
   @Get(':id')
