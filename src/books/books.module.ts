@@ -3,6 +3,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import { CacheModule } from '@nestjs/cache-manager';
+import { StudentGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       max: 100, // max items (if in-memory)
     }),
   ],
-  providers: [BooksService],
+  providers: [BooksService, TeacherGuard, StudentGuard],
   controllers: [BooksController],
   exports: [BooksService],
 })

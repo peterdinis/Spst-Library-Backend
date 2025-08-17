@@ -4,6 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RolesGuard {
@@ -22,19 +23,19 @@ export class RolesGuard {
 }
 
 export class StudentGuard extends RolesGuard {
-  constructor() {
+  constructor(private prisma: PrismaService) {
     super([Role.STUDENT]);
   }
 }
 
 export class TeacherGuard extends RolesGuard {
-  constructor() {
+  constructor(private prisma: PrismaService) {
     super([Role.TEACHER]);
   }
 }
 
 export class AdminGuard extends RolesGuard {
-  constructor() {
+  constructor(private prisma: PrismaService) {
     super([Role.ADMIN]);
   }
 }
