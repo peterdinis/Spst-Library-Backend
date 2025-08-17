@@ -53,10 +53,12 @@ model Book {
 
 model Account {
   id         Int      @id @default(autoincrement())
-  name       String
+  name       String?  @default("John")
+  lastName   String?  @default("Doe")
   username   String   @unique
   email      String   @unique
   password   String
+  classRoom  String?   @default("1.A")
   role       Role     @default(STUDENT)
   dateJoined DateTime @default(now())
   isActive   Boolean  @default(true)
