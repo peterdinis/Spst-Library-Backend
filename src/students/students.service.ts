@@ -120,4 +120,23 @@ export class StudentsService {
       },
     }));
   }
+
+  /**
+ * Updates a student's profile
+ * @param studentId - Student ID from JWT
+ * @param data - Fields to update (name, lastName, classRoom, email, etc.)
+ * @returns Updated student account without password
+ */
+  async updateProfile(
+    studentId: number,
+    data: Partial<Pick<Account, 'name' | 'lastName' | 'classRoom' | 'email'>>,
+  ): Promise<Omit<Account, 'password'>> {
+    const updated = await this.prisma.account.update({
+      where: { id: studentId },
+      data,
+    });
+
+    const { password, ...result } = updated;
+    return result;
+  }
 }
