@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { Author } from '@prisma/client';
 import { AdminGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
+import { Public } from 'src/permissions/decorators/is-public.decorator';
 
 @ApiTags('authors')
 @Controller('authors')
@@ -48,6 +49,7 @@ export class AuthorsController {
    * @param {FindAllAuthorsDto} query - Pagination and search parameters.
    * @returns {Promise<{ data: Author[]; total: number }>} Authors with total count.
    */
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all authors with pagination and search' })
   @ApiQuery({
@@ -80,6 +82,8 @@ export class AuthorsController {
    * @param {number} id - The ID of the author.
    * @returns {Promise<Author | null>} The requested author.
    */
+
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get an author by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Author ID' })

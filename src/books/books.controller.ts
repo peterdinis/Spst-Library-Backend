@@ -23,12 +23,14 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { AdminGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
+import { Public } from 'src/permissions/decorators/is-public.decorator';
 
 @ApiTags('books')
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
+  @Public()
   @ApiOperation({ summary: 'Get all books with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -51,6 +53,7 @@ export class BooksController {
     return this.booksService.create(createBookDto);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get all books' })
   @ApiResponse({ status: 200, description: 'List of books' })
   @Get()
@@ -58,6 +61,7 @@ export class BooksController {
     return this.booksService.findAll();
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get book by ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Book details' })
@@ -88,6 +92,7 @@ export class BooksController {
     return this.booksService.remove(id);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Search books' })
   @ApiQuery({ name: 'query', type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
@@ -101,6 +106,7 @@ export class BooksController {
     return this.booksService.search(query, page || 1, limit || 10);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Filter books' })
   @ApiBody({ type: FilterBooksDto })
   @Post('filter')
@@ -108,12 +114,14 @@ export class BooksController {
     return this.booksService.filterBooks(filterDto);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get available books' })
   @Get('available')
   async findAvailable() {
     return this.booksService.findAvailable();
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get unavailable books' })
   @Get('unavailable')
   async findUnavailable() {

@@ -14,13 +14,14 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { FindAllOrdersDto } from './dto/find-all-orders.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { AdminGuard } from 'src/permissions/guards/roles.guard';
+import { AdminGuard, StudentGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
 
 @ApiTags('orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(StudentGuard, TeacherGuard)
   @Post()
   @ApiOperation({ summary: 'Create a new order' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
@@ -43,6 +44,7 @@ export class OrdersController {
     return this.ordersService.findAll(query);
   }
 
+  @UseGuards(AdminGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve an order by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the order' })

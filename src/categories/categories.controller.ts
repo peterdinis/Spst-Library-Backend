@@ -25,6 +25,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FindAllCategoriesDto } from './dto/find-all-categories.dto';
 import { CategoryService } from './categories.service';
 import { AdminGuard, TeacherGuard } from 'src/permissions/guards/roles.guard';
+import { Public } from 'src/permissions/decorators/is-public.decorator';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -52,6 +53,7 @@ export class CategoryController {
   /**
    * Retrieve categories with optional search and pagination.
    */
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all categories (with pagination & search)' })
   @ApiQuery({
@@ -85,6 +87,7 @@ export class CategoryController {
   /**
    * Retrieve a category by its ID.
    */
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Category ID' })
