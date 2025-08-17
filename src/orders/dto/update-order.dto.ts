@@ -8,6 +8,8 @@ export class UpdateOrderDto {
     example: OrderStatus.APPROVED,
     description: 'New status of the order',
   })
-  @IsEnum(OrderStatus, { message: 'Status must be one of PENDING, APPROVED, REJECTED, RETURNED' })
+  @IsEnum(OrderStatus, {
+    message: 'Status must be one of PENDING, APPROVED, REJECTED, RETURNED',
+  })
   status: OrderStatus;
 }

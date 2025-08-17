@@ -25,7 +25,7 @@ import { OrdersModule } from 'src/orders/orders.module';
     }),
     StudentsModule,
     TeachersModule,
-    OrdersModule
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,7 +4,10 @@ import { Type } from 'class-transformer';
 import { OrderStatus } from '@prisma/client';
 
 export class FindAllOrdersDto {
-  @ApiPropertyOptional({ enum: OrderStatus, description: 'Filter by order status' })
+  @ApiPropertyOptional({
+    enum: OrderStatus,
+    description: 'Filter by order status',
+  })
   @IsOptional()
   @IsEnum(OrderStatus)
   status?: OrderStatus;
@@ -30,7 +33,10 @@ export class FindAllOrdersDto {
   @Min(0)
   skip?: number = 0;
 
-  @ApiPropertyOptional({ example: 20, description: 'Number of records to return' })
+  @ApiPropertyOptional({
+    example: 20,
+    description: 'Number of records to return',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

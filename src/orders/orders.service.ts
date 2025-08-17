@@ -23,8 +23,11 @@ export class OrdersService {
    * @returns The created order
    */
   async create(accountId: number, bookId: number) {
-    const account = await this.prisma.account.findUnique({ where: { id: accountId } });
-    if (!account) throw new BadRequestException(`Account ${accountId} does not exist`);
+    const account = await this.prisma.account.findUnique({
+      where: { id: accountId },
+    });
+    if (!account)
+      throw new BadRequestException(`Account ${accountId} does not exist`);
 
     const book = await this.prisma.book.findUnique({ where: { id: bookId } });
     if (!book) throw new BadRequestException(`Book ${bookId} does not exist`);
