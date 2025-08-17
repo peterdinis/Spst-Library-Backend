@@ -83,4 +83,60 @@ export class TeachersService {
     const { password, ...result } = teacher;
     return result;
   }
+
+   /**
+   * Get all books borrowed by a teacher
+   * @param teacherId - Teacher's account ID
+   * @returns Borrowed books with order info
+   */
+  async getBorrowedBooks(teacherId: number) {
+    const borrowed = await this.prisma.order.findMany({
+      where: {
+        accountId: teacherId,
+        status: {
+          in: ['APPROVED', 'RETURNED'],
+        },
+      },
+      include: {
+        book: true,
+      },
+    });
+
+    return borrowed.map(order => ({
+      orderId: order.id,
+      status: order.status,
+      borrowedAt: order.createdAt,
+      book: {
+        id: order.book.id,
+        title: order.book.title,
+        authorId: order.book.authorId,
+        categoryId: order.book.categoryId,
+        publisherName: order.book.publisherName,
+        isbn: order.book.isbn,
+        coverImageUrl: order.book.coverImageUrl,
+        isBorrowed: order.book.isBorrowed,
+        publishedYear: order.book.publishedYear,
+        language: order.book.language,
+      },
+    }));
+  }
+
+  /**
+   * Updates a teacher's profile
+   * @param teacherId - Teacher ID from JWT
+   * @param data - Fields to update (name, lastName, classRoom, email, etc.)
+   * @returns Updated teacher account without password
+   */
+  async updateProfile(
+    teacherId: number,
+    data: Partial<Pick<Account, 'name' | 'lastName' | 'classRoom' | 'email'>>,
+  ): Promise<Omit<Account, 'password'>> {
+    const updated = await this.prisma.account.update({
+      where: { id: teacherId },
+      data,
+    });
+
+    const { password, ...result } = updated;
+    return result;
+  }
 }
