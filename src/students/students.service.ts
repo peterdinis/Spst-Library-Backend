@@ -9,7 +9,7 @@ export class StudentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   /**
    * Registers a new student in the system
@@ -84,11 +84,11 @@ export class StudentsService {
     return result;
   }
 
-  /** 
- * Get all books borrowed by a student 
- * @param studentId - The id of the student
- * @returns Array of borrowed books with order info
- */
+  /**
+   * Get all books borrowed by a student
+   * @param studentId - The id of the student
+   * @returns Array of borrowed books with order info
+   */
   async getBorrowedBooks(studentId: number) {
     const borrowed = await this.prisma.order.findMany({
       where: {
@@ -102,7 +102,7 @@ export class StudentsService {
       },
     });
 
-    return borrowed.map(order => ({
+    return borrowed.map((order) => ({
       orderId: order.id,
       status: order.status,
       borrowedAt: order.createdAt,
@@ -122,11 +122,11 @@ export class StudentsService {
   }
 
   /**
- * Updates a student's profile
- * @param studentId - Student ID from JWT
- * @param data - Fields to update (name, lastName, classRoom, email, etc.)
- * @returns Updated student account without password
- */
+   * Updates a student's profile
+   * @param studentId - Student ID from JWT
+   * @param data - Fields to update (name, lastName, classRoom, email, etc.)
+   * @returns Updated student account without password
+   */
   async updateProfile(
     studentId: number,
     data: Partial<Pick<Account, 'name' | 'lastName' | 'classRoom' | 'email'>>,

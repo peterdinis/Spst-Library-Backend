@@ -20,7 +20,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @ApiTags('teachers')
 @Controller('teachers')
 export class TeachersController {
-  constructor(private readonly teachersService: TeachersService) { }
+  constructor(private readonly teachersService: TeachersService) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new teacher account' })
@@ -138,7 +138,10 @@ export class TeachersController {
       ],
     },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized - invalid or missing JWT' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - invalid or missing JWT',
+  })
   async borrowedBooks(@Request() req: any) {
     return this.teachersService.getBorrowedBooks(req.user.sub);
   }
@@ -176,7 +179,10 @@ export class TeachersController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized - invalid or missing JWT' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - invalid or missing JWT',
+  })
   async updateProfile(
     @Request() req: any,
     @Body()

@@ -84,7 +84,7 @@ export class TeachersService {
     return result;
   }
 
-   /**
+  /**
    * Get all books borrowed by a teacher
    * @param teacherId - Teacher's account ID
    * @returns Borrowed books with order info
@@ -102,7 +102,7 @@ export class TeachersService {
       },
     });
 
-    return borrowed.map(order => ({
+    return borrowed.map((order) => ({
       orderId: order.id,
       status: order.status,
       borrowedAt: order.createdAt,
