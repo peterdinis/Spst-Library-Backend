@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: nestjs-prisma-sqlite
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - sqlite-data:/app/prisma/data
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./prisma/data/dev.db
+    command: npm run start:dev
+    user: "${UID}:${GID}"
+
+volumes:
+  sqlite-data:
