@@ -1,19 +1,20 @@
 FROM node:20-alpine
 
+# Create app dir
 WORKDIR /app
 
-# Copy only package files first
-COPY package*.json ./
+# Add non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Install deps
+COPY package*.json ./
 RUN npm install
 
-# Copy rest of app (excluding node_modules because of .dockerignore)
 COPY . .
 
-# Generate Prisma client
 RUN npx prisma generate
 
-EXPOSE 3001
+EXPOSE 3000
+
+USER appuser
 
 CMD ["npm", "run", "start:dev"]

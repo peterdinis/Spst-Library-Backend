@@ -9,10 +9,11 @@ services:
       - /app/node_modules
       - sqlite-data:/app/prisma/data
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
       - DATABASE_URL=file:./prisma/data/dev.db
     command: npm run start:dev
+    user: "${UID}:${GID}"
 
 volumes:
   sqlite-data:
