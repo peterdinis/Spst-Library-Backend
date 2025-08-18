@@ -1,21 +1,19 @@
-# Use Node.js LTS
 FROM node:20-alpine
 
-# Create app dir
 WORKDIR /app
 
-# Install dependencies first (for caching)
+# Copy only package files first
 COPY package*.json ./
+
+# Install deps
 RUN npm install
 
-# Copy the rest of the app
+# Copy rest of app (excluding node_modules because of .dockerignore)
 COPY . .
 
 # Generate Prisma client
 RUN npx prisma generate
 
-# Expose app port
 EXPOSE 3001
 
-# Start NestJS
 CMD ["npm", "run", "start:dev"]
