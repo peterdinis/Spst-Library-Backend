@@ -3,16 +3,16 @@ version: "3.8"
 services:
   app:
     build: .
-    container_name: nestjs-prisma-sqlite
+    container_name: spst-library-container
     volumes:
       - .:/app
       - /app/node_modules
-      - sqlite-data:/app/dev.db 
+      - sqlite-data:/app
     ports:
       - "3001:3001"
     environment:
       - DATABASE_URL=file:/app/dev.db
-    command: npm run start:dev
+    command: sh -c "npx prisma generate && npm run start:dev"
     user: "${UID}:${GID}"
 
 volumes:
