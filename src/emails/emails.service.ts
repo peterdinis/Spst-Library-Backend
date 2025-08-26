@@ -1,3 +1,4 @@
+// emails.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { SendMailDto } from './dto/send-email.dto';
@@ -21,7 +22,7 @@ export class EmailsService {
   async sendMail(emailDto: SendMailDto) {
     try {
       const info = await this.transporter.sendMail({
-        from: '"SPŠT Admin" <no-reply@example.com>',
+        from: emailDto.from,
         to: emailDto.to,
         subject: emailDto.subject,
         html: emailDto.html,
@@ -33,5 +34,23 @@ export class EmailsService {
       this.logger.error(`Failed to send email: ${error.message}`);
       throw error;
     }
+  }
+
+  async sendVerificationCode(to: string) {
+    if (!/\S+@\S+\.\S+/.test(to)) {
+      throw new Error('Invalid email format');
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const mailDto: SendMailDto = {
+      from: process.env.MAIL_FROM || 'noreply@example.com',
+      to,
+      subject: 'Your Verification Code',
+      html: `<p>Your verification code is: <strong>${code}</strong></p>`,
+    };
+
+    const info = await this.sendMail(mailDto);
+    return { code, info };
   }
 }
