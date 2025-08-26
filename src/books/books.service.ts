@@ -2,21 +2,19 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  Inject,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from '@prisma/client';
 import { FilterBooksDto } from './dto/filtering-books.dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class BooksService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly cacheService: CacheService,
   ) {}
 
   /**
@@ -24,7 +22,7 @@ export class BooksService {
    */
   async paginate(page = 1, limit = 10, search?: string) {
     const cacheKey = `books:paginate:${page}:${limit}:${search || ''}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheService.get(cacheKey);
     if (cached) return cached;
 
     const skip = (page - 1) * limit;
@@ -47,7 +45,7 @@ export class BooksService {
       meta: { total, page, lastPage: Math.ceil(total / limit) },
     };
 
-    await this.cacheManager.set(cacheKey, result, 60);
+    await this.cacheService.set(cacheKey, result, 60_000); // 60s
     return result;
   }
 
@@ -95,7 +93,7 @@ export class BooksService {
       },
     });
 
-    await (this.cacheManager as any).reset();
+    await this.cacheService.reset();
     return book;
   }
 
@@ -111,13 +109,13 @@ export class BooksService {
    */
   async findOne(id: number): Promise<Book> {
     const cacheKey = `books:one:${id}`;
-    const cached = await this.cacheManager.get<Book>(cacheKey);
+    const cached = await this.cacheService.get<Book>(cacheKey);
     if (cached) return cached;
 
     const book = await this.prisma.book.findUnique({ where: { id } });
     if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
 
-    await this.cacheManager.set(cacheKey, book, 60);
+    await this.cacheService.set(cacheKey, book, 60_000);
     return book;
   }
 
@@ -161,7 +159,7 @@ export class BooksService {
     }
 
     const book = await this.prisma.book.update({ where: { id }, data });
-    await (this.cacheManager as any).reset();
+    await this.cacheService.reset();
     return book;
   }
 
@@ -173,7 +171,7 @@ export class BooksService {
     if (!existing) throw new NotFoundException(`Book with ID ${id} not found`);
 
     const book = await this.prisma.book.delete({ where: { id } });
-    await (this.cacheManager as any).reset();
+    await this.cacheService.reset();
     return book;
   }
 
@@ -182,7 +180,7 @@ export class BooksService {
    */
   async search(query: string, page = 1, limit = 10) {
     const cacheKey = `books:search:${query}:${page}:${limit}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheService.get(cacheKey);
     if (cached) return cached;
 
     const skip = (page - 1) * limit;
@@ -211,7 +209,7 @@ export class BooksService {
       meta: { total, page, lastPage: Math.ceil(total / limit) },
     };
 
-    await this.cacheManager.set(cacheKey, result, 60);
+    await this.cacheService.set(cacheKey, result, 60_000);
     return result;
   }
 
@@ -220,7 +218,7 @@ export class BooksService {
    */
   async filterBooks(filterDto: FilterBooksDto) {
     const cacheKey = `books:filter:${JSON.stringify(filterDto)}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheService.get(cacheKey);
     if (cached) return cached;
 
     const {
@@ -261,7 +259,7 @@ export class BooksService {
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
 
-    await this.cacheManager.set(cacheKey, result, 60);
+    await this.cacheService.set(cacheKey, result, 60_000);
     return result;
   }
 
@@ -287,7 +285,7 @@ export class BooksService {
       where: { id },
       data: { isAviable: isAvailable },
     });
-    await (this.cacheManager as any).reset();
+    await this.cacheService.reset();
     return book;
   }
 }

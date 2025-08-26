@@ -14,6 +14,9 @@ importers:
       '@faker-js/faker':
         specifier: ^9.9.0
         version: 9.9.0
+      '@keyv/redis':
+        specifier: ^5.1.1
+        version: 5.1.1(keyv@5.5.0)
       '@nestjs/cache-manager':
         specifier: ^3.0.1
         version: 3.0.1(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(cache-manager@7.1.1)(keyv@5.5.0)(rxjs@7.8.2)
@@ -62,6 +65,9 @@ importers:
       ioredis:
         specifier: ^5.7.0
         version: 5.7.0
+      keyv:
+        specifier: ^5.5.0
+        version: 5.5.0
       nodemailer:
         specifier: ^7.0.5
         version: 7.0.5
@@ -958,6 +964,12 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
+  '@keyv/redis@5.1.1':
+    resolution: {integrity: sha512-bPypEnO2uSDjrgDP2whyewZ2R8aAJvoLM2440J1omjpJnzv1Awzs3RIztQGoDafNhPe0dZeI+44XKCdSiWkgTg==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      keyv: ^5.5.0
+
   '@keyv/serialize@1.1.0':
     resolution: {integrity: sha512-RlDgexML7Z63Q8BSaqhXdCYNBy/JQnqYIwxofUrNLGCblOMHp+xux2Q8nLMLlPpgHQPoU0Do8Z6btCpRBEqZ8g==}
 
@@ -1261,6 +1273,10 @@ packages:
 
   '@prisma/get-platform@6.14.0':
     resolution: {integrity: sha512-7VjuxKNwjnBhKfqPpMeWiHEa2sVjYzmHdl1slW6STuUCe9QnOY0OY1ljGSvz6wpG4U8DfbDqkG1yofd/1GINww==}
+
+  '@redis/client@5.8.2':
+    resolution: {integrity: sha512-WtMScno3+eBpTac1Uav2zugXEoXqaU23YznwvFgkPwBQVwEHTDgOG7uEAObtZ/Nyn8SmAMbqkEubJaMOvnqdsQ==}
+    engines: {node: '>= 18'}
 
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
@@ -2792,6 +2808,9 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
+
+  hookified@1.12.0:
+    resolution: {integrity: sha512-hMr1Y9TCLshScrBbV2QxJ9BROddxZ12MX9KsCtuGGy/3SmmN5H1PllKerrVlSotur9dlE8hmUKAOSa3WDzsZmQ==}
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
@@ -5364,6 +5383,13 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@keyv/redis@5.1.1(keyv@5.5.0)':
+    dependencies:
+      '@redis/client': 5.8.2
+      cluster-key-slot: 1.1.2
+      hookified: 1.12.0
+      keyv: 5.5.0
+
   '@keyv/serialize@1.1.0': {}
 
   '@lukeed/csprng@1.1.0': {}
@@ -5657,6 +5683,10 @@ snapshots:
   '@prisma/get-platform@6.14.0':
     dependencies:
       '@prisma/debug': 6.14.0
+
+  '@redis/client@5.8.2':
+    dependencies:
+      cluster-key-slot: 1.1.2
 
   '@scarf/scarf@1.4.0': {}
 
@@ -7498,6 +7528,8 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
+
+  hookified@1.12.0: {}
 
   html-escaper@2.0.2: {}
 

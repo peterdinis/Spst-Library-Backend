@@ -23,6 +23,7 @@
   "dependencies": {
     "@casl/ability": "^6.7.3",
     "@faker-js/faker": "^9.9.0",
+    "@keyv/redis": "^5.1.1",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -39,6 +40,7 @@
     "cache-manager-ioredis-yet": "^2.1.2",
     "date-fns": "^4.1.0",
     "ioredis": "^5.7.0",
+    "keyv": "^5.5.0",
     "nodemailer": "^7.0.5",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

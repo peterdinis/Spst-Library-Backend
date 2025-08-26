@@ -1,6 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { BooksModule } from 'src/books/books.module';
 import { LoggingMiddleware } from 'src/shared/middleware/logging.middleware';
@@ -11,6 +9,8 @@ import { AuthorsModule } from 'src/authors/authors.module';
 import { StudentsModule } from 'src/students/students.module';
 import { TeachersModule } from 'src/teachers/teachers.module';
 import { OrdersModule } from 'src/orders/orders.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 
 @Module({
   imports: [
@@ -23,12 +23,17 @@ import { OrdersModule } from 'src/orders/orders.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    CacheModule.registerAsync({
+      useFactory: async () => ({
+        stores: [
+          createKeyv('redis://localhost:6379'),
+        ],
+      }),
+    }),
     StudentsModule,
     TeachersModule,
     OrdersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
