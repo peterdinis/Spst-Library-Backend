@@ -4,7 +4,6 @@ import { faker } from '@faker-js/faker';
 const prisma = new PrismaClient();
 
 async function main() {
-  // ❗ Odstránenie existujúcich dát
   await prisma.order.deleteMany({});
   await prisma.book.deleteMany({});
   await prisma.author.deleteMany({});

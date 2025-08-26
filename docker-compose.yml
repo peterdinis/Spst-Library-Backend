@@ -12,8 +12,21 @@ services:
       - "3001:3001"
     environment:
       - DATABASE_URL=file:/app/dev.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     command: sh -c "npx prisma generate && npm run start:dev"
     user: "${UID}:${GID}"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: spst-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
 
 volumes:
   sqlite-data:
+  redis-data:
