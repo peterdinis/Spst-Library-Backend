@@ -53,4 +53,24 @@ export class EmailsService {
     const info = await this.sendMail(mailDto);
     return { code, info };
   }
+
+  async sendTeacherVerificationCode(to: string) {
+    if (!/\S+@\S+\.\S+/.test(to)) {
+      throw new Error('Invalid email format');
+    }
+
+    const code = Array.from({ length: 8 }, () =>
+      Math.random().toString(36)[2]
+    ).join('').toUpperCase();
+
+    const mailDto: SendMailDto = {
+      from: process.env.MAIL_FROM || 'noreply@example.com',
+      to,
+      subject: 'Teacher Verification Code',
+      html: `<p>Your teacher verification code is: <strong>${code}</strong></p>`,
+    };
+
+    const info = await this.sendMail(mailDto);
+    return { code, info };
+  }
 }

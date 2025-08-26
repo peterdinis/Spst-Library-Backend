@@ -17,4 +17,4 @@ EXPOSE 3000
 
 USER appuser
 
-CMD ["npm", "run", "start:dev"]
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate dev --name init && npm run start:dev"]

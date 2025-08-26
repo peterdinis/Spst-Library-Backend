@@ -5,10 +5,12 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { StudentsService } from './students.service';
 import { StudentsController } from './students.controller';
+import { EmailsModule } from 'src/emails/emails.module';
 
 @Module({
   imports: [
     PrismaModule,
+    EmailsModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'secret123',
