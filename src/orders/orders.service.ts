@@ -102,7 +102,6 @@ export class OrdersService {
   }
 
   async remove(id: number) {
-
     const deleted = await this.prisma.order.delete({
       where: { id },
       include: { book: true, account: true },

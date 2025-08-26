@@ -3,9 +3,6 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    CacheModule
-  ],
+  imports: [PrismaModule, CacheModule],
 })
 export class AuthorsModule {}

@@ -35,9 +35,10 @@ export class AuthorsService {
     const { skip = 0, take = 10, search = '' } = params;
     const cacheKey = `authors:paginate:${skip}:${take}:${search || 'all'}`;
 
-    const cached = await this.cacheService.get<{ data: Author[]; total: number }>(
-      cacheKey,
-    );
+    const cached = await this.cacheService.get<{
+      data: Author[];
+      total: number;
+    }>(cacheKey);
     if (cached) return cached;
 
     const where = search

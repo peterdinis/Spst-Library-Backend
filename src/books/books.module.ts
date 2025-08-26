@@ -5,10 +5,7 @@ import { BooksController } from './books.controller';
 import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    CacheModule
-  ],
+  imports: [PrismaModule, CacheModule],
   providers: [BooksService],
   controllers: [BooksController],
   exports: [BooksService],

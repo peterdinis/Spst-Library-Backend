@@ -25,9 +25,7 @@ import { createKeyv } from '@keyv/redis';
     }),
     CacheModule.registerAsync({
       useFactory: async () => ({
-        stores: [
-          createKeyv('redis://localhost:6379'),
-        ],
+        stores: [createKeyv('redis://localhost:6379')],
       }),
     }),
     StudentsModule,

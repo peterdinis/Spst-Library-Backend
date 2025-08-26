@@ -36,9 +36,10 @@ export class CategoryService {
     const cacheKey = `categories:all:${skip}:${take}:${search}`;
 
     // Check cache first
-    const cached = await this.cacheService.get<{ data: Category[]; total: number }>(
-      cacheKey,
-    );
+    const cached = await this.cacheService.get<{
+      data: Category[];
+      total: number;
+    }>(cacheKey);
     if (cached) return cached;
 
     const where = search

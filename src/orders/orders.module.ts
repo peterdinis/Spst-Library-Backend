@@ -7,6 +7,6 @@ import { CacheModule } from 'src/cache/cache.module';
 @Module({
   imports: [PrismaModule, CacheModule],
   controllers: [OrdersController],
-  providers: [OrdersService]
+  providers: [OrdersService],
 })
 export class OrdersModule {}

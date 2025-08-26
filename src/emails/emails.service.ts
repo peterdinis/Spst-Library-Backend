@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { SendMailDto } from './dto/send-email.dto';
 
 @Injectable()
 export class EmailsService {
@@ -17,13 +18,13 @@ export class EmailsService {
     });
   }
 
-  async sendMail(to: string, subject: string, html: string) {
+  async sendMail(emailDto: SendMailDto) {
     try {
       const info = await this.transporter.sendMail({
         from: '"SPŠT Admin" <no-reply@example.com>',
-        to,
-        subject,
-        html,
+        to: emailDto.to,
+        subject: emailDto.subject,
+        html: emailDto.html,
       });
 
       this.logger.log(`Email sent: ${info.messageId}`);

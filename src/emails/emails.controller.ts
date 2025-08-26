@@ -13,6 +13,6 @@ export class EmailsController {
   @ApiResponse({ status: 201, description: 'Email sent successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   async sendMail(@Body() dto: SendMailDto) {
-    return this.mailService.sendMail(dto.to, dto.subject, dto.html);
+    return this.mailService.sendMail(dto);
   }
 }

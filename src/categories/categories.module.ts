@@ -5,10 +5,7 @@ import { CategoryController } from './categories.controller';
 import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    CacheModule
-  ],
+  imports: [PrismaModule, CacheModule],
   providers: [CategoryService],
   controllers: [CategoryController],
 })
