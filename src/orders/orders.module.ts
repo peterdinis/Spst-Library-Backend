@@ -3,9 +3,10 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { CacheModule } from 'src/cache/cache.module';
+import { EmailsModule } from 'src/emails/emails.module';
 
 @Module({
-  imports: [PrismaModule, CacheModule],
+  imports: [PrismaModule, CacheModule, EmailsModule],
   controllers: [OrdersController],
   providers: [OrdersService],
 })

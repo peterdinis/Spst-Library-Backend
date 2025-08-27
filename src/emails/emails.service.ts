@@ -1,4 +1,3 @@
-// emails.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { SendMailDto } from './dto/send-email.dto';
@@ -73,4 +72,27 @@ export class EmailsService {
     const info = await this.sendMail(mailDto);
     return { code, info };
   }
+
+  async sendOrderConfirmation(to: string, order: any) {
+  if (!/\S+@\S+\.\S+/.test(to)) {
+    throw new Error('Invalid email format');
+  }
+
+  const mailDto: SendMailDto = {
+    from: process.env.MAIL_FROM || 'noreply@example.com',
+    to,
+    subject: 'Order Confirmation',
+    html: `
+      <h2>Thank you for your order!</h2>
+      <p>Hi ${order.account.name},</p>
+      <p>Your order for <strong>${order.book.title}</strong> has been received.</p>
+      <p>Order ID: <strong>${order.id}</strong></p>
+      <p>Status: <strong>${order.status}</strong></p>
+      <br/>
+      <p>We’ll notify you when it ships. Thanks for shopping with us!</p>
+    `,
+  };
+
+  return this.sendMail(mailDto);
+}
 }

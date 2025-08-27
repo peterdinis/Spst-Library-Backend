@@ -6,11 +6,13 @@ import {
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CacheService } from 'src/cache/cache.service';
+import { EmailsService } from 'src/emails/emails.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private prisma: PrismaService,
+    private emailsService: EmailsService,
     private cacheService: CacheService,
   ) {}
 
@@ -33,6 +35,11 @@ export class OrdersService {
     await this.cacheService.delete('orders:all');
     await this.cacheService.delete(`orders:account:${accountId}`);
     await this.cacheService.delete(`orders:book:${bookId}`);
+
+    // ✅ Send confirmation email
+    if (account.email) {
+      await this.emailsService.sendOrderConfirmation(account.email, order);
+    }
 
     return order;
   }
