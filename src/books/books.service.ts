@@ -2,27 +2,44 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from '@prisma/client';
 import { FilterBooksDto } from './dto/filtering-books.dto';
-import { CacheService } from 'src/cache/cache.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class BooksService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cacheService: CacheService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
+
+  /**
+   * Helper: Clear all cached books-related keys
+   */
+  private async clearCache() {
+    // 🚨 Typ `Cache` nemá reset(), preto prechádzame workaround
+    if (typeof (this.cacheManager as any).store.keys === 'function') {
+      const keys: string[] = await (this.cacheManager as any).store.keys();
+      const bookKeys = keys.filter((k) => k.startsWith('books:'));
+      await Promise.all(bookKeys.map((k) => this.cacheManager.del(k)));
+    } else {
+      // fallback ak keys() nie je podporované
+      await this.cacheManager.del('books:*');
+    }
+  }
 
   /**
    * Paginate books with optional search by title.
    */
   async paginate(page = 1, limit = 10, search?: string) {
     const cacheKey = `books:paginate:${page}:${limit}:${search || ''}`;
-    const cached = await this.cacheService.get(cacheKey);
+    const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
     const skip = (page - 1) * limit;
@@ -45,7 +62,7 @@ export class BooksService {
       meta: { total, page, lastPage: Math.ceil(total / limit) },
     };
 
-    await this.cacheService.set(cacheKey, result, 60_000); // 60s
+    await this.cacheManager.set(cacheKey, result, 60);
     return result;
   }
 
@@ -93,7 +110,7 @@ export class BooksService {
       },
     });
 
-    await this.cacheService.reset();
+    await this.clearCache();
     return book;
   }
 
@@ -109,13 +126,13 @@ export class BooksService {
    */
   async findOne(id: number): Promise<Book> {
     const cacheKey = `books:one:${id}`;
-    const cached = await this.cacheService.get<Book>(cacheKey);
+    const cached = await this.cacheManager.get<Book>(cacheKey);
     if (cached) return cached;
 
     const book = await this.prisma.book.findUnique({ where: { id } });
     if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
 
-    await this.cacheService.set(cacheKey, book, 60_000);
+    await this.cacheManager.set(cacheKey, book, 60);
     return book;
   }
 
@@ -159,7 +176,7 @@ export class BooksService {
     }
 
     const book = await this.prisma.book.update({ where: { id }, data });
-    await this.cacheService.reset();
+    await this.clearCache();
     return book;
   }
 
@@ -171,7 +188,7 @@ export class BooksService {
     if (!existing) throw new NotFoundException(`Book with ID ${id} not found`);
 
     const book = await this.prisma.book.delete({ where: { id } });
-    await this.cacheService.reset();
+    await this.clearCache();
     return book;
   }
 
@@ -180,7 +197,7 @@ export class BooksService {
    */
   async search(query: string, page = 1, limit = 10) {
     const cacheKey = `books:search:${query}:${page}:${limit}`;
-    const cached = await this.cacheService.get(cacheKey);
+    const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
     const skip = (page - 1) * limit;
@@ -189,8 +206,8 @@ export class BooksService {
         { title: { contains: query, mode: 'insensitive' } },
         { description: { contains: query, mode: 'insensitive' } },
         { isbn: { contains: query } },
-        { authorId: Number(query) || undefined },
-        { categoryId: Number(query) || undefined },
+        { authorId: isNaN(Number(query)) ? undefined : Number(query) },
+        { categoryId: isNaN(Number(query)) ? undefined : Number(query) },
       ].filter(Boolean),
     };
 
@@ -209,7 +226,7 @@ export class BooksService {
       meta: { total, page, lastPage: Math.ceil(total / limit) },
     };
 
-    await this.cacheService.set(cacheKey, result, 60_000);
+    await this.cacheManager.set(cacheKey, result, 60);
     return result;
   }
 
@@ -218,7 +235,7 @@ export class BooksService {
    */
   async filterBooks(filterDto: FilterBooksDto) {
     const cacheKey = `books:filter:${JSON.stringify(filterDto)}`;
-    const cached = await this.cacheService.get(cacheKey);
+    const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
     const {
@@ -259,7 +276,7 @@ export class BooksService {
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
 
-    await this.cacheService.set(cacheKey, result, 60_000);
+    await this.cacheManager.set(cacheKey, result, 60);
     return result;
   }
 
@@ -285,7 +302,7 @@ export class BooksService {
       where: { id },
       data: { isAviable: isAvailable },
     });
-    await this.cacheService.reset();
+    await this.clearCache();
     return book;
   }
 }

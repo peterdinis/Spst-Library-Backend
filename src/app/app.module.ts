@@ -19,7 +19,9 @@ import { CacheModule } from '@nestjs/cache-manager';
     BooksModule,
     EmailsModule,
     CategoriesModule,
-    CacheModule,
+    CacheModule.register({
+      isGlobal: true
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
