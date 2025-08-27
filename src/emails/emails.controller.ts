@@ -16,10 +16,13 @@ export class EmailsController {
   async sendMail(@Body() dto: SendMailDto) {
     return this.mailService.sendMail(dto);
   }
-  
+
   @Post('verify')
   @ApiOperation({ summary: 'Send a verification code to email' })
-  @ApiResponse({ status: 201, description: 'Verification code sent successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Verification code sent successfully',
+  })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   async sendVerificationCode(@Body('email') email: string) {
     return this.mailService.sendVerificationCode(email);

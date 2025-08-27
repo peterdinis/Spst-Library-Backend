@@ -58,9 +58,9 @@ export class EmailsService {
       throw new Error('Invalid email format');
     }
 
-    const code = Array.from({ length: 8 }, () =>
-      Math.random().toString(36)[2]
-    ).join('').toUpperCase();
+    const code = Array.from({ length: 8 }, () => Math.random().toString(36)[2])
+      .join('')
+      .toUpperCase();
 
     const mailDto: SendMailDto = {
       from: process.env.MAIL_FROM || 'noreply@example.com',
@@ -74,15 +74,15 @@ export class EmailsService {
   }
 
   async sendOrderConfirmation(to: string, order: any) {
-  if (!/\S+@\S+\.\S+/.test(to)) {
-    throw new Error('Invalid email format');
-  }
+    if (!/\S+@\S+\.\S+/.test(to)) {
+      throw new Error('Invalid email format');
+    }
 
-  const mailDto: SendMailDto = {
-    from: process.env.MAIL_FROM || 'noreply@example.com',
-    to,
-    subject: 'Order Confirmation',
-    html: `
+    const mailDto: SendMailDto = {
+      from: process.env.MAIL_FROM || 'noreply@example.com',
+      to,
+      subject: 'Order Confirmation',
+      html: `
       <h2>Thank you for your order!</h2>
       <p>Hi ${order.account.name},</p>
       <p>Your order for <strong>${order.book.title}</strong> has been received.</p>
@@ -91,8 +91,8 @@ export class EmailsService {
       <br/>
       <p>We’ll notify you when it ships. Thanks for shopping with us!</p>
     `,
-  };
+    };
 
-  return this.sendMail(mailDto);
-}
+    return this.sendMail(mailDto);
+  }
 }
