@@ -11,7 +11,6 @@ import { TeachersModule } from 'src/teachers/teachers.module';
 import { OrdersModule } from 'src/orders/orders.module';
 import { CacheModule } from '@nestjs/cache-manager';
 
-
 @Module({
   imports: [
     PrismaModule,
@@ -20,7 +19,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     EmailsModule,
     CategoriesModule,
     CacheModule.register({
-      isGlobal: true
+      isGlobal: true,
     }),
     ConfigModule.forRoot({
       isGlobal: true,

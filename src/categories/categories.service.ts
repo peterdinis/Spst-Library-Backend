@@ -29,7 +29,10 @@ export class CategoryService {
     const { skip = 0, take = 10, search = '' } = params;
     const cacheKey = `categories:list:${skip}:${take}:${search || 'all'}`;
 
-    const cached = await this.cacheManager.get<{ data: Category[]; total: number }>(cacheKey);
+    const cached = await this.cacheManager.get<{
+      data: Category[];
+      total: number;
+    }>(cacheKey);
     if (cached) return cached;
 
     const where = search

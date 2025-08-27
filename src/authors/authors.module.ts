@@ -8,5 +8,4 @@ import { AuthorsService } from './authors.service';
   controllers: [AuthorsController],
   providers: [AuthorsService],
 })
-
 export class AuthorsModule {}
