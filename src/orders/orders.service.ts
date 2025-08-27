@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CacheService } from 'src/cache/cache.service';
 import { EmailsService } from 'src/emails/emails.service';
 
 @Injectable()
@@ -13,7 +15,7 @@ export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private emailsService: EmailsService,
-    private cacheService: CacheService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async create(accountId: number, bookId: number) {
@@ -32,11 +34,11 @@ export class OrdersService {
     });
 
     // Invalidate relevant caches
-    await this.cacheService.delete('orders:all');
-    await this.cacheService.delete(`orders:account:${accountId}`);
-    await this.cacheService.delete(`orders:book:${bookId}`);
+    await this.cacheManager.del('orders:all');
+    await this.cacheManager.del(`orders:account:${accountId}`);
+    await this.cacheManager.del(`orders:book:${bookId}`);
 
-    // ✅ Send confirmation email
+    // Send confirmation email
     if (account.email) {
       await this.emailsService.sendOrderConfirmation(account.email, order);
     }
@@ -61,7 +63,7 @@ export class OrdersService {
       bookId || 'all'
     }:${skip}:${take}`;
 
-    const cached = await this.cacheService.get<any[]>(cacheKey);
+    const cached = await this.cacheManager.get<any[]>(cacheKey);
     if (cached) return cached;
 
     const orders = await this.prisma.order.findMany({
@@ -72,13 +74,13 @@ export class OrdersService {
       orderBy: { createdAt: 'desc' },
     });
 
-    await this.cacheService.set(cacheKey, orders, 60_000 * 5); // 5 min cache
+    await this.cacheManager.set(cacheKey, orders); // 5 min
     return orders;
   }
 
   async findOne(id: number) {
     const cacheKey = `order:${id}`;
-    const cached = await this.cacheService.get(cacheKey);
+    const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
     const order = await this.prisma.order.findUnique({
@@ -88,7 +90,7 @@ export class OrdersService {
 
     if (!order) throw new NotFoundException(`Order ${id} not found`);
 
-    await this.cacheService.set(cacheKey, order, 60_000 * 5);
+    await this.cacheManager.set(cacheKey, order); // 5 min
     return order;
   }
 
@@ -102,8 +104,8 @@ export class OrdersService {
     });
 
     // Invalidate caches
-    await this.cacheService.delete(`order:${id}`);
-    await this.cacheService.delete('orders:all');
+    await this.cacheManager.del(`order:${id}`);
+    await this.cacheManager.del('orders:all');
 
     return updated;
   }
@@ -115,8 +117,8 @@ export class OrdersService {
     });
 
     // Invalidate caches
-    await this.cacheService.delete(`order:${id}`);
-    await this.cacheService.delete('orders:all');
+    await this.cacheManager.del(`order:${id}`);
+    await this.cacheManager.del('orders:all');
 
     return deleted;
   }

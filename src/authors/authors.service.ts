@@ -1,16 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Author } from '@prisma/client';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { FindAllAuthorsDto } from './dto/find-all-authors.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
-import { CacheService } from 'src/cache/cache.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthorsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cacheService: CacheService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   /**
@@ -20,7 +21,7 @@ export class AuthorsService {
     const author = await this.prisma.author.create({ data });
 
     // Invalidate all cached author lists
-    await this.cacheService.delete('authors:all');
+    await this.cacheManager.del('authors:all');
 
     return author;
   }
@@ -35,11 +36,14 @@ export class AuthorsService {
     const { skip = 0, take = 10, search = '' } = params;
     const cacheKey = `authors:paginate:${skip}:${take}:${search || 'all'}`;
 
-    const cached = await this.cacheService.get<{
+    const cached = await this.cacheManager.get<{
       data: Author[];
       total: number;
     }>(cacheKey);
-    if (cached) return cached;
+
+    if (cached) {
+      return cached;
+    }
 
     const where = search
       ? {
@@ -62,7 +66,7 @@ export class AuthorsService {
     ]);
 
     const result = { data, total };
-    await this.cacheService.set(cacheKey, result, 60_000 * 5); // cache for 5 min
+    await this.cacheManager.set(cacheKey, result, 1000 * 60 * 5); // cache 5 min
 
     return result;
   }
@@ -72,12 +76,16 @@ export class AuthorsService {
    */
   async findOne(id: number): Promise<Author | null> {
     const cacheKey = `author:${id}`;
-    const cached = await this.cacheService.get<Author>(cacheKey);
-    if (cached) return cached;
+    const cached = await this.cacheManager.get<Author>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
 
     const author = await this.prisma.author.findUnique({ where: { id } });
+
     if (author) {
-      await this.cacheService.set(cacheKey, author, 60_000 * 5);
+      await this.cacheManager.set(cacheKey, author, 1000 * 60 * 5);
     }
 
     return author;
@@ -89,8 +97,8 @@ export class AuthorsService {
   async update(id: number, data: UpdateAuthorDto): Promise<Author> {
     const author = await this.prisma.author.update({ where: { id }, data });
 
-    await this.cacheService.delete(`author:${id}`);
-    await this.cacheService.delete('authors:all');
+    await this.cacheManager.del(`author:${id}`);
+    await this.cacheManager.del('authors:all');
 
     return author;
   }
@@ -101,8 +109,8 @@ export class AuthorsService {
   async remove(id: number): Promise<Author> {
     const author = await this.prisma.author.delete({ where: { id } });
 
-    await this.cacheService.delete(`author:${id}`);
-    await this.cacheService.delete('authors:all');
+    await this.cacheManager.del(`author:${id}`);
+    await this.cacheManager.del('authors:all');
 
     return author;
   }
