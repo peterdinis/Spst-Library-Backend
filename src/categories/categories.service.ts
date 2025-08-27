@@ -1,45 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FindAllCategoriesDto } from './dto/find-all-categories.dto';
-import { CacheService } from 'src/cache/cache.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CategoryService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cacheService: CacheService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache, // opravené
   ) {}
 
-  /**
-   * Create a new category.
-   */
   async create(data: CreateCategoryDto): Promise<Category> {
     const category = await this.prisma.category.create({ data });
 
-    // Invalidate category caches after creation
-    await this.cacheService.delete('categories:all');
-    await this.cacheService.delete(`category:${category.id}`);
+    await this.cacheManager.del('categories:all');
+    await this.cacheManager.del(`category:${category.id}`);
 
     return category;
   }
 
-  /**
-   * Retrieve all categories with optional pagination and search.
-   */
   async findAll(
     params: FindAllCategoriesDto,
   ): Promise<{ data: Category[]; total: number }> {
     const { skip = 0, take = 10, search = '' } = params;
-    const cacheKey = `categories:all:${skip}:${take}:${search}`;
+    const cacheKey = `categories:list:${skip}:${take}:${search || 'all'}`;
 
-    // Check cache first
-    const cached = await this.cacheService.get<{
-      data: Category[];
-      total: number;
-    }>(cacheKey);
+    const cached = await this.cacheManager.get<{ data: Category[]; total: number }>(cacheKey);
     if (cached) return cached;
 
     const where = search
@@ -47,58 +37,46 @@ export class CategoryService {
       : {};
 
     const [data, total] = await Promise.all([
-      this.prisma.category.findMany({ where, skip, take }),
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { id: 'asc' },
+      }),
       this.prisma.category.count({ where }),
     ]);
 
     const result = { data, total };
-
-    // Cache result for 60 seconds
-    await this.cacheService.set(cacheKey, result, 60_000);
-
+    await this.cacheManager.set(cacheKey, result); // TTL v sekundách
     return result;
   }
 
-  /**
-   * Retrieve a category by its ID.
-   */
-  async findOne(id: number): Promise<Category | null> {
+  async findOne(id: number): Promise<Category> {
     const cacheKey = `category:${id}`;
-
-    const cached = await this.cacheService.get<Category>(cacheKey);
+    const cached = await this.cacheManager.get<Category>(cacheKey);
     if (cached) return cached;
 
     const category = await this.prisma.category.findUnique({ where: { id } });
+    if (!category) throw new NotFoundException(`Category ${id} not found`);
 
-    if (category) {
-      await this.cacheService.set(cacheKey, category, 60_000);
-    }
-
+    await this.cacheManager.set(cacheKey, category);
     return category;
   }
 
-  /**
-   * Update a category by its ID.
-   */
   async update(id: number, data: UpdateCategoryDto): Promise<Category> {
     const category = await this.prisma.category.update({ where: { id }, data });
 
-    // Invalidate caches
-    await this.cacheService.delete('categories:all');
-    await this.cacheService.delete(`category:${id}`);
+    await this.cacheManager.del('categories:all');
+    await this.cacheManager.del(`category:${id}`);
 
     return category;
   }
 
-  /**
-   * Delete a category by its ID.
-   */
   async remove(id: number): Promise<Category> {
     const category = await this.prisma.category.delete({ where: { id } });
 
-    // Invalidate caches
-    await this.cacheService.delete('categories:all');
-    await this.cacheService.delete(`category:${id}`);
+    await this.cacheManager.del('categories:all');
+    await this.cacheManager.del(`category:${id}`);
 
     return category;
   }
