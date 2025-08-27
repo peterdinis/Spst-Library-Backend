@@ -24,7 +24,9 @@ CREATE TABLE "Book" (
     "categoryId" INTEGER NOT NULL,
     "publisherName" TEXT NOT NULL,
     "isbn" TEXT,
+    "isAviable" BOOLEAN NOT NULL DEFAULT true,
     "dateCreated" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "isBorrowed" BOOLEAN NOT NULL DEFAULT false,
     "publishedYear" INTEGER,
     "description" TEXT,
     "coverImageUrl" TEXT,
@@ -36,13 +38,17 @@ CREATE TABLE "Book" (
 -- CreateTable
 CREATE TABLE "Account" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL,
+    "name" TEXT DEFAULT 'John',
+    "lastName" TEXT DEFAULT 'Doe',
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "classRoom" TEXT DEFAULT '1.A',
     "role" TEXT NOT NULL DEFAULT 'STUDENT',
     "dateJoined" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "isActive" BOOLEAN NOT NULL DEFAULT true
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "verificationCode" TEXT
 );
 
 -- CreateTable
@@ -57,7 +63,22 @@ CREATE TABLE "Order" (
 );
 
 -- CreateIndex
+CREATE INDEX "Category_name_idx" ON "Category"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Book_isbn_key" ON "Book"("isbn");
+
+-- CreateIndex
+CREATE INDEX "Book_title_idx" ON "Book"("title");
+
+-- CreateIndex
+CREATE INDEX "Book_authorId_idx" ON "Book"("authorId");
+
+-- CreateIndex
+CREATE INDEX "Book_categoryId_idx" ON "Book"("categoryId");
+
+-- CreateIndex
+CREATE INDEX "Book_publishedYear_idx" ON "Book"("publishedYear");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_username_key" ON "Account"("username");
