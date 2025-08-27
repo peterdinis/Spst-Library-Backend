@@ -10,7 +10,7 @@ import { StudentsModule } from 'src/students/students.module';
 import { TeachersModule } from 'src/teachers/teachers.module';
 import { OrdersModule } from 'src/orders/orders.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { createKeyv } from '@keyv/redis';
+
 
 @Module({
   imports: [
@@ -23,11 +23,6 @@ import { createKeyv } from '@keyv/redis';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-    }),
-    CacheModule.registerAsync({
-      useFactory: async () => ({
-        stores: [createKeyv('redis://localhost:6379')],
-      }),
     }),
     StudentsModule,
     TeachersModule,
