@@ -19,6 +19,7 @@ import { createKeyv } from '@keyv/redis';
     BooksModule,
     EmailsModule,
     CategoriesModule,
+    CacheModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
