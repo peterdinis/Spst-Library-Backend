@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Inject,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -17,19 +18,17 @@ export class BooksService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-  ) {}
+  ) { }
 
   /**
    * Helper: Clear all cached books-related keys
    */
   private async clearCache() {
-    // 🚨 Typ `Cache` nemá reset(), preto prechádzame workaround
     if (typeof (this.cacheManager as any).store.keys === 'function') {
       const keys: string[] = await (this.cacheManager as any).store.keys();
       const bookKeys = keys.filter((k) => k.startsWith('books:'));
       await Promise.all(bookKeys.map((k) => this.cacheManager.del(k)));
     } else {
-      // fallback ak keys() nie je podporované
       await this.cacheManager.del('books:*');
     }
   }
@@ -37,9 +36,17 @@ export class BooksService {
   /**
    * Paginate books with optional search by title.
    */
+
   async paginate(page = 1, limit = 10, search?: string) {
+    if (limit <= 0) {
+      throw new BadRequestException('Limit must be greater than 0');
+    }
+
     const cacheKey = `books:paginate:${page}:${limit}:${search || ''}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheManager.get<{
+      data: Book[];
+      meta: { total: number; page: number; lastPage: number };
+    }>(cacheKey);
     if (cached) return cached;
 
     const skip = (page - 1) * limit;
@@ -47,24 +54,38 @@ export class BooksService {
       ? { title: { contains: search, mode: 'insensitive' } }
       : {};
 
-    const [books, total] = await this.prisma.$transaction([
-      this.prisma.book.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { dateCreated: 'desc' },
-      }),
-      this.prisma.book.count({ where }),
-    ]);
+    let books: Book[] = [];
+    let total = 0;
+
+    try {
+      [books, total] = await this.prisma.$transaction([
+        this.prisma.book.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { dateCreated: 'desc' },
+        }),
+        this.prisma.book.count({ where }),
+      ]);
+    } catch (error) {
+      console.error('Prisma paginate error:', error);
+      throw new InternalServerErrorException('Database query failed');
+    }
 
     const result = {
       data: books,
-      meta: { total, page, lastPage: Math.ceil(total / limit) },
+      meta: {
+        total,
+        page,
+        lastPage: total > 0 ? Math.ceil(total / limit) : 0,
+      },
     };
 
     await this.cacheManager.set(cacheKey, result, 60);
     return result;
   }
+
+
 
   /**
    * Create a new book.

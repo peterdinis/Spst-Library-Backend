@@ -26,7 +26,7 @@ import { Public } from 'src/permissions/decorators/is-public.decorator';
 @ApiTags('books')
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksService: BooksService) { }
 
   @Public()
   @ApiOperation({ summary: 'Get all books with pagination' })
@@ -35,8 +35,8 @@ export class BooksController {
   @ApiQuery({ name: 'search', required: false, type: String })
   @Get('paginate')
   async paginate(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
     @Query('search') search?: string,
   ) {
     return this.booksService.paginate(page || 1, limit || 10, search);
