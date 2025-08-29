@@ -42,6 +42,20 @@ export class BooksController {
     return this.booksService.paginate(page || 1, limit || 10, search);
   }
 
+  @Public()
+  @ApiOperation({ summary: 'Advanced search books (title, description, isbn, author, category)' })
+  @ApiQuery({ name: 'q', type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @Get('advanced-search')
+  async advancedSearch(
+    @Query('q') q: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.booksService.advancedSearch(q, page || 1, limit || 10);
+  }
+
   @ApiOperation({ summary: 'Create a new book' })
   @ApiBody({ type: CreateBookDto })
   @ApiResponse({ status: 201, description: 'Book created' })

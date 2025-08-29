@@ -34,6 +34,69 @@ export class BooksService {
   }
 
   /**
+ * Advanced search books by multiple fields (title, description, isbn, author name, category name)
+ */
+  async advancedSearch(query: string, page = 1, limit = 10) {
+    if (!query || query.trim() === '') {
+      throw new BadRequestException('Search query cannot be empty');
+    }
+
+    const cacheKey = `books:advancedSearch:${query}:${page}:${limit}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    const skip = (page - 1) * limit;
+
+    const [books, total] = await this.prisma.$transaction([
+      this.prisma.book.findMany({
+        where: {
+          OR: [
+            { title: { contains: query } },
+            { description: { contains: query } },
+            { isbn: { contains: query } },
+            {
+              author: {
+                name: { contains: query },
+              },
+            },
+            {
+              category: {
+                name: { contains: query },
+              },
+            },
+          ],
+        },
+        skip,
+        take: limit,
+        orderBy: { dateCreated: 'desc' },
+        include: { author: true, category: true },
+      }),
+      this.prisma.book.count({
+        where: {
+          OR: [
+            { title: { contains: query } },
+            { description: { contains: query } },
+            { isbn: { contains: query } },
+          ],
+        },
+      }),
+    ]);
+
+    const result = {
+      data: books,
+      meta: {
+        total,
+        page,
+        lastPage: total > 0 ? Math.ceil(total / limit) : 0,
+      },
+    };
+
+    await this.cacheManager.set(cacheKey, result, 60);
+    return result;
+  }
+
+
+  /**
    * Paginate books with optional search by title.
    */
 
