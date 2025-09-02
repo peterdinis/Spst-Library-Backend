@@ -13,3 +13,16 @@ services:
     command: sh -c "npm install && npx prisma migrate deploy && npm run start:dev"
     environment:
       DATABASE_URL: "file:./dev.db"
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+
+  redis:
+    image: redis:7-alpine
+    container_name: nestjs_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
