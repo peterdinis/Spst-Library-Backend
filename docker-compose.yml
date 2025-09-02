@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  app:
+    image: node:20-alpine
+    container_name: nestjs_app
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3001:3001"
+    command: sh -c "npm install && npx prisma migrate deploy && npm run start:dev"
+    environment:
+      DATABASE_URL: "file:./dev.db"
