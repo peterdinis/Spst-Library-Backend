@@ -1,5 +1,10 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,19 +17,20 @@ export class BookTagService {
   async create(name: string) {
     // Check if tag already exists
     const exists = await this.prisma.bookTag.findUnique({ where: { name } });
-    if (exists) throw new BadRequestException(`Tag with name "${name}" already exists`);
+    if (exists)
+      throw new BadRequestException(`Tag with name "${name}" already exists`);
 
     const tag = await this.prisma.bookTag.create({ data: { name } });
-    await this.cacheManager.del('bookTags'); // invalidate cache
+    await this.cacheManager.delete('bookTags'); // invalidate cache
     return tag;
   }
 
   async findAll() {
-    const cached = await this.cacheManager.get('bookTags');
+    const cached = await this.cacheManager.match('bookTags');
     if (cached) return cached;
 
     const tags = await this.prisma.bookTag.findMany();
-    await this.cacheManager.set('bookTags', tags, { ttl: 300 });
+    await this.cacheManager.add('bookTags');
     return tags;
   }
 
@@ -40,14 +46,15 @@ export class BookTagService {
 
     if (name) {
       const exists = await this.prisma.bookTag.findUnique({ where: { name } });
-      if (exists && exists.id !== id) throw new BadRequestException(`Tag with name "${name}" already exists`);
+      if (exists && exists.id !== id)
+        throw new BadRequestException(`Tag with name "${name}" already exists`);
     }
 
     const updated = await this.prisma.bookTag.update({
       where: { id },
       data: { name },
     });
-    await this.cacheManager.del('bookTags'); // invalidate cache
+    await this.cacheManager.delete('bookTags'); // invalidate cache
     return updated;
   }
 
@@ -56,7 +63,7 @@ export class BookTagService {
     if (!tag) throw new NotFoundException(`Tag ${id} not found`);
 
     await this.prisma.bookTag.delete({ where: { id } });
-    await this.cacheManager.del('bookTags'); // invalidate cache
+    await this.cacheManager.delete('bookTags'); // invalidate cache
     return { message: `Tag ${id} deleted` };
   }
 
@@ -64,14 +71,14 @@ export class BookTagService {
     if (!query) throw new BadRequestException('Search query cannot be empty');
 
     const cacheKey = `bookTags_search_${query}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheManager.match(cacheKey);
     if (cached) return cached;
 
     const results = await this.prisma.bookTag.findMany({
-      where: { name: { contains: query, mode: 'insensitive' } },
+      where: { name: { contains: query } },
     });
 
-    await this.cacheManager.set(cacheKey, results, { ttl: 300 });
+    await this.cacheManager.add(cacheKey);
     return results;
   }
 }

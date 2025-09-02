@@ -22,7 +22,7 @@ import { BookTagModule } from 'src/book-tag/book-tag.module';
       }),
     }),
     PrismaModule,
-    BookTagModule
+    BookTagModule,
   ],
   controllers: [AppController],
   providers: [AppService],
