@@ -7,6 +7,7 @@ import * as redisStore from 'cache-manager-ioredis';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { BookTagModule } from 'src/book-tag/book-tag.module';
 import { RatingModule } from 'src/rating/rating.module';
+import { CategoryModule } from 'src/category/category.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RatingModule } from 'src/rating/rating.module';
     PrismaModule,
     BookTagModule,
     RatingModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,8 +2,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import * as redisStore from 'cache-manager-ioredis';
-import { CategorytService } from './category.service';
 import { CategoryController } from './category.controller';
+import { CategoryService } from './category.service';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { CategoryController } from './category.controller';
       }),
     }),
   ],
-  providers: [CategorytService],
+  providers: [CategoryService],
   exports: [CategoryController],
 })
 export class CategoryModule {}
