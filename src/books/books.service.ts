@@ -59,7 +59,7 @@ export class BooksService {
                 where,
                 skip,
                 take: limit,
-                include: { author: true, category: true, bookTags: true },
+                include: { author: true, ratings: true, category: true, bookTags: true },
                 orderBy: { createdAt: 'desc' },
             }),
             this.prisma.book.count({ where }),
