@@ -1,8 +1,4 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { CreateBookTagDto } from './create-book-tag.dto';
 
-export class UpdateBookTagDto {
-  @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  name?: string;
-}
+export class UpdateBookTagDto extends PartialType(CreateBookTagDto) {}
