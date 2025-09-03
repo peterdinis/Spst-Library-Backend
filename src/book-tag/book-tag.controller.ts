@@ -19,7 +19,10 @@ export class BookTagController {
   @Post()
   @ApiOperation({ summary: 'Create a new book tag' })
   @ApiResponse({ status: 201, description: 'Book tag created successfully' })
-  @ApiResponse({ status: 400, description: 'Tag with this name already exists' })
+  @ApiResponse({
+    status: 400,
+    description: 'Tag with this name already exists',
+  })
   create(@Body('name') name: string) {
     return this.bookTagService.create(name);
   }

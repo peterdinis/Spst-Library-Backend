@@ -1,0 +1,58 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { RatingService } from './rating.service';
+import { CreateRatingDto } from './dto/create-rating.dto';
+import { PaginationDto } from './dto/rating-pagination.dto';
+import { UpdateRatingDto } from './dto/update-rating.dto';
+
+@ApiTags('Ratings')
+@Controller('ratings')
+export class RatingController {
+  constructor(private readonly ratingService: RatingService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all ratings (paginated)' })
+  @ApiResponse({ status: 200, description: 'List of ratings with pagination' })
+  findAll(@Query() pagination: PaginationDto) {
+    return this.ratingService.findAll(pagination);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a rating by ID' })
+  @ApiResponse({ status: 200, description: 'Rating found' })
+  @ApiResponse({ status: 404, description: 'Rating not found' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.ratingService.findOne(id);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new rating' })
+  @ApiResponse({ status: 201, description: 'Rating created' })
+  create(@Body() body: CreateRatingDto) {
+    return this.ratingService.create(body);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a rating' })
+  @ApiResponse({ status: 200, description: 'Rating updated' })
+  update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateRatingDto) {
+    return this.ratingService.update(id, body);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a rating' })
+  @ApiResponse({ status: 200, description: 'Rating deleted' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.ratingService.remove(id);
+  }
+}

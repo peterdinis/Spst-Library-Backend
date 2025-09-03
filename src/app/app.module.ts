@@ -6,6 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { BookTagModule } from 'src/book-tag/book-tag.module';
+import { RatingModule } from 'src/rating/rating.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { BookTagModule } from 'src/book-tag/book-tag.module';
     }),
     PrismaModule,
     BookTagModule,
+    RatingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
