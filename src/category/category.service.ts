@@ -33,7 +33,6 @@ export class CategoryService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.category.count({ where }),
     ]);

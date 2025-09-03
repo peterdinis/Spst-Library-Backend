@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-ioredis';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { BookTagModule } from 'src/book-tag/book-tag.module';
 import { RatingModule } from 'src/rating/rating.module';
 import { CategoryModule } from 'src/category/category.module';
+import { AuthorsModule } from 'src/authors/authors.module';
+import { GlobalCacheModule } from 'src/cache/global.cache.module';
 
 @Module({
   imports: [
@@ -15,18 +15,12 @@ import { CategoryModule } from 'src/category/category.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    CacheModule.registerAsync({
-      useFactory: () => ({
-        store: redisStore,
-        host: process.env.REDIS_HOST,
-        port: 6379,
-        ttl: 60,
-      }),
-    }),
+    GlobalCacheModule.forRootAsync(),
     PrismaModule,
     BookTagModule,
     RatingModule,
-    CategoryModule
+    CategoryModule,
+    AuthorsModule
   ],
   controllers: [AppController],
   providers: [AppService],
