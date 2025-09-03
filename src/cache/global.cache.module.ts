@@ -7,7 +7,7 @@ import * as redisStore from 'cache-manager-ioredis';
 export class GlobalCacheModule {
   static forRootAsync() {
     return CacheModule.registerAsync({
-      isGlobal: true, // makes it global
+      isGlobal: true,
       useFactory: () => ({
         store: redisStore,
         host: process.env.REDIS_HOST,

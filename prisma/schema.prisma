@@ -2,28 +2,27 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// TODO: User, and Order
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model Book {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   description String?
   year        Int?
-  isAvailable Boolean   @default(true)
-  isNew       Boolean   @default(false)
-  category    Category? @relation(fields: [categoryId], references: [id])
+  isAvailable Boolean      @default(true)
+  isNew       Boolean      @default(false)
+  category    Category?    @relation(fields: [categoryId], references: [id])
   categoryId  Int?
-  author      Author    @relation(fields: [authorId], references: [id])
+  author      Author       @relation(fields: [authorId], references: [id])
   authorId    Int
   bookTags    BookTag[]
   ratings     Rating[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  orderItems  OrderItem[]  // knihy môžu byť v objednávkach
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Category {
@@ -50,7 +49,7 @@ model Author {
 model BookTag {
   id        Int      @id @default(autoincrement())
   name      String   @unique
-  books     Book[] // Many-to-Many
+  books     Book[]   // Many-to-Many
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -63,4 +62,50 @@ model Rating {
   comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+//
+// 🔥 NOVÉ MODELY
+//
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String   // hashed password
+  role      Role     @default(STUDENT)
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id        Int          @id @default(autoincrement())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    Int
+  items     OrderItem[]
+  status    OrderStatus  @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   Int
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+  quantity  Int      @default(1)
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
