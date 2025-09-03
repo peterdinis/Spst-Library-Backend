@@ -8,6 +8,7 @@ import { RatingModule } from 'src/rating/rating.module';
 import { CategoryModule } from 'src/category/category.module';
 import { AuthorsModule } from 'src/authors/authors.module';
 import { GlobalCacheModule } from 'src/cache/global.cache.module';
+import { BooksModule } from 'src/books/books.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { GlobalCacheModule } from 'src/cache/global.cache.module';
     BookTagModule,
     RatingModule,
     CategoryModule,
-    AuthorsModule
+    AuthorsModule,
+    BooksModule
   ],
   controllers: [AppController],
   providers: [AppService],
