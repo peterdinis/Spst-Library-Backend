@@ -18,6 +18,6 @@ import { RatingController } from './rating.controller';
     }),
   ],
   providers: [RatingService],
-  controllers: [RatingController]
+  controllers: [RatingController],
 })
 export class RatingModule {}
