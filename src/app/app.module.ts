@@ -9,6 +9,7 @@ import { CategoryModule } from 'src/category/category.module';
 import { AuthorsModule } from 'src/authors/authors.module';
 import { GlobalCacheModule } from 'src/cache/global.cache.module';
 import { BooksModule } from 'src/books/books.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { BooksModule } from 'src/books/books.module';
     RatingModule,
     CategoryModule,
     AuthorsModule,
-    BooksModule
+    BooksModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
