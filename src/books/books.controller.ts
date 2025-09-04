@@ -31,7 +31,11 @@ export class BooksController {
 
   @Get()
   @ApiOperation({ summary: 'Get all books with pagination & search' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by name or description' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search by name or description',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Books retrieved successfully' })

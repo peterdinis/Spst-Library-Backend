@@ -4,9 +4,7 @@ import { RatingService } from './rating.service';
 import { RatingController } from './rating.controller';
 
 @Module({
-  imports: [
-    PrismaModule,
-  ],
+  imports: [PrismaModule],
   providers: [RatingService],
   controllers: [RatingController],
 })

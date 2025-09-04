@@ -39,10 +39,27 @@ export class AuthorsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get a paginated list of authors with optional search' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by author name' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
+  @ApiOperation({
+    summary: 'Get a paginated list of authors with optional search',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search by author name',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 10)',
+  })
   @ApiResponse({ status: 200, description: 'Paginated list of authors.' })
   @ApiBadRequestResponse({ description: 'Invalid pagination values.' })
   @ApiNotFoundResponse({ description: 'No authors found.' })
@@ -67,10 +84,7 @@ export class AuthorsController {
   @ApiNotFoundResponse({ description: 'Author not found.' })
   @ApiBadRequestResponse({ description: 'Invalid author ID or data.' })
   @ApiConflictResponse({ description: 'Duplicate author data conflict.' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateAuthorDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAuthorDto) {
     return this.authorsService.update(id, dto);
   }
 

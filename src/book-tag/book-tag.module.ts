@@ -4,9 +4,7 @@ import { BookTagController } from './book-tag.controller';
 import { BookTagService } from './book-tag.service';
 
 @Module({
-  imports: [
-    PrismaModule,
-  ],
+  imports: [PrismaModule],
   controllers: [BookTagController],
   providers: [BookTagService],
 })
