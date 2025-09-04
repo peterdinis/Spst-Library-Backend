@@ -2,7 +2,10 @@ import { IsOptional, IsString, IsInt, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class QueryBooksDto {
-  @ApiPropertyOptional({ description: 'Search by name or description', example: 'gatsby' })
+  @ApiPropertyOptional({
+    description: 'Search by name or description',
+    example: 'gatsby',
+  })
   @IsOptional()
   @IsString()
   search?: string;

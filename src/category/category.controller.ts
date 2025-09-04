@@ -41,7 +41,10 @@ export class CategoryController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a category' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateCategoryDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateCategoryDto,
+  ) {
     return this.categoryService.update(id, body);
   }
 

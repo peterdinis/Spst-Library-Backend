@@ -22,13 +22,19 @@ export class FilterBooksDto {
   @IsBoolean()
   isNew?: boolean;
 
-  @ApiPropertyOptional({ example: 2000, description: 'Filter by published year (min)' })
+  @ApiPropertyOptional({
+    example: 2000,
+    description: 'Filter by published year (min)',
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
   yearMin?: number;
 
-  @ApiPropertyOptional({ example: 2020, description: 'Filter by published year (max)' })
+  @ApiPropertyOptional({
+    example: 2020,
+    description: 'Filter by published year (max)',
+  })
   @IsOptional()
   @IsInt()
   @Max(new Date().getFullYear())

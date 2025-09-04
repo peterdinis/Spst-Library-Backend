@@ -24,7 +24,7 @@ import { AuthModule } from 'src/auth/auth.module';
     CategoryModule,
     AuthorsModule,
     BooksModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
