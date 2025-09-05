@@ -2,8 +2,8 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { Role } from './roles';
-import { AccessContorlService } from './access-control.service';
 import { ROLE_KEY } from './roles.decorator';
+import { AccessControlService } from './access-control.service';
 
 export class TokenDto {
   id: number;
@@ -14,7 +14,7 @@ export class TokenDto {
 export class RoleGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private accessControlService: AccessContorlService,
+    private accessControlService: AccessControlService,
   ) {}
 
   canActivate(

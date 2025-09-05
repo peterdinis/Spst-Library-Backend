@@ -40,10 +40,7 @@ export class RolesController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a role' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateRoleDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleDto) {
     return this.rolesService.update(id, dto);
   }
 
@@ -54,7 +51,7 @@ export class RolesController {
   }
 
   @Patch('change-user-role')
-  @ApiOperation({ summary: 'Change a user\'s role' })
+  @ApiOperation({ summary: "Change a user's role" })
   changeUserRole(@Body() dto: ChangeUserRoleDto) {
     return this.rolesService.changeUserRole(dto);
   }

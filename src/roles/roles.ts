@@ -5,11 +5,3 @@ export enum Role {
   TEACHER = 'TEACHER',
   STUDENT = 'STUDENT',
 }
-
-export function toDomainRole(role: PrismaRole): Role {
-  return Role[role as keyof typeof Role];
-}
-
-export function toPrismaRole(role: Role): PrismaRole {
-  return role as unknown as PrismaRole;
-}
