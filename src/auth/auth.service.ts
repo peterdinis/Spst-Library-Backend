@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -34,9 +38,12 @@ export class AuthService {
       currentRole: creatorRole,
       requiredRole: desiredAppRole,
     });
-    if (!allowed) throw new UnauthorizedException('You cannot assign this role');
+    if (!allowed)
+      throw new UnauthorizedException('You cannot assign this role');
 
-    const existingUser = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
     if (existingUser) throw new BadRequestException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -65,7 +72,8 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
+    if (!isPasswordValid)
+      throw new UnauthorizedException('Invalid credentials');
 
     return this.generateToken(user.id, user.role.name);
   }

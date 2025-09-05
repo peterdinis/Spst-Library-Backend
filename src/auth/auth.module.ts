@@ -7,16 +7,15 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
-    imports: [
-        PassportModule,
-        RolesModule,
-        JwtModule.register({
-            secret: process.env.JWT_SECRET || 'supersecret',
-            signOptions: { expiresIn: '1h' },
-        }),
-    ],
-    controllers: [AuthController],
-    providers: [AuthService, JwtStrategy]
+  imports: [
+    PassportModule,
+    RolesModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'supersecret',
+      signOptions: { expiresIn: '1h' },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy],
 })
-
-export class AuthModule { }
+export class AuthModule {}
