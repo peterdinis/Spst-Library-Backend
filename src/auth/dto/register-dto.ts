@@ -22,8 +22,7 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @ApiPropertyOptional({ enum: Role, example: Role.STUDENT })
-  @IsOptional()
-  @IsEnum(Role)
+  @ApiProperty({ example: 'strongPassword123' })
+  @IsNotEmpty()
   role?: Role;
 }
