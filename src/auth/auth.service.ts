@@ -9,8 +9,8 @@ import { Role as PrismaRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/register-dto';
 import { LoginDto } from './dto/login-dto';
-import { Role, toPrismaRole } from 'src/shared/roles/roles';
-import { AccessControlService } from 'src/shared/roles/access-control.service';
+import { AccessControlService } from 'src/roles/access-control.service';
+import { Role, toPrismaRole } from 'src/roles/roles';
 
 @Injectable()
 export class AuthService {
