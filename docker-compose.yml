@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   app:
     build: .
@@ -12,8 +10,8 @@ services:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
     volumes:
-      - ./:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./:/usr/src/app:delegated
+      - node_modules:/usr/src/app/node_modules
     command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev"
     depends_on:
       - redis
