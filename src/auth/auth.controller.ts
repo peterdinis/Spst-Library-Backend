@@ -2,7 +2,6 @@ import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
-import { RoleGuard } from 'src/shared/roles/role.guard';
 import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
 
@@ -35,8 +34,7 @@ export class AuthController {
   async profile(@Req() req: any) {
     return this.authService.profile(req.user.id);
   }
-
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  
   @ApiBearerAuth()
   @Get('admin')
   @ApiOperation({ summary: 'Admin-only route' })

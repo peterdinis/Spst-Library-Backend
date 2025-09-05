@@ -1,18 +1,22 @@
+version: "3.9"
+
 services:
   app:
-    image: node:20-alpine
+    build: .
     container_name: spst-kniznica
     working_dir: /usr/src/app
-    volumes:
-      - ./:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
     ports:
       - "3001:3001"
-    command: sh -c "npm install && npx prisma migrate deploy && npm run start:dev"
     environment:
       DATABASE_URL: "file:./dev.db"
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev"
+    depends_on:
+      - redis
 
   redis:
     image: redis:7-alpine
