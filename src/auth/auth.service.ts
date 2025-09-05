@@ -1,16 +1,11 @@
-import {
-  Injectable,
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Role as PrismaRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/register-dto';
 import { LoginDto } from './dto/login-dto';
 import { AccessControlService } from 'src/roles/access-control.service';
-import { Role, toPrismaRole } from 'src/roles/roles';
+import { Role } from 'src/roles/roles'; // your app-level enum (e.g., ADMIN | TEACHER | STUDENT)
 
 @Injectable()
 export class AuthService {
@@ -18,51 +13,61 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private accessControlService: AccessControlService,
-  ) { }
+  ) {}
+
+  /** Convert your app enum Role to a DB role name string. */
+  private roleEnumToName(desired: Role): string {
+    return String(desired); // if your enum is a string enum, this is fine
+  }
+
+  private async getRoleByNameOrThrow(name: string) {
+    const role = await this.prisma.role.findUnique({ where: { name } });
+    if (!role) throw new BadRequestException(`Role "${name}" not found in DB`);
+    return role;
+  }
 
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
-    // Default to STUDENT if role is not provided
-    const desiredRole = dto.role;
+    const desiredAppRole: Role = (dto as any).role ?? Role.STUDENT;
 
-    // Check if creator (self-register or admin) can assign this role
-    if (
-      !this.accessControlService.isAuthorized({
-        currentRole: creatorRole,
-        requiredRole: desiredRole as unknown as Role,
-      })
-    ) {
-      throw new UnauthorizedException('You cannot assign this role');
-    }
-
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    // Check if the creator is allowed to assign this role
+    const allowed = this.accessControlService.isAuthorized({
+      currentRole: creatorRole,
+      requiredRole: desiredAppRole,
     });
+    if (!allowed) throw new UnauthorizedException('You cannot assign this role');
+
+    const existingUser = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (existingUser) throw new BadRequestException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
+    const desiredRoleName = this.roleEnumToName(desiredAppRole); // e.g., 'STUDENT'
+    const roleRecord = await this.getRoleByNameOrThrow(desiredRoleName);
+
     const user = await this.prisma.user.create({
       data: {
-        ...dto,
+        email: dto.email,
+        name: dto.name,
         password: hashedPassword,
-        role: toPrismaRole(desiredRole as unknown as Role),
+        role: { connect: { id: roleRecord.id } },
       },
+      include: { role: true },
     });
 
-    return this.generateToken(user.id, user.role);
+    return this.generateToken(user.id, user.role.name);
   }
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
+      include: { role: true },
     });
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-    if (!isPasswordValid)
-      throw new UnauthorizedException('Invalid credentials');
+    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
 
-    return this.generateToken(user.id, user.role);
+    return this.generateToken(user.id, user.role.name);
   }
 
   async profile(userId: number) {
@@ -72,16 +77,17 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
-        role: true,
+        role: { select: { id: true, name: true } },
         createdAt: true,
-        orders: true
+        orders: true,
       },
     });
   }
 
-  private generateToken(userId: number, role: PrismaRole) {
+  private generateToken(userId: number, roleName: string) {
+    // Embed a human-readable role name into JWT
     return {
-      access_token: this.jwtService.sign({ sub: userId, role }),
+      access_token: this.jwtService.sign({ sub: userId, role: roleName }),
     };
   }
 }
