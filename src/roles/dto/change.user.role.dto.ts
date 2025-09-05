@@ -1,11 +1,19 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
+
 
 export class ChangeUserRoleDto {
-  @ApiProperty({ example: 1, description: 'User ID whose role should be updated' })
-  @IsNotEmpty()
-  userId: number;
+@IsInt()
+userId: number;
 
-  @ApiProperty()
-  role: string;
+
+@ValidateIf(o => !o.roleName)
+@IsInt()
+@IsOptional()
+roleId?: number;
+
+
+@ValidateIf(o => !o.roleId)
+@IsString()
+@IsOptional()
+roleName?: string; 
 }
