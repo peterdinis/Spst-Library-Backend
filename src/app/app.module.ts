@@ -26,7 +26,7 @@ import { OrdersModule } from 'src/orders/orders.module';
     AuthorsModule,
     BooksModule,
     AuthModule,
-    OrdersModule
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

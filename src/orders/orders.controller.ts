@@ -37,4 +37,15 @@ export class OrdersController {
   async updateStatus(@Body() dto: UpdateOrderStatusDto) {
     return this.ordersService.updateOrderStatus(dto);
   }
+
+  @Patch(':id/return')
+  @ApiOperation({ summary: 'Return an order' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the order to return',
+  })
+  async returnOrder(@Param('id') id: string) {
+    return this.ordersService.returnOrder(Number(id));
+  }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { Order } from '@prisma/client';
+import { Order, OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
 
@@ -13,7 +13,7 @@ export class OrdersService {
       data: {
         userId: dto.userId,
         items: {
-          create: dto.items.map(item => ({
+          create: dto.items.map((item) => ({
             bookId: item.bookId,
             quantity: item.quantity,
           })),
@@ -45,5 +45,22 @@ export class OrdersService {
       data: { status: dto.status },
     });
     return order;
+  }
+
+  async returnOrder(orderId: number) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order) throw new NotFoundException('Order not found');
+
+    // Only allow returning COMPLETED orders (optional business logic)
+    if (order.status !== 'COMPLETED') {
+      throw new Error('Only completed orders can be returned');
+    }
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'RETURNED' as OrderStatus },
+    });
   }
 }
