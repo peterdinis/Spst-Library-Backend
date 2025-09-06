@@ -1,0 +1,40 @@
+// src/orders/orders.controller.ts
+import { Controller, Post, Body, Get, Param, Patch } from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
+
+@ApiTags('Orders')
+@Controller('orders')
+export class OrdersController {
+  constructor(private ordersService: OrdersService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiResponse({ status: 201, description: 'Order created successfully' })
+  async createOrder(@Body() dto: CreateOrderDto) {
+    return this.ordersService.createOrder(dto);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get order by ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
+  async getOrder(@Param('id') id: string) {
+    return this.ordersService.getOrderById(Number(id));
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get all orders by user' })
+  @ApiParam({ name: 'userId', type: Number })
+  async getOrdersByUser(@Param('userId') userId: string) {
+    return this.ordersService.getOrdersByUser(Number(userId));
+  }
+
+  @Patch('status')
+  @ApiOperation({ summary: 'Update order status' })
+  async updateStatus(@Body() dto: UpdateOrderStatusDto) {
+    return this.ordersService.updateOrderStatus(dto);
+  }
+}
