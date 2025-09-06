@@ -48,56 +48,56 @@ export class BooksService {
   }
 
   async findAll(query: QueryBooksDto) {
-    const { search, page = 1, limit = 10 } = query;
+  const { search, page = 1, limit = 10 } = query;
 
-    if (page < 1) throw new BadRequestException('Page must be >= 1');
-    if (limit < 1 || limit > 100)
-      throw new BadRequestException('Limit must be between 1 and 100');
+  if (page < 1) throw new BadRequestException('Page must be >= 1');
+  if (limit < 1 || limit > 100)
+    throw new BadRequestException('Limit must be between 1 and 100');
 
-    const skip = (page - 1) * limit;
-    const cacheKey = `books:${search || 'all'}:${page}:${limit}`;
-    const cached = await this.cacheManager.get(cacheKey);
-    if (cached) return cached;
+  const skip = (page - 1) * limit;
+  const cacheKey = `books:${search || 'all'}:${page}:${limit}`;
+  const cached = await this.cacheManager.get(cacheKey);
+  if (cached) return cached;
 
-    const where = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-          ],
-        }
-      : {};
+  const where = search
+    ? {
+        OR: [
+          { name: { contains: search } },           // removed mode
+          { description: { contains: search } },    // removed mode
+        ],
+      }
+    : {};
 
-    const [books, total] = await this.prisma.$transaction([
-      this.prisma.book.findMany({
-        where,
-        skip,
-        take: limit,
-        include: {
-          author: true,
-          ratings: true,
-          category: true,
-          bookTags: true,
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.book.count({ where }),
-    ]);
+  const [books, total] = await this.prisma.$transaction([
+    this.prisma.book.findMany({
+      where,
+      skip,
+      take: Number(limit),   // make sure this is a number
+      include: {
+        author: true,
+        ratings: true,
+        category: true,
+        bookTags: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    this.prisma.book.count({ where }),
+  ]);
 
-    if (books.length === 0) {
-      throw new NotFoundException('No books found for the given query');
-    }
-
-    const result = {
-      data: books,
-      total,
-      page,
-      lastPage: Math.ceil(total / limit),
-    };
-
-    await this.cacheManager.set(cacheKey, result, 30_000);
-    return result;
+  if (books.length === 0) {
+    throw new NotFoundException('No books found for the given query');
   }
+
+  const result = {
+    data: books,
+    total,
+    page,
+    lastPage: Math.ceil(total / limit),
+  };
+
+  await this.cacheManager.set(cacheKey, result, 30_000);
+  return result;
+}
 
   async findOne(id: number) {
     if (!id || id < 1) throw new BadRequestException('Invalid book ID');
