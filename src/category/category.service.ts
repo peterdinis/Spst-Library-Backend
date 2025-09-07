@@ -32,7 +32,10 @@ export class CategoryService {
       this.prisma.category.findMany({
         where,
         skip,
-        take: limit,
+        take: Number(limit),
+        include: {
+          books: true
+        }
       }),
       this.prisma.category.count({ where }),
     ]);
