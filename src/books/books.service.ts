@@ -72,7 +72,7 @@ export class BooksService {
     this.prisma.book.findMany({
       where,
       skip,
-      take: Number(limit),   // make sure this is a number
+      take: Number(limit),
       include: {
         author: true,
         ratings: true,
