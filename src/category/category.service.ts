@@ -11,7 +11,7 @@ export class CategoryService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   private readonly cacheKeyAll = 'categories:all';
 
@@ -24,10 +24,14 @@ export class CategoryService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const where = search
-      ? { name: { contains: search, mode: 'insensitive' } }
-      : {};
+    const lowerSearch = search && search.toLowerCase();
 
+    const where = {
+      OR: [
+        { name: { contains: lowerSearch } },
+        { description: { contains: lowerSearch } },
+      ],
+    };
     const [items, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
