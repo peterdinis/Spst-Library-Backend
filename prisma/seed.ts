@@ -1,157 +1,183 @@
+
 import { PrismaClient, OrderStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Seeding database...');
 
+  // ----- DELETE EXISTING DATA -----
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.rating.deleteMany();
+  await prisma.bookTag.deleteMany();
+  await prisma.book.deleteMany();
+  await prisma.author.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.role.deleteMany();
+  console.log('🧹 Existing data cleared');
+
+  // ----- ROLES -----
+  const roleNames = ['ADMIN', 'TEACHER', 'STUDENT'];
+  const roles: { id: number; name: string }[] = [];
+
+  for (const name of roleNames) {
+    const role = await prisma.role.create({ data: { name } });
+    roles.push(role);
+  }
+  console.log('👤 3 roles created');
+
   // ----- USERS -----
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const users: { id: number; name: string; email: string; password: string; roleId: number; createdAt: Date; updatedAt: Date }[] = [];
 
-  const admin = await prisma.user.create({
-    data: {
-      email: 'admin@example.com',
-      name: 'Admin User',
-      password: passwordHash,
-    },
-  });
-
-  const teacher = await prisma.user.create({
-    data: {
-      email: 'teacher@example.com',
-      name: 'Teacher User',
-      password: passwordHash,
-    },
-  });
-
-  const student = await prisma.user.create({
-    data: {
-      email: 'student@example.com',
-      name: 'Student User',
-      password: passwordHash,
-    },
-  });
+  for (let i = 0; i < 100; i++) {
+    const user = await prisma.user.create({
+      data: {
+        email: faker.internet.email(),
+        name: faker.person.fullName(),
+        password: await bcrypt.hash("password123", 10), // Hash the password properly
+        roleId: faker.helpers.arrayElement(roles).id,
+      },
+    });
+    users.push(user);
+  }
+  console.log('👥 100 users created');
 
   // ----- CATEGORIES -----
-  const fiction = await prisma.category.create({
-    data: {
-      name: 'Fiction',
-      description: 'Fictional books',
-    },
-  });
-
-  const science = await prisma.category.create({
-    data: {
-      name: 'Science',
-      description: 'Scientific books',
-    },
-  });
+  const categories: { id: number; name: string; description: string | null; createdAt: Date; updatedAt: Date }[] = [];
+  for (let i = 0; i < 100; i++) {
+    const category = await prisma.category.create({
+      data: {
+        name: faker.lorem.words({ min: 1, max: 3 }),
+        description: faker.lorem.sentence(),
+      },
+    });
+    categories.push(category);
+  }
+  console.log('📂 100 categories created');
 
   // ----- AUTHORS -----
-  const author1 = await prisma.author.create({
-    data: {
-      name: 'J. K. Rowling',
-      bio: 'Author of Harry Potter series',
-      litPeriod: 'Contemporary',
-      bornDate: '1965-07-31',
-    },
-  });
+  const authors: {
+    id: number;
+    name: string;
+    bio: string | null;
+    litPeriod: string;
+    bornDate: string;
+    deathDate: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }[] = [];
 
-  const author2 = await prisma.author.create({
-    data: {
-      name: 'Stephen Hawking',
-      bio: 'Theoretical physicist and cosmologist',
-      litPeriod: 'Modern',
-      bornDate: '1942-01-08',
-      deathDate: '2018-03-14',
-    },
-  });
+  for (let i = 0; i < 100; i++) {
+    const bornDate = faker.date.past({ years: 100, refDate: new Date('2000-01-01') });
+    const author = await prisma.author.create({
+      data: {
+        name: faker.person.fullName(),
+        bio: faker.lorem.paragraph(),
+        litPeriod: faker.helpers.arrayElement(['Medieval', 'Renaissance', 'Modern', 'Contemporary']),
+        bornDate: bornDate.toISOString().split('T')[0],
+        deathDate: faker.datatype.boolean()
+          ? faker.date.between({ 
+              from: bornDate, 
+              to: new Date('2024-01-01') 
+            }).toISOString().split('T')[0]
+          : null,
+      },
+    });
+    authors.push(author);
+  }
+  console.log('✍️ 100 authors created');
 
   // ----- BOOKS -----
-  const book1 = await prisma.book.create({
-    data: {
-      name: 'Harry Potter and the Philosopher’s Stone',
-      description: 'Fantasy novel',
-      year: 1997,
-      categoryId: fiction.id,
-      authorId: author1.id,
-      isAvailable: true,
-      isNew: false,
-    },
-  });
+  const books: {
+    id: number;
+    name: string;
+    description: string | null;
+    year: number | null;
+    categoryId: number | null;
+    authorId: number;
+    isAvailable: boolean;
+    isNew: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }[] = [];
 
-  const book2 = await prisma.book.create({
-    data: {
-      name: 'A Brief History of Time',
-      description: 'Book on cosmology',
-      year: 1988,
-      categoryId: science.id,
-      authorId: author2.id,
-      isAvailable: true,
-      isNew: true,
-    },
-  });
+  for (let i = 0; i < 100; i++) {
+    const book = await prisma.book.create({
+      data: {
+        name: faker.lorem.words({ min: 1, max: 4 }),
+        description: faker.lorem.sentences({ min: 2, max: 3 }),
+        year: faker.number.int({ min: 1900, max: 2024 }),
+        categoryId: faker.helpers.arrayElement(categories).id,
+        authorId: faker.helpers.arrayElement(authors).id,
+        isAvailable: faker.datatype.boolean(),
+        isNew: faker.datatype.boolean(),
+      },
+    });
+    books.push(book);
+  }
+  console.log('📚 100 books created');
 
-  // ----- TAGS -----
-  const fantasyTag = await prisma.bookTag.create({
-    data: {
-      name: 'Fantasy',
-      books: { connect: [{ id: book1.id }] },
-    },
-  });
+  // ----- BOOK TAGS -----
+  const bookTags: { id: number; name: string; createdAt: Date; updatedAt: Date }[] = [];
+  
+  for (let i = 0; i < 50; i++) {
+    const tag = await prisma.bookTag.create({
+      data: {
+        name: faker.lorem.word() + '-' + faker.string.uuid().slice(0, 6),
+      },
+    });
+    bookTags.push(tag);
+  }
 
-  const scienceTag = await prisma.bookTag.create({
-    data: {
-      name: 'Science',
-      books: { connect: [{ id: book2.id }] },
-    },
-  });
+  // Connect books to tags (many-to-many relationship)
+  for (const tag of bookTags) {
+    const selectedBooks = faker.helpers.arrayElements(books, faker.number.int({ min: 1, max: 10 }));
+    await prisma.bookTag.update({
+      where: { id: tag.id },
+      data: {
+        books: {
+          connect: selectedBooks.map((b) => ({ id: b.id })),
+        },
+      },
+    });
+  }
+  console.log('🏷️ 50 tags created and connected to books');
 
   // ----- RATINGS -----
-  await prisma.rating.create({
-    data: {
-      bookId: book1.id,
-      value: 5,
-      comment: 'Amazing book!',
-    },
-  });
-
-  await prisma.rating.create({
-    data: {
-      bookId: book2.id,
-      value: 4,
-      comment: 'Very insightful.',
-    },
-  });
+  for (let i = 0; i < 200; i++) {
+    await prisma.rating.create({
+      data: {
+        bookId: faker.helpers.arrayElement(books).id,
+        value: faker.number.int({ min: 1, max: 5 }),
+        comment: faker.datatype.boolean() ? faker.lorem.sentence() : null,
+      },
+    });
+  }
+  console.log('⭐ 200 ratings created');
 
   // ----- ORDERS -----
-  const order1 = await prisma.order.create({
-    data: {
-      userId: student.id,
-      status: OrderStatus.PENDING,
-      items: {
-        create: [
-          { bookId: book1.id, quantity: 1 },
-          { bookId: book2.id, quantity: 2 },
-        ],
+  for (let i = 0; i < 100; i++) {
+    const orderUser = faker.helpers.arrayElement(users);
+    const orderBooks = faker.helpers.arrayElements(books, faker.number.int({ min: 1, max: 5 }));
+    
+    await prisma.order.create({
+      data: {
+        userId: orderUser.id,
+        status: faker.helpers.arrayElement([OrderStatus.PENDING, OrderStatus.COMPLETED, OrderStatus.CANCELLED]),
+        items: {
+          create: orderBooks.map((b) => ({
+            bookId: b.id,
+            quantity: faker.number.int({ min: 1, max: 3 }),
+          })),
+        },
       },
-    },
-    include: { items: true },
-  });
-
-  const order2 = await prisma.order.create({
-    data: {
-      userId: teacher.id,
-      status: OrderStatus.COMPLETED,
-      items: {
-        create: [
-          { bookId: book2.id, quantity: 1 },
-        ],
-      },
-    },
-    include: { items: true },
-  });
+    });
+  }
+  console.log('🛒 100 orders created');
 
   console.log('✅ Seeding completed!');
 }

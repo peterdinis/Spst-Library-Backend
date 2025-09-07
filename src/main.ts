@@ -4,7 +4,7 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors()
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('SPŠT API Documentation')
     .setVersion('1.0')

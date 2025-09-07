@@ -11,7 +11,7 @@ export class CategoryService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) { }
+  ) {}
 
   private readonly cacheKeyAll = 'categories:all';
 
@@ -38,8 +38,8 @@ export class CategoryService {
         skip,
         take: Number(limit),
         include: {
-          books: true
-        }
+          books: true,
+        },
       }),
       this.prisma.category.count({ where }),
     ]);

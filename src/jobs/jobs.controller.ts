@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Jobs') 
+@ApiTags('Jobs')
 @Controller('jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
