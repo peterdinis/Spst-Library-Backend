@@ -11,6 +11,8 @@ import { GlobalCacheModule } from 'src/cache/global.cache.module';
 import { BooksModule } from 'src/books/books.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { OrdersModule } from 'src/orders/orders.module';
+import { JobsModule } from 'src/jobs/jobs.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { OrdersModule } from 'src/orders/orders.module';
     BooksModule,
     AuthModule,
     OrdersModule,
+    JobsModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],

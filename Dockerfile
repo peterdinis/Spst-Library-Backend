@@ -1,17 +1,22 @@
 FROM node:20-alpine
 
+# Nainštalovanie pnpm a udržanie npm
+RUN npm install -g pnpm@latest
+
 WORKDIR /usr/src/app
 
-# Skopíruj len package.json a package-lock.json pre npm install
+# Skopíruj package files
 COPY package*.json ./
+COPY pnpm-lock.yaml* ./
 
-# Nainštaluj závislosti
-RUN npm install
+# Nainštaluj závislosti (preferuj pnpm ak existuje lock file)
+RUN if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else npm install; fi
 
-# Skopíruj zvyšok projektu, node_modules sa neprepíše vďaka .dockerignore
+# Skopíruj zvyšok projektu
 COPY . .
 
 # Prisma client
 RUN npx prisma generate
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+# Použij pnpm ak je dostupný, inak npm
+CMD ["sh", "-c", "npx prisma migrate deploy && (command -v pnpm >/dev/null && pnpm run start:dev || npm run start:dev)"]
