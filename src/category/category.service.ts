@@ -24,14 +24,15 @@ export class CategoryService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const lowerSearch = search && search.toLowerCase();
+    const where = search
+      ? {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+      : {};
 
-    const where = {
-      OR: [
-        { name: { contains: lowerSearch } },
-        { description: { contains: lowerSearch } },
-      ],
-    };
     const [items, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
