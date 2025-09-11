@@ -33,6 +33,12 @@ export class CategoryController {
     return this.categoryService.findOne(id);
   }
 
+  @Get('all')
+  @ApiOperation({ summary: 'Get all categories (cached, no pagination or search)' })
+  findAllCached() {
+    return this.categoryService.findAllCached();
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create a new category' })
   create(@Body() body: CreateCategoryDto) {

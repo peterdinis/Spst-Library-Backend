@@ -15,6 +15,19 @@ export class CategoryService {
 
   private readonly cacheKeyAll = 'categories:all';
 
+  async findAllCached() {
+    const cacheKey = `${this.cacheKeyAll}:full`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    const categories = await this.prisma.category.findMany({
+      include: { books: true },
+    });
+
+    await this.cacheManager.set(cacheKey, categories, 60); // cache for 60 seconds
+    return categories;
+  }
+
   async findAll(pagination: PaginationDto) {
     const { page = 1, limit = 10, search } = pagination;
     const skip = (page - 1) * limit;
