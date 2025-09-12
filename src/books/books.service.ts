@@ -18,7 +18,6 @@ import { DEFAULT_CACHE_TTL } from 'src/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
-
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
@@ -231,7 +230,7 @@ export class BooksService {
     await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
-  
+
   async findTopRated(limit = 10) {
     if (limit < 1 || limit > 50)
       throw new BadRequestException('Limit must be between 1 and 50');

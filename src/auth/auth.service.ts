@@ -9,12 +9,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/register-dto';
 import { LoginDto } from './dto/login-dto';
 import { AccessControlService } from 'src/roles/access-control.service';
-import { Role } from 'src/roles/roles';
-import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from 'src/constants/applicationConstants';
+import {
+  ACCESS_TOKEN_EXPIRY,
+  REFRESH_TOKEN_EXPIRY,
+} from 'src/constants/applicationConstants';
+import { Role } from 'src/roles/utils/roles';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
@@ -129,7 +131,7 @@ export class AuthService {
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
-    
+
     await this.prisma.token.create({
       data: { userId, refreshToken: refresh_token, expiresAt },
     });

@@ -21,7 +21,7 @@ export class BookTagService {
       throw new BadRequestException(`Tag with name "${name}" already exists`);
 
     const tag = await this.prisma.bookTag.create({ data: { name } });
-    
+
     await this.cacheManager.del('bookTags');
     return tag;
   }

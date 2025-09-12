@@ -80,7 +80,7 @@ export class AuthorsService {
       },
     };
 
-    await this.cacheManager.set(cacheKey, result, 60)
+    await this.cacheManager.set(cacheKey, result, 60);
     return result;
   }
 
@@ -112,7 +112,7 @@ export class AuthorsService {
 
     const exists = await this.prisma.author.findUnique({ where: { id } });
     if (!exists) throw new NotFoundException(`Author ${id} not found`);
-    
+
     if (dto.name || dto.bornDate) {
       const duplicate = await this.prisma.author.findFirst({
         where: {
