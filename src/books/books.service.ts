@@ -14,10 +14,10 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { QueryBooksDto } from './dto/query-book.dto';
 import { FilterBooksDto } from './dto/filter-books.dto';
+import { DEFAULT_CACHE_TTL } from 'src/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
-  private readonly DEFAULT_CACHE_TTL = 30_000;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -125,7 +125,7 @@ export class BooksService {
       page,
       lastPage: Math.ceil(total / limit),
     };
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
 
@@ -140,7 +140,7 @@ export class BooksService {
     });
     if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
 
-    await this.cacheManager.set(cacheKey, book, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, book, DEFAULT_CACHE_TTL);
     return book;
   }
 
@@ -210,7 +210,7 @@ export class BooksService {
     if (books.length === 0)
       throw new NotFoundException('No available books found');
     const result = { data: books, total: books.length };
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
 
@@ -228,11 +228,10 @@ export class BooksService {
     if (books.length === 0)
       throw new NotFoundException('No unavailable books found');
     const result = { data: books, total: books.length };
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
-
-  // 🆕 EXTRA IDEAS
+  
   async findTopRated(limit = 10) {
     if (limit < 1 || limit > 50)
       throw new BadRequestException('Limit must be between 1 and 50');

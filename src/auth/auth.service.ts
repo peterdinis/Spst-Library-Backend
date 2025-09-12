@@ -10,11 +10,10 @@ import { RegisterDto } from './dto/register-dto';
 import { LoginDto } from './dto/login-dto';
 import { AccessControlService } from 'src/roles/access-control.service';
 import { Role } from 'src/roles/roles';
+import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from 'src/constants/applicationConstants';
 
 @Injectable()
 export class AuthService {
-  private ACCESS_TOKEN_EXPIRY = '15m';
-  private REFRESH_TOKEN_EXPIRY = '7d';
 
   constructor(
     private prisma: PrismaService,
@@ -96,7 +95,6 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token expired');
     }
 
-    // Optionally revoke old token and create a new one
     await this.prisma.token.delete({ where: { id: tokenRecord.id } });
 
     return this.generateTokens(userId, tokenRecord.user.role.name);
@@ -122,17 +120,16 @@ export class AuthService {
   private async generateTokens(userId: number, roleName: string) {
     const access_token = this.jwtService.sign(
       { sub: userId, role: roleName },
-      { expiresIn: this.ACCESS_TOKEN_EXPIRY },
+      { expiresIn: ACCESS_TOKEN_EXPIRY },
     );
     const refresh_token = this.jwtService.sign(
       { sub: userId, role: roleName },
-      { expiresIn: this.REFRESH_TOKEN_EXPIRY },
+      { expiresIn: REFRESH_TOKEN_EXPIRY },
     );
 
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
-
-    // Store refresh token in DB
+    expiresAt.setDate(expiresAt.getDate() + 7);
+    
     await this.prisma.token.create({
       data: { userId, refreshToken: refresh_token, expiresAt },
     });

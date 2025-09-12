@@ -20,7 +20,6 @@ export class AuthorsService {
   ) {}
 
   async create(dto: CreateAuthorDto) {
-    // ensure no duplicate author with same name + bornDate
     const existing = await this.prisma.author.findFirst({
       where: { name: dto.name, bornDate: dto.bornDate },
     });
@@ -31,7 +30,7 @@ export class AuthorsService {
     }
 
     const author = await this.prisma.author.create({ data: dto });
-    await this.cacheManager.clear(); // invalidate cache
+    await this.cacheManager.clear();
     return author;
   }
 
@@ -81,7 +80,7 @@ export class AuthorsService {
       },
     };
 
-    await this.cacheManager.set(cacheKey, result, 60); // 60s TTL
+    await this.cacheManager.set(cacheKey, result, 60)
     return result;
   }
 
@@ -113,8 +112,7 @@ export class AuthorsService {
 
     const exists = await this.prisma.author.findUnique({ where: { id } });
     if (!exists) throw new NotFoundException(`Author ${id} not found`);
-
-    // prevent duplicate if name + bornDate already taken by another author
+    
     if (dto.name || dto.bornDate) {
       const duplicate = await this.prisma.author.findFirst({
         where: {

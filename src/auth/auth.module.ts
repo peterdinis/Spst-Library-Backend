@@ -14,8 +14,8 @@ import { PrismaModule } from 'src/prisma/prisma.module';
     RolesModule,
     PrismaModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'supersecret',
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.EXPIRES_IN },
     }),
   ],
   controllers: [AuthController],
