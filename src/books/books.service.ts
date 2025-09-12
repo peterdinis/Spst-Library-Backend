@@ -14,7 +14,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { QueryBooksDto } from './dto/query-book.dto';
 import { FilterBooksDto } from './dto/filter-books.dto';
-import { DEFAULT_CACHE_TTL } from 'src/constants/applicationConstants';
+import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
