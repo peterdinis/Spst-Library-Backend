@@ -94,7 +94,9 @@ export class AuthorsService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const author = await this.prisma.author.findUnique({ where: { id } });
+    const author = await this.prisma.author.findUnique({ where: { id }, include: {
+      books: true
+    } });
     if (!author) throw new NotFoundException(`Author ${id} not found`);
 
     await this.cacheManager.set(cacheKey, author, 60);
