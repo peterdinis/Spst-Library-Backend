@@ -8,18 +8,12 @@ interface IsAuthorizedParams {
 
 @Injectable()
 export class AccessControlService {
-  // Assign numeric priority to each role
   private rolePriority: Record<Role, number> = {
     STUDENT: 1,
     TEACHER: 2,
     ADMIN: 3,
   };
 
-  /**
-   * Checks if the current role has sufficient priority to access a resource
-   * @param params - { currentRole, requiredRole }
-   * @returns boolean
-   */
   public isAuthorized({ currentRole, requiredRole }: IsAuthorizedParams): boolean {
     const currentPriority = this.rolePriority[currentRole];
     const requiredPriority = this.rolePriority[requiredRole];
