@@ -105,4 +105,5 @@ enum OrderStatus {
   PENDING
   COMPLETED
   CANCELLED
+  RETURNED
 }
