@@ -34,7 +34,10 @@ export class AuthController {
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
   @ApiResponse({ status: 200, description: 'Tokens refreshed successfully.' })
-  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token.' })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired refresh token.',
+  })
   async refresh(@Body() body: { userId: number; refreshToken: string }) {
     const { userId, refreshToken } = body;
     return this.authService.refreshToken(userId, refreshToken);

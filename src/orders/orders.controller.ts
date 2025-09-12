@@ -39,14 +39,22 @@ export class OrdersController {
 
   @Patch(':id/return')
   @ApiOperation({ summary: 'Return a completed order' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID of the order to return' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the order to return',
+  })
   async returnOrder(@Param('id') id: string) {
     return this.ordersService.returnOrder(Number(id));
   }
 
   @Patch(':id/cancel')
   @ApiOperation({ summary: 'Cancel an order' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID of the order to cancel' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the order to cancel',
+  })
   async cancelOrder(@Param('id') id: string) {
     return this.ordersService.cancelOrder(Number(id));
   }

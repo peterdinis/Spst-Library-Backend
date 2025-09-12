@@ -95,14 +95,24 @@ export class BooksController {
 
   @Get('top-rated')
   @ApiOperation({ summary: 'Get top rated books' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of books to return' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of books to return',
+  })
   findTopRated(@Query('limit') limit?: number) {
     return this.booksService.findTopRated(limit);
   }
 
   @Get('recently-added')
   @ApiOperation({ summary: 'Get recently added books' })
-  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days to look back' })
+  @ApiQuery({
+    name: 'days',
+    required: false,
+    type: Number,
+    description: 'Number of days to look back',
+  })
   findRecentlyAdded(@Query('days') days?: number) {
     return this.booksService.findRecentlyAdded(days);
   }

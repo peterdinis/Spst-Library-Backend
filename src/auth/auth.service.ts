@@ -35,18 +35,32 @@ export class AuthService {
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
     const desiredAppRole: Role = (dto as any).role ?? Role.STUDENT;
 
-    if (!this.accessControlService.isAuthorized({ currentRole: creatorRole, requiredRole: desiredAppRole })) {
+    if (
+      !this.accessControlService.isAuthorized({
+        currentRole: creatorRole,
+        requiredRole: desiredAppRole,
+      })
+    ) {
       throw new UnauthorizedException('You cannot assign this role');
     }
 
-    const existingUser = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
     if (existingUser) throw new BadRequestException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const roleRecord = await this.getRoleByNameOrThrow(this.roleEnumToName(desiredAppRole));
+    const roleRecord = await this.getRoleByNameOrThrow(
+      this.roleEnumToName(desiredAppRole),
+    );
 
     const user = await this.prisma.user.create({
-      data: { email: dto.email, name: dto.name, password: hashedPassword, role: { connect: { id: roleRecord.id } } },
+      data: {
+        email: dto.email,
+        name: dto.name,
+        password: hashedPassword,
+        role: { connect: { id: roleRecord.id } },
+      },
       include: { role: true },
     });
 
@@ -54,11 +68,15 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email }, include: { role: true } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+      include: { role: true },
+    });
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
+    if (!isPasswordValid)
+      throw new UnauthorizedException('Invalid credentials');
 
     return this.generateTokens(user.id, user.role.name);
   }
@@ -91,13 +109,25 @@ export class AuthService {
   async profile(userId: number) {
     return this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, name: true, role: { select: { id: true, name: true } }, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: { select: { id: true, name: true } },
+        createdAt: true,
+      },
     });
   }
 
   private async generateTokens(userId: number, roleName: string) {
-    const access_token = this.jwtService.sign({ sub: userId, role: roleName }, { expiresIn: this.ACCESS_TOKEN_EXPIRY });
-    const refresh_token = this.jwtService.sign({ sub: userId, role: roleName }, { expiresIn: this.REFRESH_TOKEN_EXPIRY });
+    const access_token = this.jwtService.sign(
+      { sub: userId, role: roleName },
+      { expiresIn: this.ACCESS_TOKEN_EXPIRY },
+    );
+    const refresh_token = this.jwtService.sign(
+      { sub: userId, role: roleName },
+      { expiresIn: this.REFRESH_TOKEN_EXPIRY },
+    );
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
