@@ -82,8 +82,7 @@ export class OrdersService {
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     this.validateUserId(dto.userId);
     this.validateOrderItems(dto.items);
-
-    // Check each book exists and is available
+    
     for (const item of dto.items) {
       await this.validateBookExists(item.bookId);
     }

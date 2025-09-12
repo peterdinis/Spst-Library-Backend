@@ -12,11 +12,11 @@ import { Cache } from 'cache-manager';
 import { PaginationDto } from './dto/category-pagination.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { DEFAULT_CACHE_TTL } from 'src/constants/applicationConstants';
 
 @Injectable()
 export class CategoryService {
   private readonly cacheKeyAll = 'categories:all';
-  private readonly DEFAULT_CACHE_TTL = 60;
 
   constructor(
     private prisma: PrismaService,
@@ -69,7 +69,7 @@ export class CategoryService {
       },
     });
 
-    await this.cacheManager.set(cacheKey, categories, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, categories, DEFAULT_CACHE_TTL);
     return categories;
   }
 
@@ -110,7 +110,7 @@ export class CategoryService {
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
 
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
 
@@ -121,7 +121,7 @@ export class CategoryService {
 
     const category = await this.validateCategoryExists(id);
 
-    await this.cacheManager.set(cacheKey, category, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, category, DEFAULT_CACHE_TTL);
     return category;
   }
 
