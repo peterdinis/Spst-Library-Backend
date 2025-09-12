@@ -6,10 +6,9 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // ----- USERS -----
   const passwordHash = await bcrypt.hash('password123', 10);
 
-  const admin = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: 'admin@example.com',
       name: 'Admin User',
@@ -33,7 +32,6 @@ async function main() {
     },
   });
 
-  // ----- CATEGORIES -----
   const fiction = await prisma.category.create({
     data: {
       name: 'Fiction',
@@ -48,7 +46,6 @@ async function main() {
     },
   });
 
-  // ----- AUTHORS -----
   const author1 = await prisma.author.create({
     data: {
       name: 'J. K. Rowling',
@@ -68,7 +65,6 @@ async function main() {
     },
   });
 
-  // ----- BOOKS -----
   const book1 = await prisma.book.create({
     data: {
       name: 'Harry Potter and the Philosopher’s Stone',
@@ -93,22 +89,20 @@ async function main() {
     },
   });
 
-  // ----- TAGS -----
-  const fantasyTag = await prisma.bookTag.create({
+  await prisma.bookTag.create({
     data: {
       name: 'Fantasy',
       books: { connect: [{ id: book1.id }] },
     },
   });
 
-  const scienceTag = await prisma.bookTag.create({
+  await prisma.bookTag.create({
     data: {
       name: 'Science',
       books: { connect: [{ id: book2.id }] },
     },
   });
 
-  // ----- RATINGS -----
   await prisma.rating.create({
     data: {
       bookId: book1.id,
@@ -124,9 +118,8 @@ async function main() {
       comment: 'Very insightful.',
     },
   });
-
-  // ----- ORDERS -----
-  const order1 = await prisma.order.create({
+  
+  await prisma.order.create({
     data: {
       userId: student.id,
       status: OrderStatus.PENDING,
@@ -140,7 +133,7 @@ async function main() {
     include: { items: true },
   });
 
-  const order2 = await prisma.order.create({
+  await prisma.order.create({
     data: {
       userId: teacher.id,
       status: OrderStatus.COMPLETED,

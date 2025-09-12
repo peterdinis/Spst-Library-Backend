@@ -19,16 +19,21 @@ export class OrdersService {
       throw new BadRequestException('Book ID must be a positive number');
     }
     const book = await this.prisma.book.findUnique({ where: { id: bookId } });
-    if (!book) throw new NotFoundException(`Book with ID ${bookId} does not exist`);
-    if (!book.isAvailable) throw new ConflictException(`Book "${book.name}" is not available`);
+    if (!book)
+      throw new NotFoundException(`Book with ID ${bookId} does not exist`);
+    if (!book.isAvailable)
+      throw new ConflictException(`Book "${book.name}" is not available`);
   }
 
   private async validateOrderExists(orderId: number) {
     if (!orderId || orderId < 1) {
       throw new BadRequestException('Order ID must be a positive number');
     }
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
-    if (!order) throw new NotFoundException(`Order with ID ${orderId} does not exist`);
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order)
+      throw new NotFoundException(`Order with ID ${orderId} does not exist`);
     return order;
   }
 
@@ -46,18 +51,25 @@ export class OrdersService {
         throw new BadRequestException('Item quantity must be at least 1');
       }
       if (bookIds.has(item.bookId)) {
-        throw new BadRequestException('Duplicate books are not allowed in the same order');
+        throw new BadRequestException(
+          'Duplicate books are not allowed in the same order',
+        );
       }
       bookIds.add(item.bookId);
     }
   }
 
-  private validateOrderStatusTransition(current: OrderStatus, next: OrderStatus) {
+  private validateOrderStatusTransition(
+    current: OrderStatus,
+    next: OrderStatus,
+  ) {
     if (current === OrderStatus.CANCELLED) {
       throw new ConflictException('Cannot update a cancelled order');
     }
     if (current === OrderStatus.RETURNED && next !== OrderStatus.PENDING) {
-      throw new ConflictException('Returned orders can only be reset to PENDING');
+      throw new ConflictException(
+        'Returned orders can only be reset to PENDING',
+      );
     }
   }
 
@@ -71,7 +83,6 @@ export class OrdersService {
     this.validateUserId(dto.userId);
     this.validateOrderItems(dto.items);
 
-    // Check each book exists and is available
     for (const item of dto.items) {
       await this.validateBookExists(item.bookId);
     }
@@ -80,7 +91,12 @@ export class OrdersService {
       return await this.prisma.order.create({
         data: {
           userId: dto.userId,
-          items: { create: dto.items.map(item => ({ bookId: item.bookId, quantity: item.quantity })) },
+          items: {
+            create: dto.items.map((item) => ({
+              bookId: item.bookId,
+              quantity: item.quantity,
+            })),
+          },
         },
         include: { items: { include: { book: true } } },
       });

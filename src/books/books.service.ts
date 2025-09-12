@@ -14,11 +14,10 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { QueryBooksDto } from './dto/query-book.dto';
 import { FilterBooksDto } from './dto/filter-books.dto';
+import { DEFAULT_CACHE_TTL } from 'src/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
-  private readonly DEFAULT_CACHE_TTL = 30_000;
-
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
@@ -27,15 +26,23 @@ export class BooksService {
   private async validateAuthorExists(authorId: number) {
     if (!authorId || authorId < 1)
       throw new BadRequestException('Author ID must be a positive number');
-    const author = await this.prisma.author.findUnique({ where: { id: authorId } });
-    if (!author) throw new NotFoundException(`Author with ID ${authorId} does not exist`);
+    const author = await this.prisma.author.findUnique({
+      where: { id: authorId },
+    });
+    if (!author)
+      throw new NotFoundException(`Author with ID ${authorId} does not exist`);
   }
 
   private async validateCategoryExists(categoryId: number) {
     if (!categoryId || categoryId < 1)
       throw new BadRequestException('Category ID must be a positive number');
-    const category = await this.prisma.category.findUnique({ where: { id: categoryId } });
-    if (!category) throw new NotFoundException(`Category with ID ${categoryId} does not exist`);
+    const category = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+    if (!category)
+      throw new NotFoundException(
+        `Category with ID ${categoryId} does not exist`,
+      );
   }
 
   private async validateBookExists(bookId: number): Promise<Book> {
@@ -62,7 +69,9 @@ export class BooksService {
       where: { name: dto.name, authorId: dto.authorId },
     });
     if (existing) {
-      throw new ConflictException(`Book "${dto.name}" by this author already exists`);
+      throw new ConflictException(
+        `Book "${dto.name}" by this author already exists`,
+      );
     }
 
     const newBook = await this.prisma.book.create({ data: dto });
@@ -96,7 +105,12 @@ export class BooksService {
         where,
         skip,
         take: limit,
-        include: { author: true, ratings: true, category: true, bookTags: true },
+        include: {
+          author: true,
+          ratings: true,
+          category: true,
+          bookTags: true,
+        },
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.book.count({ where }),
@@ -104,8 +118,13 @@ export class BooksService {
 
     if (total === 0) throw new NotFoundException('No books found');
 
-    const result = { data: books, total, page, lastPage: Math.ceil(total / limit) };
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    const result = {
+      data: books,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
 
@@ -120,7 +139,7 @@ export class BooksService {
     });
     if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
 
-    await this.cacheManager.set(cacheKey, book, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, book, DEFAULT_CACHE_TTL);
     return book;
   }
 
@@ -145,7 +164,8 @@ export class BooksService {
   }
 
   async filter(query: FilterBooksDto) {
-    const { authorId, categoryId, isAvailable, isNew, yearMin, yearMax } = query;
+    const { authorId, categoryId, isAvailable, isNew, yearMin, yearMax } =
+      query;
 
     const where: Prisma.BookWhereInput = {};
     if (authorId) {
@@ -170,7 +190,8 @@ export class BooksService {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (books.length === 0) throw new NotFoundException('No books match the provided filters');
+    if (books.length === 0)
+      throw new NotFoundException('No books match the provided filters');
     return { data: books, total: books.length };
   }
 
@@ -185,9 +206,10 @@ export class BooksService {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (books.length === 0) throw new NotFoundException('No available books found');
+    if (books.length === 0)
+      throw new NotFoundException('No available books found');
     const result = { data: books, total: books.length };
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
 
@@ -202,13 +224,13 @@ export class BooksService {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (books.length === 0) throw new NotFoundException('No unavailable books found');
+    if (books.length === 0)
+      throw new NotFoundException('No unavailable books found');
     const result = { data: books, total: books.length };
-    await this.cacheManager.set(cacheKey, result, this.DEFAULT_CACHE_TTL);
+    await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
     return result;
   }
 
-  // 🆕 EXTRA IDEAS
   async findTopRated(limit = 10) {
     if (limit < 1 || limit > 50)
       throw new BadRequestException('Limit must be between 1 and 50');

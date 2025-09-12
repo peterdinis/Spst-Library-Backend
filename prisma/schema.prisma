@@ -80,6 +80,7 @@ model User {
   roleId    Int      @default(1235)
   role      Role     @relation(fields: [roleId], references: [id])
   orders    Order[]
+  tokens    Token[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -109,4 +110,13 @@ enum OrderStatus {
   COMPLETED
   CANCELLED
   RETURNED
+}
+
+model Token {
+  id           Int      @id @default(autoincrement())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+  refreshToken String   @unique
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
 }

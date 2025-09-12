@@ -20,7 +20,6 @@ export class AuthorsService {
   ) {}
 
   async create(dto: CreateAuthorDto) {
-    // ensure no duplicate author with same name + bornDate
     const existing = await this.prisma.author.findFirst({
       where: { name: dto.name, bornDate: dto.bornDate },
     });
@@ -31,59 +30,59 @@ export class AuthorsService {
     }
 
     const author = await this.prisma.author.create({ data: dto });
-    await this.cacheManager.clear(); // invalidate cache
+    await this.cacheManager.clear();
     return author;
   }
 
   async findAll(query: QueryAuthorDto) {
-  const page = query.page ?? 1;
-  const limit = query.limit ?? 10;
-  const search = query.search?.trim();
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const search = query.search?.trim();
 
-  if (page <= 0 || limit <= 0) {
-    throw new BadRequestException('Page and limit must be greater than 0');
+    if (page <= 0 || limit <= 0) {
+      throw new BadRequestException('Page and limit must be greater than 0');
+    }
+
+    const cacheKey = `authors:${search || 'all'}:page:${page}:limit:${limit}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    const where = search
+      ? { name: { contains: search, mode: 'insensitive' } }
+      : {};
+
+    const [data, total] = await Promise.all([
+      this.prisma.author.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: Number(limit),
+        orderBy: { createdAt: 'desc' },
+        include: {
+          books: true,
+        },
+      }),
+      this.prisma.author.count({ where }),
+    ]);
+
+    if (!data.length) {
+      throw new NotFoundException(
+        `No authors found${search ? ` matching "${search}"` : ''}.`,
+      );
+    }
+
+    const result = {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+
+    await this.cacheManager.set(cacheKey, result, 60);
+    return result;
   }
-
-  const cacheKey = `authors:${search || 'all'}:page:${page}:limit:${limit}`;
-  const cached = await this.cacheManager.get(cacheKey);
-  if (cached) return cached;
-
-  const where = search
-    ? { name: { contains: search, mode: 'insensitive' } }
-    : {};
-
-  const [data, total] = await Promise.all([
-    this.prisma.author.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: Number(limit),
-      orderBy: { createdAt: 'desc' },
-      include: {
-        books: true
-      }
-    }),
-    this.prisma.author.count({ where }),
-  ]);
-
-  if (!data.length) {
-    throw new NotFoundException(
-      `No authors found${search ? ` matching "${search}"` : ''}.`,
-    );
-  }
-
-  const result = {
-    data,
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
-
-  await this.cacheManager.set(cacheKey, result, 60); // 60s TTL
-  return result;
-}
 
   async findOne(id: number) {
     if (!id || id <= 0) {
@@ -94,9 +93,12 @@ export class AuthorsService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const author = await this.prisma.author.findUnique({ where: { id }, include: {
-      books: true
-    } });
+    const author = await this.prisma.author.findUnique({
+      where: { id },
+      include: {
+        books: true,
+      },
+    });
     if (!author) throw new NotFoundException(`Author ${id} not found`);
 
     await this.cacheManager.set(cacheKey, author, 60);
@@ -111,7 +113,6 @@ export class AuthorsService {
     const exists = await this.prisma.author.findUnique({ where: { id } });
     if (!exists) throw new NotFoundException(`Author ${id} not found`);
 
-    // prevent duplicate if name + bornDate already taken by another author
     if (dto.name || dto.bornDate) {
       const duplicate = await this.prisma.author.findFirst({
         where: {

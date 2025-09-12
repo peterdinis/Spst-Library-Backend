@@ -16,14 +16,12 @@ export class BookTagService {
   ) {}
 
   async create(name: string) {
-    // Check if tag already exists
     const exists = await this.prisma.bookTag.findUnique({ where: { name } });
     if (exists)
       throw new BadRequestException(`Tag with name "${name}" already exists`);
 
     const tag = await this.prisma.bookTag.create({ data: { name } });
 
-    // invalidate cache
     await this.cacheManager.del('bookTags');
     return tag;
   }
@@ -33,7 +31,7 @@ export class BookTagService {
     if (cached) return cached;
 
     const tags = await this.prisma.bookTag.findMany();
-    await this.cacheManager.set('bookTags', tags); // cache na 60 sekúnd
+    await this.cacheManager.set('bookTags', tags);
     return tags;
   }
 
@@ -58,7 +56,6 @@ export class BookTagService {
       data: { name },
     });
 
-    // invalidate cache
     await this.cacheManager.del('bookTags');
     return updated;
   }
@@ -69,7 +66,6 @@ export class BookTagService {
 
     await this.prisma.bookTag.delete({ where: { id } });
 
-    // invalidate cache
     await this.cacheManager.del('bookTags');
     return { message: `Tag ${id} deleted` };
   }
@@ -85,7 +81,7 @@ export class BookTagService {
       where: { name: { contains: query } },
     });
 
-    await this.cacheManager.set(cacheKey, results); // cache výsledok
+    await this.cacheManager.set(cacheKey, results);
     return results;
   }
 }

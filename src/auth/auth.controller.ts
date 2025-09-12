@@ -31,6 +31,28 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token using refresh token' })
+  @ApiResponse({ status: 200, description: 'Tokens refreshed successfully.' })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired refresh token.',
+  })
+  async refresh(@Body() body: { userId: number; refreshToken: string }) {
+    const { userId, refreshToken } = body;
+    return this.authService.refreshToken(userId, refreshToken);
+  }
+
+  @Post('logout')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Logout user and revoke all refresh tokens' })
+  @ApiResponse({ status: 200, description: 'User logged out successfully.' })
+  async logout(@Req() req: any) {
+    await this.authService.revokeTokens(req.user.id);
+    return { message: 'Logged out successfully' };
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get('profile')
