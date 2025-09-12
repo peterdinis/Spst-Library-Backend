@@ -11,20 +11,31 @@ export class CategoryService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) { }
+  ) {}
 
   private readonly cacheKeyAll = 'categories:all';
 
   async findAllCached() {
     const cacheKey = `${this.cacheKeyAll}:full`;
     const cached = await this.cacheManager.get(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      console.log('Returning cached:', cached);
+      return cached;
+    }
 
     const categories = await this.prisma.category.findMany({
-      include: { books: true },
+      include: {
+        books: {
+          select: {
+            id: true,
+            name: true,
+            categoryId: true,
+          },
+        },
+      },
     });
 
-    await this.cacheManager.set(cacheKey, categories, 60); // cache for 60 seconds
+    await this.cacheManager.set(cacheKey, categories, 60);
     return categories;
   }
 
@@ -39,11 +50,11 @@ export class CategoryService {
 
     const where = search
       ? {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-        ],
-      }
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        }
       : {};
 
     const [items, total] = await Promise.all([
@@ -52,8 +63,8 @@ export class CategoryService {
         skip,
         take: Number(limit),
         include: {
-          books: true
-        }
+          books: true,
+        },
       }),
       this.prisma.category.count({ where }),
     ]);
