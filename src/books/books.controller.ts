@@ -13,8 +13,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { QueryBooksDto } from './dto/query-book.dto';
 import { FilterBooksDto } from './dto/filter-books.dto';
+import { QueryBooksDto } from './dto/query-book.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -31,11 +31,7 @@ export class BooksController {
 
   @Get()
   @ApiOperation({ summary: 'Get all books with pagination & search' })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    description: 'Search by name or description',
-  })
+  @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Books retrieved successfully' })
@@ -95,5 +91,19 @@ export class BooksController {
   @ApiResponse({ status: 404, description: 'No unavailable books found' })
   findUnavailable() {
     return this.booksService.findUnavailable();
+  }
+
+  @Get('top-rated')
+  @ApiOperation({ summary: 'Get top rated books' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of books to return' })
+  findTopRated(@Query('limit') limit?: number) {
+    return this.booksService.findTopRated(limit);
+  }
+
+  @Get('recently-added')
+  @ApiOperation({ summary: 'Get recently added books' })
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days to look back' })
+  findRecentlyAdded(@Query('days') days?: number) {
+    return this.booksService.findRecentlyAdded(days);
   }
 }

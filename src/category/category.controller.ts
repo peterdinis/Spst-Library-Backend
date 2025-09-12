@@ -26,6 +26,15 @@ export class CategoryController {
     return this.categoryService.findAll(pagination);
   }
 
+  // 👉 presunuté nad :id
+  @Get('all')
+  @ApiOperation({
+    summary: 'Get all categories (cached, no pagination or search)',
+  })
+  findAllCached() {
+    return this.categoryService.findAllCached();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a category by ID' })
   @ApiResponse({ status: 404, description: 'Category not found' })
