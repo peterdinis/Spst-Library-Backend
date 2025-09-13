@@ -5,7 +5,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('RolesService', () => {
   let service: RolesService;
-  
+
   let prisma: {
     role: {
       create: jest.Mock;
@@ -53,7 +53,9 @@ describe('RolesService', () => {
       prisma.role.create.mockResolvedValue({ id: 1, name: 'Admin' });
       const result = await service.create({ name: 'Admin' });
       expect(result).toEqual({ id: 1, name: 'Admin' });
-      expect(prisma.role.create).toHaveBeenCalledWith({ data: { name: 'Admin' } });
+      expect(prisma.role.create).toHaveBeenCalledWith({
+        data: { name: 'Admin' },
+      });
     });
   });
 
@@ -115,9 +117,9 @@ describe('RolesService', () => {
 
     it('should throw if neither roleId nor roleName is provided', async () => {
       prisma.user.findUnique.mockResolvedValue({ id: userId });
-      await expect(
-        service.changeUserRole({ userId }),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.changeUserRole({ userId })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw if role not found by ID', async () => {

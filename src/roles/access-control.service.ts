@@ -14,7 +14,10 @@ export class AccessControlService {
     ADMIN: 3,
   };
 
-  public isAuthorized({ currentRole, requiredRole }: IsAuthorizedParams): boolean {
+  public isAuthorized({
+    currentRole,
+    requiredRole,
+  }: IsAuthorizedParams): boolean {
     const currentPriority = this.rolePriority[currentRole];
     const requiredPriority = this.rolePriority[requiredRole];
 

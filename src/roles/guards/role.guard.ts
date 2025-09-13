@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AccessControlService } from '../access-control.service';
 import { ROLE_KEY } from '../decorators/roles.decorator';
@@ -43,7 +48,7 @@ export class RoleGuard implements CanActivate {
     }
 
     const currentRoleEnum = mapPrismaRoleToEnum(token.role);
-    
+
     const hasAccess = requiredRoles.some((requiredRole) =>
       this.accessControlService.isAuthorized({
         currentRole: currentRoleEnum,
@@ -52,7 +57,9 @@ export class RoleGuard implements CanActivate {
     );
 
     if (!hasAccess) {
-      throw new ForbiddenException('You do not have permission to access this resource');
+      throw new ForbiddenException(
+        'You do not have permission to access this resource',
+      );
     }
 
     return true;

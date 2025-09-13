@@ -5,5 +5,5 @@ export class TokenDto {
   id: number;
 
   @IsString()
-  role: string; 
+  role: string;
 }

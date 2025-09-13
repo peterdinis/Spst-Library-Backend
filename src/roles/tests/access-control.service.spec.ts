@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { AccessControlService } from '../access-control.service';
 import { Role } from '../utils/roles';
@@ -163,8 +162,9 @@ describe('AccessControlService', () => {
         roles.forEach((currentRole, currentIndex) => {
           roles.forEach((requiredRole, requiredIndex) => {
             const result = service.isAuthorized({ currentRole, requiredRole });
-            const shouldBeAuthorized = priorities[currentIndex] >= priorities[requiredIndex];
-            
+            const shouldBeAuthorized =
+              priorities[currentIndex] >= priorities[requiredIndex];
+
             expect(result).toBe(shouldBeAuthorized);
           });
         });
