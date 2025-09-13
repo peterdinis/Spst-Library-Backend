@@ -12,7 +12,7 @@ import { AccessControlService } from 'src/roles/access-control.service';
 import {
   ACCESS_TOKEN_EXPIRY,
   REFRESH_TOKEN_EXPIRY,
-} from 'src/constants/applicationConstants';
+} from 'src/shared/constants/applicationConstants';
 import { Role } from 'src/roles/utils/roles';
 
 @Injectable()

@@ -12,7 +12,7 @@ import { Cache } from 'cache-manager';
 import { PaginationDto } from './dto/category-pagination.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { DEFAULT_CACHE_TTL } from 'src/constants/applicationConstants';
+import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class CategoryService {

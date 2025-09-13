@@ -13,7 +13,6 @@ export class RolesService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateRoleDto) {
-    // Will throw on unique name violation automatically
     return this.prisma.role.create({ data: { name: dto.name } });
   }
 
@@ -28,13 +27,11 @@ export class RolesService {
   }
 
   async update(id: number, dto: UpdateRoleDto) {
-    // Optional: check existence first for nicer 404 instead of Prisma error
     await this.findOne(id);
     return this.prisma.role.update({ where: { id }, data: { ...dto } });
   }
 
   async remove(id: number) {
-    // Optional: check existence first
     await this.findOne(id);
     return this.prisma.role.delete({ where: { id } });
   }
