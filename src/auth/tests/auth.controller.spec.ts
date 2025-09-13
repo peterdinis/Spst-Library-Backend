@@ -40,7 +40,11 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should call AuthService.register and return tokens', async () => {
-      const dto = { email: 'test@example.com', name: 'Test', password: '123456' };
+      const dto = {
+        email: 'test@example.com',
+        name: 'Test',
+        password: '123456',
+      };
       const result = await controller.register(dto);
 
       expect(authService.register).toHaveBeenCalledWith(dto);
@@ -63,16 +67,21 @@ describe('AuthController', () => {
       const body = { userId: 1, refreshToken: 'refreshToken' };
       const result = await controller.refresh(body);
 
-      expect(authService.refreshToken).toHaveBeenCalledWith(body.userId, body.refreshToken);
+      expect(authService.refreshToken).toHaveBeenCalledWith(
+        body.userId,
+        body.refreshToken,
+      );
       expect(result).toEqual(mockTokens);
     });
 
     it('should throw if AuthService.refreshToken throws', async () => {
-      jest.spyOn(authService, 'refreshToken').mockRejectedValueOnce(new UnauthorizedException());
+      jest
+        .spyOn(authService, 'refreshToken')
+        .mockRejectedValueOnce(new UnauthorizedException());
 
-      await expect(controller.refresh({ userId: 1, refreshToken: 'invalid' })).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(
+        controller.refresh({ userId: 1, refreshToken: 'invalid' }),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
