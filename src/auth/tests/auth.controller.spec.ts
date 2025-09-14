@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { Role } from 'src/roles/utils/roles';
+import { AuthController } from '../auth.controller';
+import { AuthService } from '../auth.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -102,13 +102,6 @@ describe('AuthController', () => {
 
       expect(authService.profile).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockProfile);
-    });
-  });
-
-  describe('adminOnly', () => {
-    it('should return admin-only message', () => {
-      const result = controller.adminOnly();
-      expect(result).toEqual({ message: 'This is an admin-only route' });
     });
   });
 });

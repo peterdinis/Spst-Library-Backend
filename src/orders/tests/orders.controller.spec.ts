@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrdersController } from './orders.controller';
-import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
 import { Order, OrderStatus } from '@prisma/client';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { UpdateOrderStatusDto } from '../dto/update-order.status.dto';
+import { OrdersController } from '../orders.controller';
+import { OrdersService } from '../orders.service';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -29,9 +29,7 @@ describe('OrdersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
-      providers: [
-        { provide: OrdersService, useValue: ordersServiceMock },
-      ],
+      providers: [{ provide: OrdersService, useValue: ordersServiceMock }],
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
@@ -42,7 +40,10 @@ describe('OrdersController', () => {
 
   describe('createOrder', () => {
     it('should call service.createOrder and return the order', async () => {
-      const dto: CreateOrderDto = { userId: 1, items: [{ bookId: 1, quantity: 1 }] };
+      const dto: CreateOrderDto = {
+        userId: 1,
+        items: [{ bookId: 1, quantity: 1 }],
+      };
       ordersServiceMock.createOrder.mockResolvedValue(mockOrder);
 
       const result = await controller.createOrder(dto);
@@ -73,8 +74,14 @@ describe('OrdersController', () => {
 
   describe('updateStatus', () => {
     it('should call service.updateOrderStatus and return the order', async () => {
-      const dto: UpdateOrderStatusDto = { orderId: 1, status: OrderStatus.COMPLETED };
-      ordersServiceMock.updateOrderStatus.mockResolvedValue({ ...mockOrder, status: OrderStatus.COMPLETED });
+      const dto: UpdateOrderStatusDto = {
+        orderId: 1,
+        status: OrderStatus.COMPLETED,
+      };
+      ordersServiceMock.updateOrderStatus.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.COMPLETED,
+      });
 
       const result = await controller.updateStatus(dto);
       expect(result.status).toEqual(OrderStatus.COMPLETED);
@@ -84,7 +91,10 @@ describe('OrdersController', () => {
 
   describe('returnOrder', () => {
     it('should call service.returnOrder and return the order', async () => {
-      ordersServiceMock.returnOrder.mockResolvedValue({ ...mockOrder, status: OrderStatus.PENDING });
+      ordersServiceMock.returnOrder.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.PENDING,
+      });
 
       const result = await controller.returnOrder('1');
       expect(result.status).toEqual(OrderStatus.PENDING);
@@ -94,7 +104,10 @@ describe('OrdersController', () => {
 
   describe('cancelOrder', () => {
     it('should call service.cancelOrder and return the order', async () => {
-      ordersServiceMock.cancelOrder.mockResolvedValue({ ...mockOrder, status: OrderStatus.CANCELLED });
+      ordersServiceMock.cancelOrder.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.CANCELLED,
+      });
 
       const result = await controller.cancelOrder('1');
       expect(result.status).toEqual(OrderStatus.CANCELLED);

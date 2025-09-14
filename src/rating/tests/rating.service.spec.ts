@@ -16,7 +16,6 @@ interface FindAllResult {
   };
 }
 
-// Pomôcky na typovanie cache mocku
 type CacheMock = {
   get: jest.Mock;
   set: jest.Mock;
@@ -26,7 +25,6 @@ type CacheMock = {
 
 describe('RatingService', () => {
   let service: RatingService;
-  // Tu používame jest.Mocked, aby TS vedel, že vo vnútri sú mocky
   let prisma: {
     rating: {
       findMany: jest.Mock;

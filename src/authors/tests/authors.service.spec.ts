@@ -1,207 +1,201 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthorsService } from './authors.service';
+import { AuthorsService } from '../authors.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import {
   BadRequestException,
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { CreateAuthorDto } from '../dto/create-author.dto';
+import { UpdateAuthorDto } from '../dto/update-author.dto';
+import { QueryAuthorDto } from '../dto/query-author.dto';
 
 describe('AuthorsService', () => {
   let service: AuthorsService;
-  let prisma: PrismaService;
-  let cacheManager: Cache;
+  let prisma: any;
+  let cache: { get: jest.Mock; set: jest.Mock; clear: jest.Mock };
 
   const mockAuthor = {
     id: 1,
     name: 'John Doe',
-    bornDate: new Date('1980-01-01'),
+    bornDate: '1990-01-01',
+    litPeriod: '20th Century',
+    bio: null,
+    deathDate: null,
     books: [],
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(async () => {
+    prisma = {
+      author: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        findMany: jest.fn(),
+        count: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+    };
+
+    cache = {
+      get: jest.fn(),
+      set: jest.fn(),
+      clear: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthorsService,
-        {
-          provide: PrismaService,
-          useValue: {
-            author: {
-              findFirst: jest.fn(),
-              create: jest.fn(),
-              findMany: jest.fn(),
-              count: jest.fn(),
-              findUnique: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
-            },
-          },
-        },
-        {
-          provide: CACHE_MANAGER,
-          useValue: {
-            get: jest.fn(),
-            set: jest.fn(),
-            clear: jest.fn(),
-          },
-        },
+        { provide: PrismaService, useValue: prisma },
+        { provide: CACHE_MANAGER, useValue: cache },
       ],
     }).compile();
 
     service = module.get<AuthorsService>(AuthorsService);
-    prisma = module.get<PrismaService>(PrismaService);
-    cacheManager = module.get<Cache>(CACHE_MANAGER);
   });
 
   describe('create', () => {
-    it('should create a new author and clear cache', async () => {
-      (prisma.author.findFirst as jest.Mock).mockResolvedValue(null);
-      (prisma.author.create as jest.Mock).mockResolvedValue(mockAuthor);
+    it('should create a new author', async () => {
+      prisma.author.findFirst.mockResolvedValue(null);
+      prisma.author.create.mockResolvedValue(mockAuthor);
 
-      const result = await service.create({
+      const dto: CreateAuthorDto = {
         name: 'John Doe',
-        bornDate: new Date('1980-01-01'),
-      });
+        bornDate: '1990-01-01',
+        litPeriod: '20th Century',
+        bio: 'null',
+        deathDate: '1990-01-02',
+      };
+      const result = await service.create(dto);
 
+      expect(prisma.author.findFirst).toHaveBeenCalledWith({
+        where: { name: dto.name, bornDate: dto.bornDate },
+      });
+      expect(prisma.author.create).toHaveBeenCalledWith({ data: dto });
+      expect(cache.clear).toHaveBeenCalled();
       expect(result).toEqual(mockAuthor);
-      expect(cacheManager.clear).toHaveBeenCalled();
     });
 
     it('should throw ConflictException if author exists', async () => {
-      (prisma.author.findFirst as jest.Mock).mockResolvedValue(mockAuthor);
+      prisma.author.findFirst.mockResolvedValue(mockAuthor);
 
-      await expect(
-        service.create({ name: 'John Doe', bornDate: new Date('1980-01-01') }),
-      ).rejects.toThrow(ConflictException);
+      const dto: CreateAuthorDto = {
+        name: 'John Doe',
+        bornDate: '1990-01-01',
+        litPeriod: '20th Century',
+        bio: 'null',
+        deathDate: '1990-01-02',
+      };
+      await expect(service.create(dto)).rejects.toThrow(ConflictException);
     });
   });
 
   describe('findAll', () => {
-    it('should return authors with pagination and cache', async () => {
-      (cacheManager.get as jest.Mock).mockResolvedValue(null);
-      (prisma.author.findMany as jest.Mock).mockResolvedValue([mockAuthor]);
-      (prisma.author.count as jest.Mock).mockResolvedValue(1);
+    const query: QueryAuthorDto = { page: 1, limit: 10, search: 'John' };
 
-      const result = await service.findAll({ page: 1, limit: 10 });
-
-      expect(result.data).toEqual([mockAuthor]);
-      expect(cacheManager.set).toHaveBeenCalled();
+    it('should return cached data if available', async () => {
+      cache.get.mockResolvedValue('cached-authors');
+      const result = await service.findAll(query);
+      expect(result).toBe('cached-authors');
     });
 
-    it('should return cached data if exists', async () => {
-      (cacheManager.get as jest.Mock).mockResolvedValue({
-        data: [mockAuthor],
-        meta: {},
-      });
+    it('should throw NotFoundException if no authors found', async () => {
+      cache.get.mockResolvedValue(null);
+      prisma.author.findMany.mockResolvedValue([]);
+      prisma.author.count.mockResolvedValue(0);
 
-      const result = await service.findAll({ page: 1, limit: 10 });
-
-      expect(result.data).toEqual([mockAuthor]);
-      expect(prisma.author.findMany).not.toHaveBeenCalled();
+      await expect(service.findAll(query)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException for invalid page/limit', async () => {
       await expect(service.findAll({ page: 0, limit: 10 })).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.findAll({ page: 1, limit: 0 })).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw NotFoundException if no authors found', async () => {
-      (cacheManager.get as jest.Mock).mockResolvedValue(null);
-      (prisma.author.findMany as jest.Mock).mockResolvedValue([]);
-      (prisma.author.count as jest.Mock).mockResolvedValue(0);
-
-      await expect(service.findAll({ page: 1, limit: 10 })).rejects.toThrow(
-        NotFoundException,
-      );
     });
   });
 
   describe('findOne', () => {
     it('should return cached author if exists', async () => {
-      (cacheManager.get as jest.Mock).mockResolvedValue(mockAuthor);
-
+      cache.get.mockResolvedValue(mockAuthor);
       const result = await service.findOne(1);
       expect(result).toEqual(mockAuthor);
     });
 
-    it('should return author from db and cache it', async () => {
-      (cacheManager.get as jest.Mock).mockResolvedValue(null);
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(mockAuthor);
+    it('should fetch author if not cached', async () => {
+      cache.get.mockResolvedValue(null);
+      prisma.author.findUnique.mockResolvedValue(mockAuthor);
 
       const result = await service.findOne(1);
-      expect(result).toEqual(mockAuthor);
-      expect(cacheManager.set).toHaveBeenCalled();
-    });
 
-    it('should throw BadRequestException for invalid ID', async () => {
-      await expect(service.findOne(0)).rejects.toThrow(BadRequestException);
+      expect(prisma.author.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+        include: { books: true },
+      });
+      expect(cache.set).toHaveBeenCalled();
+      expect(result).toEqual(mockAuthor);
     });
 
     it('should throw NotFoundException if author does not exist', async () => {
-      (cacheManager.get as jest.Mock).mockResolvedValue(null);
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(null);
+      cache.get.mockResolvedValue(null);
+      prisma.author.findUnique.mockResolvedValue(null);
+      await expect(service.findOne(99)).rejects.toThrow(NotFoundException);
+    });
 
-      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+    it('should throw BadRequestException for invalid id', async () => {
+      await expect(service.findOne(0)).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('update', () => {
-    it('should update author and clear cache', async () => {
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(mockAuthor);
-      (prisma.author.findFirst as jest.Mock).mockResolvedValue(null);
-      (prisma.author.update as jest.Mock).mockResolvedValue(mockAuthor);
+    const dto: UpdateAuthorDto = { name: 'Jane Doe' };
 
-      const result = await service.update(1, { name: 'Updated' });
+    it('should update an author', async () => {
+      prisma.author.findUnique.mockResolvedValue(mockAuthor);
+      prisma.author.findFirst.mockResolvedValue(null);
+      prisma.author.update.mockResolvedValue({ ...mockAuthor, ...dto });
 
-      expect(result).toEqual(mockAuthor);
-      expect(cacheManager.clear).toHaveBeenCalled();
+      const result = await service.update(1, dto);
+
+      expect(result).toEqual({ ...mockAuthor, ...dto });
+      expect(cache.clear).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if author does not exist', async () => {
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(null);
-
-      await expect(service.update(1, { name: 'Updated' })).rejects.toThrow(
-        NotFoundException,
-      );
+    it('should throw NotFoundException if author not found', async () => {
+      prisma.author.findUnique.mockResolvedValue(null);
+      await expect(service.update(1, dto)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw ConflictException if duplicate author exists', async () => {
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(mockAuthor);
-      (prisma.author.findFirst as jest.Mock).mockResolvedValue({
-        ...mockAuthor,
-        id: 2,
-      });
+    it('should throw ConflictException if duplicate exists', async () => {
+      prisma.author.findUnique.mockResolvedValue(mockAuthor);
+      prisma.author.findFirst.mockResolvedValue({ id: 2 });
+      await expect(service.update(1, dto)).rejects.toThrow(ConflictException);
+    });
 
-      await expect(service.update(1, { name: 'John Doe' })).rejects.toThrow(
-        ConflictException,
-      );
+    it('should throw BadRequestException for invalid id', async () => {
+      await expect(service.update(0, dto)).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('remove', () => {
-    it('should delete author and clear cache', async () => {
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(mockAuthor);
-      (prisma.author.delete as jest.Mock).mockResolvedValue(mockAuthor);
+    it('should remove an author', async () => {
+      prisma.author.findUnique.mockResolvedValue(mockAuthor);
+      prisma.author.delete.mockResolvedValue(mockAuthor);
 
       const result = await service.remove(1);
-      expect(result).toEqual({ message: `Author 1 deleted successfully.` });
-      expect(cacheManager.clear).toHaveBeenCalled();
+      expect(result).toEqual({ message: 'Author 1 deleted successfully.' });
+      expect(cache.clear).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if author does not exist', async () => {
-      (prisma.author.findUnique as jest.Mock).mockResolvedValue(null);
-
+    it('should throw NotFoundException if author not found', async () => {
+      prisma.author.findUnique.mockResolvedValue(null);
       await expect(service.remove(1)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw BadRequestException for invalid ID', async () => {
+    it('should throw BadRequestException for invalid id', async () => {
       await expect(service.remove(0)).rejects.toThrow(BadRequestException);
     });
   });

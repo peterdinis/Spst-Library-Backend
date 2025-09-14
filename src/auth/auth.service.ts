@@ -23,23 +23,11 @@ export class AuthService {
     private accessControlService: AccessControlService,
   ) {}
 
-  private roleEnumToName(desired: Role): string {
-    return String(desired);
-  }
-
-  private async getRoleByNameOrThrow(name: string) {
-    const role = await this.prisma.role.findUnique({ where: { name } });
-    if (!role) throw new BadRequestException(`Role "${name}" not found`);
-    return role;
-  }
-
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
-    const desiredAppRole: Role = (dto as any).role ?? Role.STUDENT;
-
     if (
       !this.accessControlService.isAuthorized({
         currentRole: creatorRole,
-        requiredRole: desiredAppRole,
+        requiredRole: dto.role as unknown as Role,
       })
     ) {
       throw new UnauthorizedException('You cannot assign this role');
@@ -51,10 +39,13 @@ export class AuthService {
     if (existingUser) throw new BadRequestException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const roleRecord = await this.getRoleByNameOrThrow(
-      this.roleEnumToName(desiredAppRole),
-    );
 
+    const roleRecord = await this.prisma.role.findUnique({
+      where: { name: dto.role as unknown as Role },
+    });
+    if (!roleRecord) throw new BadRequestException('Role not found');
+
+    // vytvorenie používateľa
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
@@ -65,10 +56,11 @@ export class AuthService {
       include: { role: true },
     });
 
-    return this.generateTokens(user.id, user.role.name);
+    // tokeny generujeme zo stringu role.name
+    return this.generateTokens(user.id, user.role.name as Role);
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, desiredRole?: Role) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
       include: { role: true },
@@ -78,6 +70,13 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
     if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
+
+    // Validácia role pri login-e
+    if (desiredRole && user.role.name !== desiredRole) {
+      throw new UnauthorizedException(
+        `This account is not registered as a ${desiredRole}`,
+      );
+    }
 
     return this.generateTokens(user.id, user.role.name);
   }

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BookTagController } from './book-tag.controller';
-import { BookTagService } from './book-tag.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { BookTagController } from '../book-tag.controller';
+import { BookTagService } from '../book-tag.service';
 
 describe('BookTagController', () => {
   let controller: BookTagController;
@@ -79,7 +79,9 @@ describe('BookTagController', () => {
     });
 
     it('should propagate service errors', async () => {
-      jest.spyOn(service, 'search').mockRejectedValueOnce(new BadRequestException());
+      jest
+        .spyOn(service, 'search')
+        .mockRejectedValueOnce(new BadRequestException());
       await expect(controller.search('')).rejects.toThrow(BadRequestException);
     });
   });

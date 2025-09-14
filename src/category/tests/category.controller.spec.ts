@@ -1,15 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoryController } from './category.controller';
-import { CategoryService } from './category.service';
-import { PaginationDto } from './dto/category-pagination.dto';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryController } from '../category.controller';
+import { CategoryService } from '../category.service';
+import { PaginationDto } from '../dto/category-pagination.dto';
+import { CreateCategoryDto } from '../dto/create-category.dto';
+import { UpdateCategoryDto } from '../dto/update-category.dto';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
   let service: CategoryService;
 
-  const mockCategory = { id: 1, name: 'Fiction', description: 'Fiction books', books: [] };
+  const mockCategory = {
+    id: 1,
+    name: 'Fiction',
+    description: 'Fiction books',
+    books: [],
+  };
   const mockCategories = [mockCategory];
 
   const categoryServiceMock = {
@@ -88,7 +93,10 @@ describe('CategoryController', () => {
 
   describe('update', () => {
     it('should call service.update and return the updated category', async () => {
-      const dto: UpdateCategoryDto = { name: 'Updated', description: 'Updated desc' };
+      const dto: UpdateCategoryDto = {
+        name: 'Updated',
+        description: 'Updated desc',
+      };
       categoryServiceMock.update.mockResolvedValue({ ...mockCategory, ...dto });
 
       const result = await controller.update(1, dto);

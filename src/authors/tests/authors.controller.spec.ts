@@ -1,12 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthorsController } from './authors.controller';
-import { AuthorsService } from './authors.service';
-import {
-  ConflictException,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
-import { Role } from 'src/roles/utils/roles';
+import { NotFoundException } from '@nestjs/common';
+import { AuthorsController } from '../authors.controller';
+import { AuthorsService } from '../authors.service';
 
 describe('AuthorsController', () => {
   let controller: AuthorsController;
@@ -50,7 +45,11 @@ describe('AuthorsController', () => {
 
   describe('create', () => {
     it('should call service.create and return the created author', async () => {
-      const dto = { name: 'John Doe', bornDate: new Date('1980-01-01') };
+      const dto = {
+        name: 'John Doe',
+        bornDate: new Date('1980-01-01').toISOString(),
+        litPeriod: 'Modern Era',
+      };
       const result = await controller.create(dto);
       expect(service.create).toHaveBeenCalledWith(dto);
       expect(result).toEqual(mockAuthor);

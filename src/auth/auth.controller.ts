@@ -61,13 +61,4 @@ export class AuthController {
   async profile(@Req() req: any) {
     return this.authService.profile(req.user.id);
   }
-
-  @ApiBearerAuth()
-  @Get('admin')
-  @ApiOperation({ summary: 'Admin-only route' })
-  @ApiResponse({ status: 200, description: 'Accessible only to admins.' })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
-  adminOnly() {
-    return { message: 'This is an admin-only route' };
-  }
 }

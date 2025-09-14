@@ -7,6 +7,12 @@ import * as bcrypt from 'bcrypt';
 import { Role } from 'src/roles/utils/roles';
 import { AuthService } from '../auth.service';
 
+// ✅ Mockovanie konštánt, ktoré sa používajú pri signovaní
+jest.mock('src/shared/constants/applicationConstants', () => ({
+  ACCESS_TOKEN_EXPIRY: '1h',
+  REFRESH_TOKEN_EXPIRY: '7d',
+}));
+
 describe('AuthService', () => {
   let service: AuthService;
   let prisma: PrismaService;
@@ -19,6 +25,7 @@ describe('AuthService', () => {
     name: 'Test User',
     password: 'hashedPassword',
     role: { id: 1, name: Role.STUDENT },
+    createdAt: new Date(),
   };
 
   beforeEach(async () => {
@@ -36,7 +43,7 @@ describe('AuthService', () => {
               findUnique: jest.fn(),
             },
             token: {
-              create: jest.fn(),
+              create: jest.fn().mockResolvedValue({}), // ✅ musí byť mocknuté
               findUnique: jest.fn(),
               delete: jest.fn(),
               deleteMany: jest.fn(),
@@ -68,9 +75,12 @@ describe('AuthService', () => {
   describe('register', () => {
     it('should register a new user and return tokens', async () => {
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
-      jest
-        .spyOn(prisma.role, 'findUnique')
-        .mockResolvedValue({ id: 1, name: Role.STUDENT });
+      jest.spyOn(prisma.role, 'findUnique').mockResolvedValue({
+        id: 1,
+        name: Role.STUDENT,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       jest.spyOn(prisma.user, 'create').mockResolvedValue(mockUser as any);
       jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as any);
 
@@ -85,6 +95,7 @@ describe('AuthService', () => {
         refresh_token: 'signedToken',
       });
       expect(prisma.user.create).toHaveBeenCalled();
+      expect(prisma.token.create).toHaveBeenCalled(); // ✅ token create
     });
 
     it('should throw if email is already in use', async () => {
@@ -107,7 +118,6 @@ describe('AuthService', () => {
           email: 'test@example.com',
           name: 'Test',
           password: '123456',
-          role: Role.ADMIN,
         }),
       ).rejects.toThrow(UnauthorizedException);
     });
@@ -127,6 +137,7 @@ describe('AuthService', () => {
         access_token: 'signedToken',
         refresh_token: 'signedToken',
       });
+      expect(prisma.token.create).toHaveBeenCalled();
     });
 
     it('should throw if user not found', async () => {
@@ -149,11 +160,22 @@ describe('AuthService', () => {
 
   describe('profile', () => {
     it('should return user profile', async () => {
-      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser as any);
+      // ✅ AuthService.profile používa `select`, takže treba rovnaký tvar
+      const profileUser = {
+        id: mockUser.id,
+        email: mockUser.email,
+        name: mockUser.name,
+        createdAt: mockUser.createdAt,
+        role: { id: mockUser.role.id, name: mockUser.role.name },
+      };
+
+      jest
+        .spyOn(prisma.user, 'findUnique')
+        .mockResolvedValue(profileUser as any);
 
       const result = await service.profile(1);
 
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual(profileUser);
     });
   });
 });
