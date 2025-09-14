@@ -21,7 +21,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private accessControlService: AccessControlService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
     if (
@@ -41,10 +41,14 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const roleRecord = await this.prisma.role.findUnique({
-      where: { name: dto.role as unknown as Role },
+      where: { name: dto.name },
     });
-    if (!roleRecord) throw new BadRequestException('Role not found');
 
+    console.log("RR", roleRecord)
+
+    if (!roleRecord) {
+      throw new BadRequestException(`Role ${roleRecord} not found`);
+    }
     // vytvorenie používateľa
     const user = await this.prisma.user.create({
       data: {
