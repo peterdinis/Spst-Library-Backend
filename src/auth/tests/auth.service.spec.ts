@@ -169,7 +169,9 @@ describe('AuthService', () => {
         role: { id: mockUser.role.id, name: mockUser.role.name },
       };
 
-      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(profileUser as any);
+      jest
+        .spyOn(prisma.user, 'findUnique')
+        .mockResolvedValue(profileUser as any);
 
       const result = await service.profile(1);
 
