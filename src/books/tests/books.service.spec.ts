@@ -5,12 +5,10 @@ import { NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BooksService } from '../books.service';
 
-// Mock constants
 jest.mock('src/shared/constants/applicationConstants', () => ({
   DEFAULT_CACHE_TTL: 300000,
 }));
 
-// Type definitions for tests
 interface PaginatedResult<T> {
   data: T[];
   meta?: {
@@ -19,7 +17,7 @@ interface PaginatedResult<T> {
     limit?: number;
     totalPages?: number;
   };
-  total?: number; // For filter method
+  total?: number;
 }
 
 interface Book {

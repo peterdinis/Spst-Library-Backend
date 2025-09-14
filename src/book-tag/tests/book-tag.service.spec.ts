@@ -96,8 +96,8 @@ describe('BookTagService', () => {
   describe('update', () => {
     it('should update tag and clear cache', async () => {
       (prisma.bookTag.findUnique as jest.Mock)
-        .mockResolvedValueOnce(mockTag) // check existence
-        .mockResolvedValueOnce(null); // check duplicate
+        .mockResolvedValueOnce(mockTag)
+        .mockResolvedValueOnce(null);
       (prisma.bookTag.update as jest.Mock).mockResolvedValue({
         ...mockTag,
         name: 'Sci-Fi',
@@ -117,8 +117,8 @@ describe('BookTagService', () => {
 
     it('should throw if duplicate tag name exists', async () => {
       (prisma.bookTag.findUnique as jest.Mock)
-        .mockResolvedValueOnce(mockTag) // check existence
-        .mockResolvedValueOnce({ id: 2, name: 'Sci-Fi' }); // duplicate
+        .mockResolvedValueOnce(mockTag)
+        .mockResolvedValueOnce({ id: 2, name: 'Sci-Fi' });
       await expect(service.update(1, 'Sci-Fi')).rejects.toThrow(
         BadRequestException,
       );
