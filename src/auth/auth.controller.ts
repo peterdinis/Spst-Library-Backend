@@ -9,6 +9,7 @@ import {
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
+import { AuthRequest } from './types/authTypes';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -48,7 +49,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Logout user and revoke all refresh tokens' })
   @ApiResponse({ status: 200, description: 'User logged out successfully.' })
-  async logout(@Req() req) {
+  async logout(@Req() req: AuthRequest) {
     await this.authService.revokeTokens(req.user.id);
     return { message: 'Logged out successfully' };
   }
@@ -58,7 +59,7 @@ export class AuthController {
   @Get('profile')
   @ApiOperation({ summary: 'Get profile of the authenticated user' })
   @ApiResponse({ status: 200, description: 'Returns user profile.' })
-  async profile(@Req() req) {
+  async profile(@Req() req: AuthRequest) {
     return this.authService.profile(req.user.id);
   }
 }
