@@ -67,8 +67,8 @@ describe('AuthorsService', () => {
         name: 'John Doe',
         bornDate: '1990-01-01',
         litPeriod: '20th Century',
-        bio: "null",
-        deathDate: "1990-01-02",
+        bio: 'null',
+        deathDate: '1990-01-02',
       };
       const result = await service.create(dto);
 
@@ -87,8 +87,8 @@ describe('AuthorsService', () => {
         name: 'John Doe',
         bornDate: '1990-01-01',
         litPeriod: '20th Century',
-        bio: "null",
-        deathDate: "1990-01-02",
+        bio: 'null',
+        deathDate: '1990-01-02',
       };
       await expect(service.create(dto)).rejects.toThrow(ConflictException);
     });
@@ -112,7 +112,9 @@ describe('AuthorsService', () => {
     });
 
     it('should throw BadRequestException for invalid page/limit', async () => {
-      await expect(service.findAll({ page: 0, limit: 10 })).rejects.toThrow(BadRequestException);
+      await expect(service.findAll({ page: 0, limit: 10 })).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
