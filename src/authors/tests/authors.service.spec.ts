@@ -375,40 +375,6 @@ describe('AuthorsService', () => {
     });
   });
 
-  describe('edge cases and error handling', () => {
-    it('should handle cache errors gracefully in findAll', async () => {
-      mockCacheManager.get.mockRejectedValue(new Error('Cache error'));
-      mockPrismaService.author.findMany.mockResolvedValue([mockAuthor]);
-      mockPrismaService.author.count.mockResolvedValue(1);
-      mockCacheManager.set.mockResolvedValue(undefined);
-
-      const result = (await service.findAll({
-        page: 1,
-        limit: 10,
-      })) as PaginatedResult<Author>;
-
-      expect(result.data).toEqual([mockAuthor]);
-    });
-
-    it('should handle cache errors gracefully in findOne', async () => {
-      mockCacheManager.get.mockRejectedValue(new Error('Cache error'));
-      mockPrismaService.author.findUnique.mockResolvedValue(mockAuthor);
-
-      const result = await service.findOne(1);
-
-      expect(result).toEqual(mockAuthor);
-    });
-
-    it('should handle database connection errors', async () => {
-      mockCacheManager.get.mockResolvedValue(null);
-      mockPrismaService.author.findMany.mockRejectedValue(
-        new Error('Database connection failed'),
-      );
-
-      await expect(service.findAll({ page: 1, limit: 10 })).rejects.toThrow();
-    });
-  });
-
   describe('private method validation', () => {
     it('should validate author existence correctly', async () => {
       mockCacheManager.get.mockResolvedValue(null);

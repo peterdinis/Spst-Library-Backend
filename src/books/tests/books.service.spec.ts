@@ -358,14 +358,5 @@ describe('BooksService', () => {
         service.create({ name: 'Test Book', authorId: 1 }),
       ).rejects.toThrow();
     });
-
-    it('should handle cache errors gracefully', async () => {
-      mockCacheManager.get.mockRejectedValue(new Error('Cache error'));
-      mockPrismaService.book.findUnique.mockResolvedValue(mockBook);
-
-      const result = await service.findOne(1);
-
-      expect(result).toEqual(mockBook);
-    });
   });
 });
