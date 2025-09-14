@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoryService } from './category.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
 import { Cache } from 'cache-manager';
+import { CategoryService } from '../category.service';
 
 describe('CategoryService', () => {
   let service: CategoryService;

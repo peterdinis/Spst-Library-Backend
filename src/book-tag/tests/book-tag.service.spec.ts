@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BookTagService } from './book-tag.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BookTagService } from '../book-tag.service';
 
 describe('BookTagService', () => {
   let service: BookTagService;

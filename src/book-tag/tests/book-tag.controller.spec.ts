@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BookTagController } from './book-tag.controller';
-import { BookTagService } from './book-tag.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { BookTagController } from '../book-tag.controller';
+import { BookTagService } from '../book-tag.service';
 
 describe('BookTagController', () => {
   let controller: BookTagController;

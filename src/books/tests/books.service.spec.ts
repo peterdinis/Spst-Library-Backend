@@ -1,6 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BooksService } from './books.service';
-import { PrismaService } from '../prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import {
@@ -8,6 +6,8 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { BooksService } from '../books.service';
 
 describe('BooksService', () => {
   let service: BooksService;
