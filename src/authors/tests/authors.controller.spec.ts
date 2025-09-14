@@ -90,7 +90,6 @@ describe('AuthorsController', () => {
     });
   });
 
-  // Optional: test error forwarding
   it('should propagate service errors', async () => {
     jest
       .spyOn(service, 'findOne')

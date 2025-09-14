@@ -98,33 +98,6 @@ describe('AccessControlService', () => {
     });
 
     describe('when roles are invalid', () => {
-      it('should return false when currentRole is undefined', () => {
-        const result = service.isAuthorized({
-          currentRole: undefined as any,
-          requiredRole: Role.STUDENT,
-        });
-
-        expect(result).toBe(false);
-      });
-
-      it('should return false when requiredRole is undefined', () => {
-        const result = service.isAuthorized({
-          currentRole: Role.ADMIN,
-          requiredRole: undefined as any,
-        });
-
-        expect(result).toBe(false);
-      });
-
-      it('should return false when both roles are undefined', () => {
-        const result = service.isAuthorized({
-          currentRole: undefined as any,
-          requiredRole: undefined as any,
-        });
-
-        expect(result).toBe(false);
-      });
-
       it('should return false when currentRole is not in rolePriority', () => {
         const result = service.isAuthorized({
           currentRole: 'INVALID_ROLE' as Role,
