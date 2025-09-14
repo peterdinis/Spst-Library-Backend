@@ -8,12 +8,14 @@ import {
   Body,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { PaginationDto } from './dto/category-pagination.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -26,7 +28,6 @@ export class CategoryController {
     return this.categoryService.findAll(pagination);
   }
 
-  // 👉 presunuté nad :id
   @Get('all')
   @ApiOperation({
     summary: 'Get all categories (cached, no pagination or search)',
@@ -43,12 +44,14 @@ export class CategoryController {
   }
 
   @Post()
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Create a new category' })
   create(@Body() body: CreateCategoryDto) {
     return this.categoryService.create(body);
   }
 
   @Patch(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Update a category' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -58,6 +61,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Delete a category' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.remove(id);

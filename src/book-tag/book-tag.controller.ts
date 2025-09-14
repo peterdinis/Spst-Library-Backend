@@ -7,9 +7,11 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BookTagService } from './book-tag.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('Book Tags')
 @Controller('book-tag')
@@ -17,6 +19,7 @@ export class BookTagController {
   constructor(private readonly bookTagService: BookTagService) {}
 
   @Post()
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Create a new book tag' })
   @ApiResponse({ status: 201, description: 'Book tag created successfully' })
   @ApiResponse({
@@ -43,6 +46,7 @@ export class BookTagController {
   }
 
   @Put(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Update a book tag by ID' })
   @ApiResponse({ status: 200, description: 'Book tag updated successfully' })
   @ApiResponse({ status: 404, description: 'Book tag not found' })
@@ -51,6 +55,7 @@ export class BookTagController {
   }
 
   @Delete(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Delete a book tag by ID' })
   @ApiResponse({ status: 200, description: 'Book tag deleted successfully' })
   @ApiResponse({ status: 404, description: 'Book tag not found' })

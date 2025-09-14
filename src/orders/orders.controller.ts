@@ -1,8 +1,17 @@
-import { Controller, Post, Body, Get, Param, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -10,6 +19,7 @@ export class OrdersController {
   constructor(private ordersService: OrdersService) {}
 
   @Post()
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Create a new order' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   async createOrder(@Body() dto: CreateOrderDto) {
@@ -17,6 +27,7 @@ export class OrdersController {
   }
 
   @Get(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Get order by ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
@@ -25,6 +36,7 @@ export class OrdersController {
   }
 
   @Get('user/:userId')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Get all orders by user' })
   @ApiParam({ name: 'userId', type: Number })
   async getOrdersByUser(@Param('userId') userId: string) {
@@ -32,12 +44,14 @@ export class OrdersController {
   }
 
   @Patch('status')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Update order status' })
   async updateStatus(@Body() dto: UpdateOrderStatusDto) {
     return this.ordersService.updateOrderStatus(dto);
   }
 
   @Patch(':id/return')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Return a completed order' })
   @ApiParam({
     name: 'id',
@@ -49,6 +63,7 @@ export class OrdersController {
   }
 
   @Patch(':id/cancel')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Cancel an order' })
   @ApiParam({
     name: 'id',
