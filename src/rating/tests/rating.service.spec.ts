@@ -5,23 +5,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { NotFoundException } from '@nestjs/common';
 import { CreateRatingDto } from '../dto/create-rating.dto';
 import { UpdateRatingDto } from '../dto/update-rating.dto';
-
-interface FindAllResult {
-  data: { id: number }[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
-type CacheMock = {
-  get: jest.Mock;
-  set: jest.Mock;
-  del: jest.Mock;
-  clear: jest.Mock;
-};
+import { CacheMock, FindAllResult } from '../types/ratingHelperTypes';
 
 describe('RatingService', () => {
   let service: RatingService;

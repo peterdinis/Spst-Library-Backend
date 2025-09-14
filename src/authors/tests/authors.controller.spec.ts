@@ -89,8 +89,7 @@ describe('AuthorsController', () => {
       expect(result).toEqual({ message: `Author 1 deleted successfully.` });
     });
   });
-
-  // Optional: test error forwarding
+  
   it('should propagate service errors', async () => {
     jest
       .spyOn(service, 'findOne')

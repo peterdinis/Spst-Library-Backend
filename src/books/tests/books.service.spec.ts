@@ -4,41 +4,11 @@ import { Cache } from 'cache-manager';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BooksService } from '../books.service';
+import { Author, Book, Category, PaginatedResult } from '../types/bookTestHelperTypes';
 
 jest.mock('src/shared/constants/applicationConstants', () => ({
   DEFAULT_CACHE_TTL: 300000,
 }));
-
-interface PaginatedResult<T> {
-  data: T[];
-  meta?: {
-    total: number;
-    page?: number;
-    limit?: number;
-    totalPages?: number;
-  };
-  total?: number;
-}
-
-interface Book {
-  id: number;
-  name: string;
-  authorId: number;
-  categoryId?: number;
-  isAvailable: boolean;
-  createdAt: Date;
-  updatedAt?: Date;
-}
-
-interface Author {
-  id: number;
-  name: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
 
 describe('BooksService', () => {
   let service: BooksService;
