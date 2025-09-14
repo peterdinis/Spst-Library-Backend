@@ -67,7 +67,7 @@ describe('RatingService', () => {
     }).compile();
 
     service = module.get<RatingService>(RatingService);
-    prisma = module.get(PrismaService) as any; // už obsahuje jest.fn()
+    prisma = module.get(PrismaService)
     cache = module.get(CACHE_MANAGER) as CacheMock;
   });
 
@@ -128,7 +128,7 @@ describe('RatingService', () => {
 
   describe('create', () => {
     it('creates rating and clears cache', async () => {
-      const dto: CreateRatingDto = { bookId: 1, score: 5 } as any;
+      const dto: CreateRatingDto = { bookId: 1, value: 5 }
       const created = { id: 1, ...dto };
       prisma.rating.create.mockResolvedValue(created);
 
@@ -141,7 +141,7 @@ describe('RatingService', () => {
 
   describe('update', () => {
     it('updates rating and clears caches', async () => {
-      const dto: UpdateRatingDto = { score: 4 } as any;
+      const dto: UpdateRatingDto = { value: 4 }
       const updated = { id: 2, ...dto };
       prisma.rating.update.mockResolvedValue(updated);
 
