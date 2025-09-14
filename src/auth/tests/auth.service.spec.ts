@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import { Role } from 'src/roles/utils/roles';
 import { AuthService } from '../auth.service';
 
-// ✅ Mockovanie konštánt, ktoré sa používajú pri signovaní
 jest.mock('src/shared/constants/applicationConstants', () => ({
   ACCESS_TOKEN_EXPIRY: '1h',
   REFRESH_TOKEN_EXPIRY: '7d',
@@ -43,7 +42,7 @@ describe('AuthService', () => {
               findUnique: jest.fn(),
             },
             token: {
-              create: jest.fn().mockResolvedValue({}), // ✅ musí byť mocknuté
+              create: jest.fn().mockResolvedValue({}),
               findUnique: jest.fn(),
               delete: jest.fn(),
               deleteMany: jest.fn(),
@@ -95,7 +94,7 @@ describe('AuthService', () => {
         refresh_token: 'signedToken',
       });
       expect(prisma.user.create).toHaveBeenCalled();
-      expect(prisma.token.create).toHaveBeenCalled(); // ✅ token create
+      expect(prisma.token.create).toHaveBeenCalled();
     });
 
     it('should throw if email is already in use', async () => {
@@ -160,7 +159,6 @@ describe('AuthService', () => {
 
   describe('profile', () => {
     it('should return user profile', async () => {
-      // ✅ AuthService.profile používa `select`, takže treba rovnaký tvar
       const profileUser = {
         id: mockUser.id,
         email: mockUser.email,

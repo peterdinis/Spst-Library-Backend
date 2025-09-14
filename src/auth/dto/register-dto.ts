@@ -2,10 +2,8 @@ import {
   IsEmail,
   IsNotEmpty,
   MinLength,
-  IsEnum,
-  IsOptional,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
 export class RegisterDto {
