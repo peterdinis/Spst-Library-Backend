@@ -4,7 +4,12 @@ import { Cache } from 'cache-manager';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BooksService } from '../books.service';
-import { Author, Book, Category, PaginatedResult } from '../types/bookTestHelperTypes';
+import {
+  Author,
+  Book,
+  Category,
+  PaginatedResult,
+} from '../types/bookTestHelperTypes';
 
 jest.mock('src/shared/constants/applicationConstants', () => ({
   DEFAULT_CACHE_TTL: 300000,
