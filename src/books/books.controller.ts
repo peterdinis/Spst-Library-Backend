@@ -8,6 +8,7 @@ import {
   Query,
   Put,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BooksService } from './books.service';
@@ -15,6 +16,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { FilterBooksDto } from './dto/filter-books.dto';
 import { QueryBooksDto } from './dto/query-book.dto';
+import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('books')
 @Controller('books')
@@ -22,6 +24,7 @@ export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Post()
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Create a new book' })
   @ApiResponse({ status: 201, description: 'Book created successfully' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
@@ -50,6 +53,7 @@ export class BooksController {
   }
 
   @Put(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Update a book by ID' })
   @ApiResponse({ status: 200, description: 'Book updated successfully' })
   @ApiResponse({ status: 400, description: 'Validation failed or invalid ID' })
@@ -62,6 +66,7 @@ export class BooksController {
   }
 
   @Delete(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Delete a book by ID' })
   @ApiResponse({ status: 200, description: 'Book deleted successfully' })
   @ApiResponse({ status: 404, description: 'Book not found' })

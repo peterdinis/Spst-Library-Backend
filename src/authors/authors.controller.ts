@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
@@ -23,6 +24,7 @@ import {
   ApiNotFoundResponse,
   ApiConflictResponse,
 } from '@nestjs/swagger';
+import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('authors')
 @Controller('authors')
@@ -30,6 +32,7 @@ export class AuthorsController {
   constructor(private readonly authorsService: AuthorsService) {}
 
   @Post()
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Create a new author' })
   @ApiResponse({ status: 201, description: 'Author successfully created.' })
   @ApiBadRequestResponse({ description: 'Invalid input data.' })
@@ -78,6 +81,7 @@ export class AuthorsController {
   }
 
   @Patch(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Update an existing author' })
   @ApiParam({ name: 'id', type: Number, description: 'Author ID' })
   @ApiResponse({ status: 200, description: 'Author successfully updated.' })
@@ -89,6 +93,7 @@ export class AuthorsController {
   }
 
   @Delete(':id')
+  @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Delete an author by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Author ID' })
   @ApiResponse({ status: 200, description: 'Author successfully deleted.' })
