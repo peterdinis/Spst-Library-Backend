@@ -9,7 +9,12 @@ describe('CategoryController', () => {
   let controller: CategoryController;
   let service: CategoryService;
 
-  const mockCategory = { id: 1, name: 'Fiction', description: 'Fiction books', books: [] };
+  const mockCategory = {
+    id: 1,
+    name: 'Fiction',
+    description: 'Fiction books',
+    books: [],
+  };
   const mockCategories = [mockCategory];
 
   const categoryServiceMock = {
@@ -88,7 +93,10 @@ describe('CategoryController', () => {
 
   describe('update', () => {
     it('should call service.update and return the updated category', async () => {
-      const dto: UpdateCategoryDto = { name: 'Updated', description: 'Updated desc' };
+      const dto: UpdateCategoryDto = {
+        name: 'Updated',
+        description: 'Updated desc',
+      };
       categoryServiceMock.update.mockResolvedValue({ ...mockCategory, ...dto });
 
       const result = await controller.update(1, dto);

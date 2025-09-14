@@ -181,7 +181,9 @@ describe('RolesController', () => {
       const error = new Error('Role not found');
       mockRolesService.update.mockRejectedValue(error);
 
-      await expect(controller.update(roleId, updateRoleDto)).rejects.toThrow(error);
+      await expect(controller.update(roleId, updateRoleDto)).rejects.toThrow(
+        error,
+      );
       expect(service.update).toHaveBeenCalledWith(roleId, updateRoleDto);
     });
   });
@@ -210,7 +212,9 @@ describe('RolesController', () => {
 
     it('should handle errors when role cannot be deleted due to constraints', async () => {
       const roleId = 1;
-      const error = new Error('Cannot delete role - users are still assigned to this role');
+      const error = new Error(
+        'Cannot delete role - users are still assigned to this role',
+      );
       mockRolesService.remove.mockRejectedValue(error);
 
       await expect(controller.remove(roleId)).rejects.toThrow(error);
@@ -249,7 +253,9 @@ describe('RolesController', () => {
       const error = new Error('User or role not found');
       mockRolesService.changeUserRole.mockRejectedValue(error);
 
-      await expect(controller.changeUserRole(changeUserRoleDto)).rejects.toThrow(error);
+      await expect(
+        controller.changeUserRole(changeUserRoleDto),
+      ).rejects.toThrow(error);
       expect(service.changeUserRole).toHaveBeenCalledWith(changeUserRoleDto);
     });
 
@@ -262,7 +268,9 @@ describe('RolesController', () => {
       const error = new Error('Invalid role ID');
       mockRolesService.changeUserRole.mockRejectedValue(error);
 
-      await expect(controller.changeUserRole(changeUserRoleDto)).rejects.toThrow(error);
+      await expect(
+        controller.changeUserRole(changeUserRoleDto),
+      ).rejects.toThrow(error);
       expect(service.changeUserRole).toHaveBeenCalledWith(changeUserRoleDto);
     });
   });

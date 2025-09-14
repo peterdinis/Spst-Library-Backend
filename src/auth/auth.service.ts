@@ -24,43 +24,41 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
+    if (
+      !this.accessControlService.isAuthorized({
+        currentRole: creatorRole,
+        requiredRole: dto.role as unknown as Role,
+      })
+    ) {
+      throw new UnauthorizedException('You cannot assign this role');
+    }
 
-  if (
-    !this.accessControlService.isAuthorized({
-      currentRole: creatorRole,
-      requiredRole: dto.role as unknown as Role,
-    })
-  ) {
-    throw new UnauthorizedException('You cannot assign this role');
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    if (existingUser) throw new BadRequestException('Email already in use');
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const roleRecord = await this.prisma.role.findUnique({
+      where: { name: dto.role as unknown as Role },
+    });
+    if (!roleRecord) throw new BadRequestException('Role not found');
+
+    // vytvorenie používateľa
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        name: dto.name,
+        password: hashedPassword,
+        role: { connect: { id: roleRecord.id } },
+      },
+      include: { role: true },
+    });
+
+    // tokeny generujeme zo stringu role.name
+    return this.generateTokens(user.id, user.role.name as Role);
   }
-
-  const existingUser = await this.prisma.user.findUnique({
-    where: { email: dto.email },
-  });
-  if (existingUser) throw new BadRequestException('Email already in use');
-
-  const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-  const roleRecord = await this.prisma.role.findUnique({
-    where: { name: dto.role as unknown as Role }
-  });
-  if (!roleRecord) throw new BadRequestException('Role not found');
-
-  // vytvorenie používateľa
-  const user = await this.prisma.user.create({
-    data: {
-      email: dto.email,
-      name: dto.name,
-      password: hashedPassword,
-      role: { connect: { id: roleRecord.id } },
-    },
-    include: { role: true },
-  });
-
-  // tokeny generujeme zo stringu role.name
-  return this.generateTokens(user.id, user.role.name as Role);
-}
-
 
   async login(dto: LoginDto, desiredRole?: Role) {
     const user = await this.prisma.user.findUnique({

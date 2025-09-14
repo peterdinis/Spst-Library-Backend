@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderStatus, Order } from '@prisma/client';
-import { BadRequestException, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order.status.dto';
 import { OrdersService } from '../orders.service';
@@ -47,25 +52,44 @@ describe('OrdersService', () => {
 
   describe('createOrder', () => {
     it('should create a new order', async () => {
-      const dto: CreateOrderDto = { userId: 1, items: [{ bookId: 1, quantity: 2 }] };
+      const dto: CreateOrderDto = {
+        userId: 1,
+        items: [{ bookId: 1, quantity: 2 }],
+      };
       prismaMock.book.findUnique.mockResolvedValue(mockBook);
       prismaMock.order.create.mockResolvedValue(mockOrder);
 
       const result = await service.createOrder(dto);
       expect(result).toEqual(mockOrder);
-      expect(prismaMock.book.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(prismaMock.book.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
       expect(prismaMock.order.create).toHaveBeenCalled();
     });
 
     it('should throw if book is not available', async () => {
-      prismaMock.book.findUnique.mockResolvedValue({ ...mockBook, isAvailable: false });
-      const dto: CreateOrderDto = { userId: 1, items: [{ bookId: 1, quantity: 2 }] };
+      prismaMock.book.findUnique.mockResolvedValue({
+        ...mockBook,
+        isAvailable: false,
+      });
+      const dto: CreateOrderDto = {
+        userId: 1,
+        items: [{ bookId: 1, quantity: 2 }],
+      };
       await expect(service.createOrder(dto)).rejects.toThrow(ConflictException);
     });
 
     it('should throw if duplicate book in order', async () => {
-      const dto: CreateOrderDto = { userId: 1, items: [{ bookId: 1, quantity: 1 }, { bookId: 1, quantity: 2 }] };
-      await expect(service.createOrder(dto)).rejects.toThrow(BadRequestException);
+      const dto: CreateOrderDto = {
+        userId: 1,
+        items: [
+          { bookId: 1, quantity: 1 },
+          { bookId: 1, quantity: 2 },
+        ],
+      };
+      await expect(service.createOrder(dto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -74,7 +98,9 @@ describe('OrdersService', () => {
       prismaMock.order.findUnique.mockResolvedValue(mockOrder);
       const result = await service.getOrderById(1);
       expect(result).toEqual(mockOrder);
-      expect(prismaMock.order.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(prismaMock.order.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
 
     it('should throw if order does not exist', async () => {
@@ -96,15 +122,23 @@ describe('OrdersService', () => {
     });
 
     it('should throw if userId invalid', async () => {
-      await expect(service.getOrdersByUser(0)).rejects.toThrow(BadRequestException);
+      await expect(service.getOrdersByUser(0)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('updateOrderStatus', () => {
     it('should update order status', async () => {
-      const dto: UpdateOrderStatusDto = { orderId: 1, status: OrderStatus.COMPLETED };
+      const dto: UpdateOrderStatusDto = {
+        orderId: 1,
+        status: OrderStatus.COMPLETED,
+      };
       prismaMock.order.findUnique.mockResolvedValue(mockOrder);
-      prismaMock.order.update.mockResolvedValue({ ...mockOrder, status: OrderStatus.COMPLETED });
+      prismaMock.order.update.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.COMPLETED,
+      });
 
       const result = await service.updateOrderStatus(dto);
       expect(result.status).toEqual(OrderStatus.COMPLETED);
@@ -113,20 +147,36 @@ describe('OrdersService', () => {
     it('should throw if invalid status', async () => {
       prismaMock.order.findUnique.mockResolvedValue(mockOrder);
       const dto: any = { orderId: 1, status: 'INVALID' };
-      await expect(service.updateOrderStatus(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.updateOrderStatus(dto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw if updating a cancelled order', async () => {
-      prismaMock.order.findUnique.mockResolvedValue({ ...mockOrder, status: OrderStatus.CANCELLED });
-      const dto: UpdateOrderStatusDto = { orderId: 1, status: OrderStatus.COMPLETED };
-      await expect(service.updateOrderStatus(dto)).rejects.toThrow(ConflictException);
+      prismaMock.order.findUnique.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.CANCELLED,
+      });
+      const dto: UpdateOrderStatusDto = {
+        orderId: 1,
+        status: OrderStatus.COMPLETED,
+      };
+      await expect(service.updateOrderStatus(dto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
   describe('returnOrder', () => {
     it('should reset a completed order to pending', async () => {
-      prismaMock.order.findUnique.mockResolvedValue({ ...mockOrder, status: OrderStatus.COMPLETED });
-      prismaMock.order.update.mockResolvedValue({ ...mockOrder, status: OrderStatus.PENDING });
+      prismaMock.order.findUnique.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.COMPLETED,
+      });
+      prismaMock.order.update.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.PENDING,
+      });
 
       const result = await service.returnOrder(1);
       expect(result.status).toEqual(OrderStatus.PENDING);
@@ -141,7 +191,10 @@ describe('OrdersService', () => {
   describe('cancelOrder', () => {
     it('should cancel an order', async () => {
       prismaMock.order.findUnique.mockResolvedValue(mockOrder);
-      prismaMock.order.update.mockResolvedValue({ ...mockOrder, status: OrderStatus.CANCELLED });
+      prismaMock.order.update.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.CANCELLED,
+      });
 
       const result = await service.cancelOrder(1);
       expect(result.status).toEqual(OrderStatus.CANCELLED);

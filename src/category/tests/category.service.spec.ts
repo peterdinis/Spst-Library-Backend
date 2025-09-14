@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { BadRequestException, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CategoryService } from '../category.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -13,17 +18,17 @@ describe('CategoryService', () => {
   let prisma: PrismaService;
   let cache: Cache;
 
-  const mockCategory = { 
-    id: 1, 
-    name: 'Fiction', 
-    description: 'Fiction books', 
+  const mockCategory = {
+    id: 1,
+    name: 'Fiction',
+    description: 'Fiction books',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   };
 
   const mockCategoryWithBooks = {
     ...mockCategory,
-    books: [{ id: 1, name: 'Test Book', categoryId: 1 }]
+    books: [{ id: 1, name: 'Test Book', categoryId: 1 }],
   };
 
   const mockCategories = [mockCategoryWithBooks];
@@ -97,7 +102,11 @@ describe('CategoryService', () => {
           books: { select: { id: true, name: true, categoryId: true } },
         },
       });
-      expect(cache.set).toHaveBeenCalledWith('categories:all:full', mockCategories, expect.any(Number));
+      expect(cache.set).toHaveBeenCalledWith(
+        'categories:all:full',
+        mockCategories,
+        expect.any(Number),
+      );
     });
   });
 
@@ -105,26 +114,36 @@ describe('CategoryService', () => {
     const paginationDto: PaginationDto = { page: 1, limit: 10 };
 
     it('should throw BadRequestException for invalid page', async () => {
-      await expect(service.findAll({ page: 0, limit: 10 })).rejects.toThrow(BadRequestException);
-      await expect(service.findAll({ page: -1, limit: 10 })).rejects.toThrow(BadRequestException);
+      await expect(service.findAll({ page: 0, limit: 10 })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.findAll({ page: -1, limit: 10 })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for invalid limit', async () => {
-      await expect(service.findAll({ page: 1, limit: 0 })).rejects.toThrow(BadRequestException);
-      await expect(service.findAll({ page: 1, limit: 101 })).rejects.toThrow(BadRequestException);
+      await expect(service.findAll({ page: 1, limit: 0 })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.findAll({ page: 1, limit: 101 })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return cached paginated categories if present', async () => {
       const mockResult = {
         data: mockCategories,
-        meta: { total: 1, page: 1, limit: 10, totalPages: 1 }
+        meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
       };
       mockCacheManager.get.mockResolvedValue(mockResult);
 
       const result = await service.findAll(paginationDto);
 
       expect(result).toEqual(mockResult);
-      expect(cache.get).toHaveBeenCalledWith('categories:all:page=1:limit=10:search=');
+      expect(cache.get).toHaveBeenCalledWith(
+        'categories:all:page=1:limit=10:search=',
+      );
     });
 
     it('should handle search functionality', async () => {
@@ -165,8 +184,14 @@ describe('CategoryService', () => {
       const result = await service.findOne(1);
 
       expect(result).toEqual(mockCategory);
-      expect(prisma.category.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(cache.set).toHaveBeenCalledWith('category:1', mockCategory, expect.any(Number));
+      expect(prisma.category.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
+      expect(cache.set).toHaveBeenCalledWith(
+        'category:1',
+        mockCategory,
+        expect.any(Number),
+      );
     });
 
     it('should throw BadRequestException for invalid ID', async () => {
@@ -183,20 +208,35 @@ describe('CategoryService', () => {
   });
 
   describe('create', () => {
-    const createDto: CreateCategoryDto = { name: 'Science Fiction', description: 'Sci-fi books' };
+    const createDto: CreateCategoryDto = {
+      name: 'Science Fiction',
+      description: 'Sci-fi books',
+    };
 
     it('should throw BadRequestException for invalid data', async () => {
-      await expect(service.create({ name: '' })).rejects.toThrow(BadRequestException);
-      await expect(service.create({ name: '   ' })).rejects.toThrow(BadRequestException);
-      await expect(service.create({ name: 'a'.repeat(101) })).rejects.toThrow(BadRequestException);
-      await expect(service.create({ name: 'Test', description: 'a'.repeat(501) })).rejects.toThrow(BadRequestException);
+      await expect(service.create({ name: '' })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.create({ name: '   ' })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.create({ name: 'a'.repeat(101) })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(
+        service.create({ name: 'Test', description: 'a'.repeat(501) }),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw ConflictException if category exists', async () => {
       mockPrismaService.category.findFirst.mockResolvedValue(mockCategory);
 
-      await expect(service.create(createDto)).rejects.toThrow(ConflictException);
-      expect(prisma.category.findFirst).toHaveBeenCalledWith({ where: { name: createDto.name } });
+      await expect(service.create(createDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(prisma.category.findFirst).toHaveBeenCalledWith({
+        where: { name: createDto.name },
+      });
     });
 
     it('should create a new category successfully', async () => {
@@ -212,9 +252,13 @@ describe('CategoryService', () => {
 
     it('should throw InternalServerErrorException on database error', async () => {
       mockPrismaService.category.findFirst.mockResolvedValue(null);
-      mockPrismaService.category.create.mockRejectedValue(new Error('DB Error'));
+      mockPrismaService.category.create.mockRejectedValue(
+        new Error('DB Error'),
+      );
 
-      await expect(service.create(createDto)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.create(createDto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -222,16 +266,26 @@ describe('CategoryService', () => {
     const updateDto: UpdateCategoryDto = { name: 'Updated Fiction' };
 
     it('should throw BadRequestException for invalid data', async () => {
-      await expect(service.update(1, { name: '' })).rejects.toThrow(BadRequestException);
-      await expect(service.update(1, { name: '   ' })).rejects.toThrow(BadRequestException);
-      await expect(service.update(1, { name: 'a'.repeat(101) })).rejects.toThrow(BadRequestException);
-      await expect(service.update(1, { description: 'a'.repeat(501) })).rejects.toThrow(BadRequestException);
+      await expect(service.update(1, { name: '' })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.update(1, { name: '   ' })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(
+        service.update(1, { name: 'a'.repeat(101) }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.update(1, { description: 'a'.repeat(501) }),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw NotFoundException if category does not exist', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(null);
 
-      await expect(service.update(999, updateDto)).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, updateDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should update category successfully', async () => {
@@ -252,9 +306,13 @@ describe('CategoryService', () => {
 
     it('should throw InternalServerErrorException on database error', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
-      mockPrismaService.category.update.mockRejectedValue(new Error('DB Error'));
+      mockPrismaService.category.update.mockRejectedValue(
+        new Error('DB Error'),
+      );
 
-      await expect(service.update(1, updateDto)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.update(1, updateDto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -279,9 +337,13 @@ describe('CategoryService', () => {
 
     it('should throw InternalServerErrorException on database error', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
-      mockPrismaService.category.delete.mockRejectedValue(new Error('DB Error'));
+      mockPrismaService.category.delete.mockRejectedValue(
+        new Error('DB Error'),
+      );
 
-      await expect(service.remove(1)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.remove(1)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -290,7 +352,9 @@ describe('CategoryService', () => {
       mockPrismaService.category.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      expect(prisma.category.findUnique).toHaveBeenCalledWith({ where: { id: 999 } });
+      expect(prisma.category.findUnique).toHaveBeenCalledWith({
+        where: { id: 999 },
+      });
     });
   });
 });

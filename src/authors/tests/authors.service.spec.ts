@@ -11,7 +11,7 @@ import { AuthorsService } from '../authors.service';
 
 // Mock constants
 jest.mock('src/shared/constants/applicationConstants', () => ({
-  DEFAULT_CACHE_TTL: 300000
+  DEFAULT_CACHE_TTL: 300000,
 }));
 
 // Type definitions for tests
@@ -94,58 +94,57 @@ describe('AuthorsService', () => {
   });
 
   describe('create', () => {
-  it('should create a new author and clear cache', async () => {
-    mockPrismaService.author.findFirst.mockResolvedValue(null);
-    mockPrismaService.author.create.mockResolvedValue(mockAuthor);
-    mockCacheManager.clear.mockResolvedValue(undefined);
+    it('should create a new author and clear cache', async () => {
+      mockPrismaService.author.findFirst.mockResolvedValue(null);
+      mockPrismaService.author.create.mockResolvedValue(mockAuthor);
+      mockCacheManager.clear.mockResolvedValue(undefined);
 
-    const result = await service.create({
-      name: 'John Doe',
-      bornDate: new Date('1980-01-01').toISOString(),
-      litPeriod: 'Modern Era'
+      const result = await service.create({
+        name: 'John Doe',
+        bornDate: new Date('1980-01-01').toISOString(),
+        litPeriod: 'Modern Era',
+      });
+
+      expect(result).toEqual(mockAuthor);
+      expect(cacheManager.clear).toHaveBeenCalled();
     });
 
-    expect(result).toEqual(mockAuthor);
-    expect(cacheManager.clear).toHaveBeenCalled();
+    it('should throw ConflictException if author exists', async () => {
+      mockPrismaService.author.findFirst.mockResolvedValue(mockAuthor);
+
+      await expect(
+        service.create({
+          name: 'John Doe',
+          bornDate: new Date('1980-01-01').toISOString(),
+          litPeriod: 'Modern Era',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should handle validation errors', async () => {
+      mockPrismaService.author.findFirst.mockResolvedValue(null);
+
+      // Test empty name
+      await expect(
+        service.create({
+          name: '',
+          bornDate: new Date('1980-01-01').toISOString(),
+          litPeriod: 'Modern Era',
+        }),
+      ).rejects.toThrow(BadRequestException);
+
+      // Test future birth date
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
+      await expect(
+        service.create({
+          name: 'John Doe',
+          bornDate: futureDate.toISOString(),
+          litPeriod: 'Modern Era',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
-
-  it('should throw ConflictException if author exists', async () => {
-    mockPrismaService.author.findFirst.mockResolvedValue(mockAuthor);
-
-    await expect(
-      service.create({
-        name: 'John Doe',
-        bornDate: new Date('1980-01-01').toISOString(),
-        litPeriod: 'Modern Era'
-      }),
-    ).rejects.toThrow(ConflictException);
-  });
-
-  it('should handle validation errors', async () => {
-    mockPrismaService.author.findFirst.mockResolvedValue(null);
-
-    // Test empty name
-    await expect(
-      service.create({
-        name: '',
-        bornDate: new Date('1980-01-01').toISOString(),
-        litPeriod: 'Modern Era'
-      }),
-    ).rejects.toThrow(BadRequestException);
-
-    // Test future birth date
-    const futureDate = new Date();
-    futureDate.setFullYear(futureDate.getFullYear() + 1);
-    await expect(
-      service.create({
-        name: 'John Doe',
-        bornDate: futureDate.toISOString(),
-        litPeriod: 'Modern Era'
-      }),
-    ).rejects.toThrow(BadRequestException);
-  });
-});
-
 
   describe('findAll', () => {
     const paginationDto = { page: 1, limit: 10 };
@@ -156,7 +155,9 @@ describe('AuthorsService', () => {
       mockPrismaService.author.count.mockResolvedValue(1);
       mockCacheManager.set.mockResolvedValue(undefined);
 
-      const result = await service.findAll(paginationDto) as PaginatedResult<Author>;
+      const result = (await service.findAll(
+        paginationDto,
+      )) as PaginatedResult<Author>;
 
       expect(result.data).toEqual([mockAuthor]);
       expect(result.meta.total).toBe(1);
@@ -173,7 +174,9 @@ describe('AuthorsService', () => {
       };
       mockCacheManager.get.mockResolvedValue(cachedResult);
 
-      const result = await service.findAll(paginationDto) as PaginatedResult<Author>;
+      const result = (await service.findAll(
+        paginationDto,
+      )) as PaginatedResult<Author>;
 
       expect(result.data).toEqual([mockAuthor]);
       expect(prisma.author.findMany).not.toHaveBeenCalled();
@@ -185,11 +188,11 @@ describe('AuthorsService', () => {
       mockPrismaService.author.count.mockResolvedValue(1);
       mockCacheManager.set.mockResolvedValue(undefined);
 
-      const result = await service.findAll({ 
-        page: 1, 
-        limit: 10, 
-        search: 'John' 
-      }) as PaginatedResult<Author>;
+      const result = (await service.findAll({
+        page: 1,
+        limit: 10,
+        search: 'John',
+      })) as PaginatedResult<Author>;
 
       expect(result.data).toEqual([mockAuthor]);
       expect(prisma.author.findMany).toHaveBeenCalledWith(
@@ -197,10 +200,10 @@ describe('AuthorsService', () => {
           where: expect.objectContaining({
             name: expect.objectContaining({
               contains: 'John',
-              mode: 'insensitive'
-            })
-          })
-        })
+              mode: 'insensitive',
+            }),
+          }),
+        }),
       );
     });
 
@@ -235,7 +238,7 @@ describe('AuthorsService', () => {
       mockCacheManager.get.mockResolvedValue(mockAuthor);
 
       const result = await service.findOne(1);
-      
+
       expect(result).toEqual(mockAuthor);
       expect(prisma.author.findUnique).not.toHaveBeenCalled();
     });
@@ -246,12 +249,12 @@ describe('AuthorsService', () => {
       mockCacheManager.set.mockResolvedValue(undefined);
 
       const result = await service.findOne(1);
-      
+
       expect(result).toEqual(mockAuthor);
       expect(cacheManager.set).toHaveBeenCalledWith(
         `author:1`,
         mockAuthor,
-        expect.any(Number)
+        expect.any(Number),
       );
     });
 
@@ -345,7 +348,7 @@ describe('AuthorsService', () => {
       mockCacheManager.clear.mockResolvedValue(undefined);
 
       const result = await service.remove(1);
-      
+
       expect(result).toEqual({ message: `Author 1 deleted successfully.` });
       expect(cacheManager.clear).toHaveBeenCalled();
       expect(prisma.author.delete).toHaveBeenCalledWith({ where: { id: 1 } });
@@ -365,7 +368,7 @@ describe('AuthorsService', () => {
     it('should handle foreign key constraint errors', async () => {
       mockPrismaService.author.findUnique.mockResolvedValue(mockAuthor);
       mockPrismaService.author.delete.mockRejectedValue(
-        new Error('Foreign key constraint failed')
+        new Error('Foreign key constraint failed'),
       );
 
       await expect(service.remove(1)).rejects.toThrow();
@@ -379,7 +382,10 @@ describe('AuthorsService', () => {
       mockPrismaService.author.count.mockResolvedValue(1);
       mockCacheManager.set.mockResolvedValue(undefined);
 
-      const result = await service.findAll({ page: 1, limit: 10 }) as PaginatedResult<Author>;
+      const result = (await service.findAll({
+        page: 1,
+        limit: 10,
+      })) as PaginatedResult<Author>;
 
       expect(result.data).toEqual([mockAuthor]);
     });
@@ -396,7 +402,7 @@ describe('AuthorsService', () => {
     it('should handle database connection errors', async () => {
       mockCacheManager.get.mockResolvedValue(null);
       mockPrismaService.author.findMany.mockRejectedValue(
-        new Error('Database connection failed')
+        new Error('Database connection failed'),
       );
 
       await expect(service.findAll({ page: 1, limit: 10 })).rejects.toThrow();
@@ -409,7 +415,7 @@ describe('AuthorsService', () => {
       mockPrismaService.author.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(
-        'Author with ID 999 not found'
+        'Author with ID 999 not found',
       );
     });
 
@@ -423,7 +429,9 @@ describe('AuthorsService', () => {
       ];
 
       for (const params of invalidParams) {
-        await expect(service.findAll(params)).rejects.toThrow(BadRequestException);
+        await expect(service.findAll(params)).rejects.toThrow(
+          BadRequestException,
+        );
       }
     });
   });

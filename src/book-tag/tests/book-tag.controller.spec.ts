@@ -79,7 +79,9 @@ describe('BookTagController', () => {
     });
 
     it('should propagate service errors', async () => {
-      jest.spyOn(service, 'search').mockRejectedValueOnce(new BadRequestException());
+      jest
+        .spyOn(service, 'search')
+        .mockRejectedValueOnce(new BadRequestException());
       await expect(controller.search('')).rejects.toThrow(BadRequestException);
     });
   });

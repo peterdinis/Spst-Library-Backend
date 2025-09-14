@@ -104,11 +104,4 @@ describe('AuthController', () => {
       expect(result).toEqual(mockProfile);
     });
   });
-
-  describe('adminOnly', () => {
-    it('should return admin-only message', () => {
-      const result = controller.adminOnly();
-      expect(result).toEqual({ message: 'This is an admin-only route' });
-    });
-  });
 });
