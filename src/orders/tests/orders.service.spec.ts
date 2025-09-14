@@ -5,7 +5,6 @@ import {
   BadRequestException,
   NotFoundException,
   ConflictException,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order.status.dto';

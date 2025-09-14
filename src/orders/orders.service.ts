@@ -158,34 +158,33 @@ export class OrdersService {
   }
 
   async cancelOrder(orderId: number): Promise<Order> {
-  // Fetch the order first
-  const order = await this.prisma.order.findUnique({
-    where: { id: orderId },
-    include: { items: { include: { book: true } } },
-  });
-
-  if (!order) {
-    throw new NotFoundException(`Order with id ${orderId} not found`);
-  }
-
-  // Prevent cancelling if already cancelled or completed
-  if (
-    order.status === OrderStatus.CANCELLED ||
-    order.status === OrderStatus.COMPLETED
-  ) {
-    throw new ConflictException('Order cannot be cancelled');
-  }
-
-  try {
-    return await this.prisma.order.update({
+    // Fetch the order first
+    const order = await this.prisma.order.findUnique({
       where: { id: orderId },
-      data: { status: OrderStatus.CANCELLED }, // or OrderStatus.CANCELLATION_REQUESTED if you want a request flow
       include: { items: { include: { book: true } } },
     });
-  } catch (err) {
-    console.error(err);
-    throw new InternalServerErrorException('Failed to cancel order');
-  }
-}
 
+    if (!order) {
+      throw new NotFoundException(`Order with id ${orderId} not found`);
+    }
+
+    // Prevent cancelling if already cancelled or completed
+    if (
+      order.status === OrderStatus.CANCELLED ||
+      order.status === OrderStatus.COMPLETED
+    ) {
+      throw new ConflictException('Order cannot be cancelled');
+    }
+
+    try {
+      return await this.prisma.order.update({
+        where: { id: orderId },
+        data: { status: OrderStatus.CANCELLED }, // or OrderStatus.CANCELLATION_REQUESTED if you want a request flow
+        include: { items: { include: { book: true } } },
+      });
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException('Failed to cancel order');
+    }
+  }
 }
