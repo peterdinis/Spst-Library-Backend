@@ -11,7 +11,7 @@ import { GlobalCacheModule } from 'src/cache/global.cache.module';
 import { BooksModule } from 'src/books/books.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { OrdersModule } from 'src/orders/orders.module';
-import { ArcjetModule } from "@arcjet/nest";
+import { ArcjetModule } from '@arcjet/nest';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { ArcjetModule } from "@arcjet/nest";
     BooksModule,
     AuthModule,
     OrdersModule,
-     ArcjetModule.forRoot({
+    ArcjetModule.forRoot({
       isGlobal: true,
       key: process.env.ARCJET_KEY!,
       rules: [],

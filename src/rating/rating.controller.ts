@@ -15,7 +15,7 @@ import { RatingService } from './rating.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { PaginationDto } from './dto/rating-pagination.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
-import { ArcjetGuard} from '@arcjet/nest';
+import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('Ratings')
 @Controller('ratings')
