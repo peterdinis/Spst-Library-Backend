@@ -110,6 +110,8 @@ enum OrderStatus {
   COMPLETED
   CANCELLED
   RETURNED
+  NOT_RETURNED
+  CANCELLATION_REQUESTED
 }
 
 model Token {
@@ -119,4 +121,5 @@ model Token {
   refreshToken String   @unique
   createdAt    DateTime @default(now())
   expiresAt    DateTime
+  updatedAt DateTime    @updatedAt
 }
