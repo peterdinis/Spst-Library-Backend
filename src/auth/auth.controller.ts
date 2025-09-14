@@ -1,6 +1,7 @@
 import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { ArcjetGuard } from '@arcjet/nest';
 import {
   ApiTags,
   ApiOperation,
@@ -44,9 +45,10 @@ export class AuthController {
     return this.authService.refreshToken(userId, refreshToken);
   }
 
-  @Post('logout')
+  // Protected routes using JWT + ArcjetGuard
+  @UseGuards(AuthGuard('jwt'), ArcjetGuard)
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Post('logout')
   @ApiOperation({ summary: 'Logout user and revoke all refresh tokens' })
   @ApiResponse({ status: 200, description: 'User logged out successfully.' })
   async logout(@Req() req: AuthRequest) {
@@ -54,7 +56,7 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), ArcjetGuard)
   @ApiBearerAuth()
   @Get('profile')
   @ApiOperation({ summary: 'Get profile of the authenticated user' })
