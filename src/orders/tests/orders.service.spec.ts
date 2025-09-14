@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrdersService } from './orders.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
 import { OrderStatus, Order } from '@prisma/client';
 import { BadRequestException, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { UpdateOrderStatusDto } from '../dto/update-order.status.dto';
+import { OrdersService } from '../orders.service';
 
 describe('OrdersService', () => {
   let service: OrdersService;

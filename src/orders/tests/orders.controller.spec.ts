@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrdersController } from './orders.controller';
-import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
 import { Order, OrderStatus } from '@prisma/client';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { UpdateOrderStatusDto } from '../dto/update-order.status.dto';
+import { OrdersController } from '../orders.controller';
+import { OrdersService } from '../orders.service';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
