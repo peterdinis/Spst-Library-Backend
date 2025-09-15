@@ -35,16 +35,16 @@ model Category {
 }
 
 model Author {
-  id        Int      @id @default(autoincrement())
-  name      String
-  bio       String?
-  books     Book[]
-  litPeriod String
-  authorImage String @default("")
-  bornDate  String
-  deathDate String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  bio         String?
+  books       Book[]
+  litPeriod   String
+  authorImage String   @default("")
+  bornDate    String
+  deathDate   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model BookTag {
@@ -84,6 +84,8 @@ model User {
   tokens    Token[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  AuthorSuggestion AuthorSuggestion[]
 }
 
 model Order {
@@ -122,5 +124,27 @@ model Token {
   refreshToken String   @unique
   createdAt    DateTime @default(now())
   expiresAt    DateTime
-  updatedAt DateTime    @updatedAt
+  updatedAt    DateTime @updatedAt
+}
+
+model AuthorSuggestion {
+  id              Int              @id @default(autoincrement())
+  name            String
+  bio             String?
+  litPeriod       String
+  authorImage     String           @default("")
+  bornDate        String
+  deathDate       String?
+  suggestedById   Int?
+  suggestedBy     User?            @relation(fields: [suggestedById], references: [id])
+  suggestedByName String?
+  status          SuggestionStatus @default(PENDING)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
