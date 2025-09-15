@@ -12,6 +12,7 @@ import { BooksModule } from 'src/books/books.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { OrdersModule } from 'src/orders/orders.module';
 import { ArcjetModule } from '@arcjet/nest';
+import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ArcjetModule } from '@arcjet/nest';
       key: process.env.ARCJET_KEY!,
       rules: [],
     }),
+    AuthorsSuggestion
   ],
   controllers: [AppController],
   providers: [AppService],
