@@ -10,9 +10,11 @@ services:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
     volumes:
-      - ./:/usr/src/app:delegated
-      - node_modules:/usr/src/app/node_modules
-    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev"
+      - ./:/usr/src/app 
+    command: >
+      sh -c "npx prisma generate &&
+             npx prisma migrate deploy &&
+             npm run start:dev"
     depends_on:
       - redis
 
@@ -26,4 +28,3 @@ services:
 
 volumes:
   redis_data:
-  node_modules:

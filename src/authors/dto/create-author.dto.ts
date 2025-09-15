@@ -17,6 +17,11 @@ export class CreateAuthorDto {
   @IsString()
   litPeriod: string;
 
+  @ApiProperty({ description: "Author Image"})
+  @IsNotEmpty()
+  @IsString()
+  authorImage: string;
+
   @ApiProperty({ description: 'Birth date (YYYY-MM-DD)' })
   @IsNotEmpty()
   @IsString()

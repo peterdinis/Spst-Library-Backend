@@ -11,13 +11,14 @@ import { QueryAuthorDto } from './dto/query-author.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthorsService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   async create(dto: CreateAuthorDto) {
     const existing = await this.prisma.author.findFirst({
@@ -47,8 +48,12 @@ export class AuthorsService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const where = search
-      ? { name: { contains: search, mode: 'insensitive' } }
+    const where: Prisma.AuthorWhereInput = search
+      ? {
+        OR: [
+          { name: { contains: search } },
+        ],
+      }
       : {};
 
     const [data, total] = await Promise.all([
