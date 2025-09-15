@@ -110,6 +110,7 @@ export class AuthService {
         name: true,
         role: { select: { id: true, name: true } },
         createdAt: true,
+        orders: true
       },
     });
   }
