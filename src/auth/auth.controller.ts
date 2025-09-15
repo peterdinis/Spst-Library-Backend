@@ -45,8 +45,7 @@ export class AuthController {
     return this.authService.refreshToken(userId, refreshToken);
   }
 
-  // Protected routes using JWT + ArcjetGuard
-  @UseGuards(AuthGuard('jwt'), ArcjetGuard)
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Post('logout')
   @ApiOperation({ summary: 'Logout user and revoke all refresh tokens' })
@@ -56,7 +55,7 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
-  @UseGuards(AuthGuard('jwt'), ArcjetGuard)
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get('profile')
   @ApiOperation({ summary: 'Get profile of the authenticated user' })
