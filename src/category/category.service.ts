@@ -13,6 +13,7 @@ import { PaginationDto } from './dto/category-pagination.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoryService {
@@ -21,7 +22,7 @@ export class CategoryService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   private async validateCategoryExists(id: number) {
     if (!id || id < 1)
@@ -76,8 +77,7 @@ export class CategoryService {
   async findAll(pagination: PaginationDto) {
     const { page = 1, limit = 10, search } = pagination;
 
-    if (page < 1)
-      throw new BadRequestException('Page must be a positive integer');
+    if (page < 1) throw new BadRequestException('Page must be a positive integer');
     if (limit < 1 || limit > 100)
       throw new BadRequestException('Limit must be between 1 and 100');
 
@@ -86,20 +86,20 @@ export class CategoryService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const where = search
+    const where: Prisma.CategoryWhereInput = search
       ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-          ],
-        }
+        OR: [
+          { name: { contains: search } },
+          { description: { contains: search } },
+        ],
+      }
       : {};
 
     const [items, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
         skip,
-        take: limit,
+        take: Number(limit),
         include: { books: true },
       }),
       this.prisma.category.count({ where }),

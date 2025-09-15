@@ -21,7 +21,7 @@ import { ArcjetGuard } from '@arcjet/nest';
 @ApiTags('books')
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksService: BooksService) { }
 
   @Post()
   @UseGuards(ArcjetGuard)
@@ -37,41 +37,12 @@ export class BooksController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Books retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'No books found' })
-  findAll(@Query() query: QueryBooksDto) {
-    return this.booksService.findAll(query);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a book by ID' })
-  @ApiResponse({ status: 200, description: 'Book retrieved successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid ID' })
-  @ApiResponse({ status: 404, description: 'Book not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.booksService.findOne(id);
-  }
-
-  @Put(':id')
-  @UseGuards(ArcjetGuard)
-  @ApiOperation({ summary: 'Update a book by ID' })
-  @ApiResponse({ status: 200, description: 'Book updated successfully' })
-  @ApiResponse({ status: 400, description: 'Validation failed or invalid ID' })
-  @ApiResponse({ status: 404, description: 'Book not found' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateBookDto: UpdateBookDto,
+  findAll(
+    @Query('search') search?: string,
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 10,
   ) {
-    return this.booksService.update(id, updateBookDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(ArcjetGuard)
-  @ApiOperation({ summary: 'Delete a book by ID' })
-  @ApiResponse({ status: 200, description: 'Book deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Book not found' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.booksService.remove(id);
+    return this.booksService.findAll({ search, page, limit });
   }
 
   @Get('filter/custom')
@@ -106,6 +77,8 @@ export class BooksController {
     type: Number,
     description: 'Number of books to return',
   })
+  @ApiResponse({ status: 200, description: 'Top rated books retrieved' })
+  @ApiResponse({ status: 404, description: 'No top rated books found' })
   findTopRated(@Query('limit') limit?: number) {
     return this.booksService.findTopRated(limit);
   }
@@ -118,7 +91,40 @@ export class BooksController {
     type: Number,
     description: 'Number of days to look back',
   })
+  @ApiResponse({ status: 200, description: 'Recently added books retrieved' })
+  @ApiResponse({ status: 404, description: 'No recently added books found' })
   findRecentlyAdded(@Query('days') days?: number) {
     return this.booksService.findRecentlyAdded(days);
+  }
+  
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a book by ID' })
+  @ApiResponse({ status: 200, description: 'Book retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid ID' })
+  @ApiResponse({ status: 404, description: 'Book not found' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.booksService.findOne(id);
+  }
+
+  @Put(':id')
+  @UseGuards(ArcjetGuard)
+  @ApiOperation({ summary: 'Update a book by ID' })
+  @ApiResponse({ status: 200, description: 'Book updated successfully' })
+  @ApiResponse({ status: 400, description: 'Validation failed or invalid ID' })
+  @ApiResponse({ status: 404, description: 'Book not found' })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBookDto: UpdateBookDto,
+  ) {
+    return this.booksService.update(id, updateBookDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(ArcjetGuard)
+  @ApiOperation({ summary: 'Delete a book by ID' })
+  @ApiResponse({ status: 200, description: 'Book deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Book not found' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.booksService.remove(id);
   }
 }
