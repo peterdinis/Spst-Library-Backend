@@ -2,16 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Skopíruj len package.json a package-lock.json pre npm install
+# Install dependencies
 COPY package*.json ./
-
-# Nainštaluj závislosti
 RUN npm install
 
-# Skopíruj zvyšok projektu, node_modules sa neprepíše vďaka .dockerignore
+# Copy source code
 COPY . .
 
-# Prisma client
+# Generate Prisma client
 RUN npx prisma generate
 
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
