@@ -40,27 +40,20 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    const roleRecord = await this.prisma.role.findUnique({
-      where: { name: dto.name },
-    });
-
-    console.log("RR", roleRecord)
-
-    if (!roleRecord) {
-      throw new BadRequestException(`Role ${roleRecord} not found`);
-    }
-    // vytvorenie používateľa
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
         name: dto.name,
         password: hashedPassword,
-        role: { connect: { id: roleRecord.id } },
+        role: {
+          connect: {
+            name: dto.role
+          }
+        }
       },
       include: { role: true },
     });
 
-    // tokeny generujeme zo stringu role.name
     return this.generateTokens(user.id, user.role.name as Role);
   }
 
@@ -74,8 +67,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
     if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
-
-    // Validácia role pri login-e
+    
     if (desiredRole && user.role.name !== desiredRole) {
       throw new UnauthorizedException(
         `This account is not registered as a ${desiredRole}`,
