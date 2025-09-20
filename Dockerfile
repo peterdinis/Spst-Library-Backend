@@ -1,15 +1,20 @@
+# Dockerfile
 FROM node:20-alpine
 
+# Nastav pracovný adresár
 WORKDIR /usr/src/app
 
-# Install dependencies
+# Skopíruj package.json a package-lock.json
 COPY package*.json ./
+
+# Inštalácia balíkov
 RUN npm install
 
-# Copy source code
+# Skopíruj zvyšok zdrojového kódu
 COPY . .
 
-# Generate Prisma client
+# Prisma generate (iba na build)
 RUN npx prisma generate
 
+# Štart príkaz
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]

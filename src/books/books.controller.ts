@@ -15,7 +15,6 @@ import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { FilterBooksDto } from './dto/filter-books.dto';
-import { QueryBooksDto } from './dto/query-book.dto';
 import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('books')
