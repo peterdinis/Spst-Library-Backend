@@ -21,7 +21,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private accessControlService: AccessControlService,
-  ) { }
+  ) {}
 
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
     if (
@@ -47,9 +47,9 @@ export class AuthService {
         password: hashedPassword,
         role: {
           connect: {
-            name: dto.role
-          }
-        }
+            name: dto.role,
+          },
+        },
       },
       include: { role: true },
     });
@@ -67,7 +67,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
     if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
-    
+
     if (desiredRole && user.role.name !== desiredRole) {
       throw new UnauthorizedException(
         `This account is not registered as a ${desiredRole}`,
@@ -110,7 +110,7 @@ export class AuthService {
         name: true,
         role: { select: { id: true, name: true } },
         createdAt: true,
-        orders: true
+        orders: true,
       },
     });
   }

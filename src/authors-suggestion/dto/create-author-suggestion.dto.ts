@@ -32,14 +32,20 @@ export class CreateAuthorSuggestionDto {
   @IsString()
   deathDate?: string;
 
-  @ApiPropertyOptional({ description: 'Meno osoby, ktorá navrhla autora (pre nepřihláseného používateľa)' })
+  @ApiPropertyOptional({
+    description:
+      'Meno osoby, ktorá navrhla autora (pre nepřihláseného používateľa)',
+  })
   @IsOptional()
   @IsString()
   suggestedByName?: string;
 }
 
 export class UpdateAuthorSuggestionStatusDto {
-  @ApiProperty({ enum: ['APPROVED', 'REJECTED'], description: 'Nový status návrhu' })
+  @ApiProperty({
+    enum: ['APPROVED', 'REJECTED'],
+    description: 'Nový status návrhu',
+  })
   @IsNotEmpty()
   @IsString()
   status: 'APPROVED' | 'REJECTED';

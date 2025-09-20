@@ -10,10 +10,17 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthorSuggestionService } from './authors-suggestion.service';
-import { CreateAuthorSuggestionDto, UpdateAuthorSuggestionStatusDto } from './dto/create-author-suggestion.dto';
-
+import {
+  CreateAuthorSuggestionDto,
+  UpdateAuthorSuggestionStatusDto,
+} from './dto/create-author-suggestion.dto';
 
 @ApiTags('Author Suggestions')
 @Controller('author-suggestions')
@@ -22,7 +29,9 @@ export class AuthorSuggestionController {
 
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  @ApiOperation({ summary: 'Navrhnúť nového autora (aj pre nepřihláseného používateľa)' })
+  @ApiOperation({
+    summary: 'Navrhnúť nového autora (aj pre nepřihláseného používateľa)',
+  })
   @ApiResponse({ status: 201, description: 'Návrh autora úspešne vytvorený' })
   @ApiResponse({ status: 400, description: 'Chyba vo validácii' })
   async create(@Body() dto: CreateAuthorSuggestionDto, @Req() req: any) {
@@ -42,7 +51,7 @@ export class AuthorSuggestionController {
   ) {
     return this.service.updateStatus(+id, dto.status);
   }
-  
+
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Zobraziť všetky návrhy autorov (admin)' })
