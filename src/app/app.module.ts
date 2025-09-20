@@ -34,7 +34,7 @@ import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.mod
       key: process.env.ARCJET_KEY!,
       rules: [],
     }),
-    AuthorsSuggestion
+    AuthorsSuggestion,
   ],
   controllers: [AppController],
   providers: [AppService],

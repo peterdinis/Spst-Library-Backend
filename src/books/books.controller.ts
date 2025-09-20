@@ -20,7 +20,7 @@ import { ArcjetGuard } from '@arcjet/nest';
 @ApiTags('books')
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) { }
+  constructor(private readonly booksService: BooksService) {}
 
   @Post()
   @UseGuards(ArcjetGuard)
@@ -95,7 +95,7 @@ export class BooksController {
   findRecentlyAdded(@Query('days') days?: number) {
     return this.booksService.findRecentlyAdded(days);
   }
-  
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a book by ID' })
   @ApiResponse({ status: 200, description: 'Book retrieved successfully' })

@@ -18,7 +18,7 @@ export class AuthorsService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) { }
+  ) {}
 
   async create(dto: CreateAuthorDto) {
     const existing = await this.prisma.author.findFirst({
@@ -50,10 +50,8 @@ export class AuthorsService {
 
     const where: Prisma.AuthorWhereInput = search
       ? {
-        OR: [
-          { name: { contains: search } },
-        ],
-      }
+          OR: [{ name: { contains: search } }],
+        }
       : {};
 
     const [data, total] = await Promise.all([

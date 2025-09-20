@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAuthorSuggestionDto } from './dto/create-author-suggestion.dto';
 import { SuggestionStatus } from '@prisma/client';
@@ -13,11 +18,15 @@ export class AuthorSuggestionService {
    */
   async create(dto: CreateAuthorSuggestionDto, userId?: number) {
     if (!dto.name || !dto.litPeriod || !dto.bornDate) {
-      throw new BadRequestException('Missing required fields: name, litPeriod, bornDate');
+      throw new BadRequestException(
+        'Missing required fields: name, litPeriod, bornDate',
+      );
     }
 
     if (!userId && !dto.suggestedByName) {
-      throw new BadRequestException('Non-authenticated users must provide suggestedByName');
+      throw new BadRequestException(
+        'Non-authenticated users must provide suggestedByName',
+      );
     }
 
     return this.prisma.authorSuggestion.create({
@@ -96,7 +105,9 @@ export class AuthorSuggestionService {
     }
 
     if (!isAdmin && suggestion.suggestedById !== userId) {
-      throw new ForbiddenException('You do not have permission to delete this suggestion');
+      throw new ForbiddenException(
+        'You do not have permission to delete this suggestion',
+      );
     }
 
     return this.prisma.authorSuggestion.delete({
