@@ -64,7 +64,7 @@ export class RatingService {
 
   async create(data: CreateRatingDto) {
     const rating = await this.prisma.rating.create({ data });
-    await this.cacheManager.clear(); // clear cache globally
+    await this.cacheManager.clear();
     return rating;
   }
 

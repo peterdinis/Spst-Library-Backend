@@ -135,7 +135,7 @@ export class BooksService {
 
     const book = await this.prisma.book.findUnique({
       where: { id },
-      include: { author: true, category: true, bookTags: true },
+      include: { author: true, category: true, bookTags: true, ratings: true },
     });
     if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
 
