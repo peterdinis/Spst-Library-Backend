@@ -78,7 +78,7 @@ model User {
   email     String   @unique
   name      String
   password  String
-  roleId    Int      @default(1235)
+  roleId    Int      
   role      Role     @relation(fields: [roleId], references: [id])
   orders    Order[]
   tokens    Token[]

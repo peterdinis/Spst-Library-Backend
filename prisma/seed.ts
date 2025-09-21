@@ -1,157 +1,122 @@
-import { PrismaClient, OrderStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  // ----- VYČISTENIE DATABÁZY -----
+  await prisma.token.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.rating.deleteMany();
+  await prisma.bookTag.deleteMany();
+  await prisma.book.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.author.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.role.deleteMany();
 
-  const passwordHash = await bcrypt.hash('password123', 10);
+  // ----- ROLES -----
+  await prisma.role.createMany({
+    data: [
+      { name: 'ADMIN' },
+      { name: 'STUDENT' },
+      { name: 'TEACHER' },
+    ],
+  });
 
-  await prisma.user.create({
+  // ----- USERS -----
+  const hashedPassword = await bcrypt.hash('Password123', 10);
+
+  const admin = await prisma.user.create({
     data: {
       email: 'admin@example.com',
       name: 'Admin User',
-      password: passwordHash,
-    },
-  });
-
-  const teacher = await prisma.user.create({
-    data: {
-      email: 'teacher@example.com',
-      name: 'Teacher User',
-      password: passwordHash,
+      password: hashedPassword,
+      role: { connect: { name: 'ADMIN' } },
     },
   });
 
   const student = await prisma.user.create({
     data: {
       email: 'student@example.com',
-      name: 'Student User',
-      password: passwordHash,
+      name: 'John Student',
+      password: hashedPassword,
+      role: { connect: { name: 'STUDENT' } },
     },
   });
 
+  // ----- CATEGORY -----
   const fiction = await prisma.category.create({
     data: {
       name: 'Fiction',
-      description: 'Fictional books',
+      description: 'Fictional works and novels',
     },
   });
 
-  const science = await prisma.category.create({
+  // ----- AUTHOR -----
+  const author = await prisma.author.create({
     data: {
-      name: 'Science',
-      description: 'Scientific books',
+      name: 'William Shakespeare',
+      bio: 'English playwright, poet, and actor',
+      litPeriod: 'Renaissance',
+      bornDate: '1564-04-26',
+      deathDate: '1616-04-23',
     },
   });
 
-  const author1 = await prisma.author.create({
+  // ----- BOOK TAGS -----
+  const classicTag = await prisma.bookTag.create({
+    data: { name: 'Classic' },
+  });
+
+  const dramaTag = await prisma.bookTag.create({
+    data: { name: 'Drama' },
+  });
+
+  // ----- BOOK -----
+  const book = await prisma.book.create({
     data: {
-      name: 'J. K. Rowling',
-      bio: 'Author of Harry Potter series',
-      litPeriod: 'Contemporary',
-      bornDate: '1965-07-31',
+      name: 'Hamlet',
+      description: 'A tragedy written by William Shakespeare.',
+      year: 1600,
+      category: { connect: { id: fiction.id } },
+      author: { connect: { id: author.id } },
+      bookTags: { connect: [{ id: classicTag.id }, { id: dramaTag.id }] },
     },
   });
 
-  const author2 = await prisma.author.create({
-    data: {
-      name: 'Stephen Hawking',
-      bio: 'Theoretical physicist and cosmologist',
-      litPeriod: 'Modern',
-      bornDate: '1942-01-08',
-      deathDate: '2018-03-14',
-    },
-  });
-
-  const book1 = await prisma.book.create({
-    data: {
-      name: 'Harry Potter and the Philosopher’s Stone',
-      description: 'Fantasy novel',
-      year: 1997,
-      categoryId: fiction.id,
-      authorId: author1.id,
-      isAvailable: true,
-      isNew: false,
-    },
-  });
-
-  const book2 = await prisma.book.create({
-    data: {
-      name: 'A Brief History of Time',
-      description: 'Book on cosmology',
-      year: 1988,
-      categoryId: science.id,
-      authorId: author2.id,
-      isAvailable: true,
-      isNew: true,
-    },
-  });
-
-  await prisma.bookTag.create({
-    data: {
-      name: 'Fantasy',
-      books: { connect: [{ id: book1.id }] },
-    },
-  });
-
-  await prisma.bookTag.create({
-    data: {
-      name: 'Science',
-      books: { connect: [{ id: book2.id }] },
-    },
-  });
-
+  // ----- RATING -----
   await prisma.rating.create({
     data: {
-      bookId: book1.id,
+      bookId: book.id,
       value: 5,
-      comment: 'Amazing book!',
+      comment: 'A timeless classic!',
     },
   });
 
-  await prisma.rating.create({
-    data: {
-      bookId: book2.id,
-      value: 4,
-      comment: 'Very insightful.',
-    },
-  });
-  
-  await prisma.order.create({
+  // ----- ORDER + ORDER ITEM -----
+  const order = await prisma.order.create({
     data: {
       userId: student.id,
-      status: OrderStatus.PENDING,
+      status: 'PENDING',
       items: {
         create: [
-          { bookId: book1.id, quantity: 1 },
-          { bookId: book2.id, quantity: 2 },
+          {
+            bookId: book.id,
+            quantity: 1,
+          },
         ],
       },
     },
-    include: { items: true },
   });
 
-  await prisma.order.create({
-    data: {
-      userId: teacher.id,
-      status: OrderStatus.COMPLETED,
-      items: {
-        create: [
-          { bookId: book2.id, quantity: 1 },
-        ],
-      },
-    },
-    include: { items: true },
-  });
-
-  console.log('✅ Seeding completed!');
+  console.log('✅ Seed completed');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error seeding database:', e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
