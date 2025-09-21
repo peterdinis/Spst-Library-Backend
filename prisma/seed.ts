@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  // ----- VYČISTENIE DATABÁZY -----
   await prisma.token.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
@@ -16,7 +15,6 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.role.deleteMany();
 
-  // ----- ROLES -----
   await prisma.role.createMany({
     data: [
       { name: 'ADMIN' },
@@ -25,7 +23,6 @@ async function main() {
     ],
   });
 
-  // ----- USERS -----
   const hashedPassword = await bcrypt.hash('Password123', 10);
 
   const admin = await prisma.user.create({
@@ -46,7 +43,6 @@ async function main() {
     },
   });
 
-  // ----- CATEGORY -----
   const fiction = await prisma.category.create({
     data: {
       name: 'Fiction',
@@ -54,7 +50,6 @@ async function main() {
     },
   });
 
-  // ----- AUTHOR -----
   const author = await prisma.author.create({
     data: {
       name: 'William Shakespeare',
@@ -65,7 +60,6 @@ async function main() {
     },
   });
 
-  // ----- BOOK TAGS -----
   const classicTag = await prisma.bookTag.create({
     data: { name: 'Classic' },
   });
@@ -74,7 +68,6 @@ async function main() {
     data: { name: 'Drama' },
   });
 
-  // ----- BOOK -----
   const book = await prisma.book.create({
     data: {
       name: 'Hamlet',
@@ -86,7 +79,6 @@ async function main() {
     },
   });
 
-  // ----- RATING -----
   await prisma.rating.create({
     data: {
       bookId: book.id,
@@ -94,8 +86,7 @@ async function main() {
       comment: 'A timeless classic!',
     },
   });
-
-  // ----- ORDER + ORDER ITEM -----
+  
   const order = await prisma.order.create({
     data: {
       userId: student.id,
