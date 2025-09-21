@@ -14,6 +14,7 @@ import {
   REFRESH_TOKEN_EXPIRY,
 } from 'src/shared/constants/applicationConstants';
 import { Role } from 'src/roles/utils/roles';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private accessControlService: AccessControlService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto, creatorRole: Role = Role.STUDENT) {
     if (
@@ -113,6 +114,43 @@ export class AuthService {
         orders: true,
       },
     });
+  }
+
+  async updateProfile(userId: number, dto: UpdateProfileDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new BadRequestException('User not found');
+
+    // Check if email is being updated
+    if (dto.email && dto.email !== user.email) {
+      const emailExists = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+      if (emailExists) throw new BadRequestException('Email already in use');
+    }
+
+    // Hash password if provided
+    let hashedPassword: string | undefined;
+    if (dto.password) {
+      hashedPassword = await bcrypt.hash(dto.password, 10);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: dto.name,
+        email: dto.email,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: { select: { id: true, name: true } },
+        createdAt: true,
+      },
+    });
+
+    return updatedUser;
   }
 
   private async generateTokens(userId: number, roleName: string) {

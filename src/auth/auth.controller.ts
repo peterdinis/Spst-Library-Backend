@@ -1,7 +1,6 @@
-import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ArcjetGuard } from '@arcjet/nest';
 import {
   ApiTags,
   ApiOperation,
@@ -11,11 +10,12 @@ import {
 import { LoginDto } from './dto/login-dto';
 import { RegisterDto } from './dto/register-dto';
 import { AuthRequest } from './types/authTypes';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
@@ -62,5 +62,15 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Returns user profile.' })
   async profile(@Req() req: AuthRequest) {
     return this.authService.profile(req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Put('update/profile')
+  @ApiOperation({ summary: 'Update profile of the authenticated user' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid input or email already in use.' })
+  async updateProfile(@Req() req: AuthRequest, @Body() dto: UpdateProfileDto) {
+    return this.authService.updateProfile(req.user.id, dto);
   }
 }
