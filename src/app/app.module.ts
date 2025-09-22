@@ -36,7 +36,7 @@ import { PdfModule } from 'src/pdf/pdf.module';
       rules: [],
     }),
     AuthorsSuggestion,
-    PdfModule
+    PdfModule,
   ],
   controllers: [AppController],
   providers: [AppService],
