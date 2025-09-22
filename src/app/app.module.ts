@@ -14,6 +14,7 @@ import { OrdersModule } from 'src/orders/orders.module';
 import { ArcjetModule } from '@arcjet/nest';
 import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.module';
 import { AdminModule } from 'src/admin/admin.module';
+import { PdfModule } from 'src/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AdminModule } from 'src/admin/admin.module';
       rules: [],
     }),
     AuthorsSuggestion,
+    PdfModule,
   ],
   controllers: [AppController],
   providers: [AppService],
