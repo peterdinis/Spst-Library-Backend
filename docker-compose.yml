@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: spst-kniznica
+    working_dir: /usr/src/app
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "file:./dev.db"
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+    volumes:
+      - ./:/usr/src/app:delegated
+      - node_modules:/usr/src/app/node_modules
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && pnpm run start:dev"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: nestjs_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+  node_modules:

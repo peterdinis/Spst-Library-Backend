@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+dist
+.env
+.git
+.gitignore
+README.md
+.eslintrc.js
+.prettierrc
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.md
+
+# pnpm specific
+.pnpm-store
