@@ -1,4 +1,5 @@
 onlyBuiltDependencies:
+<<<<<<< HEAD
   - '@nestjs/core'
   - '@prisma/client'
   - '@prisma/engines'
@@ -7,3 +8,6 @@ onlyBuiltDependencies:
   - bcrypt
   - esbuild
   - prisma
+=======
+  - '@swc/core'
+>>>>>>> main
