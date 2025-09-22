@@ -13,6 +13,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { OrdersModule } from 'src/orders/orders.module';
 import { ArcjetModule } from '@arcjet/nest';
 import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.module';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.mod
     BooksModule,
     AuthModule,
     OrdersModule,
+    AdminModule,
     ArcjetModule.forRoot({
       isGlobal: true,
       key: process.env.ARCJET_KEY!,
