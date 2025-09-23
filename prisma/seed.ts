@@ -8,13 +8,15 @@ async function main() {
 
   const passwordHash = await bcrypt.hash('password123', 10);
 
-  await prisma.user.create({
+  // Users
+  const admin = await prisma.user.create({
     data: {
       email: 'admin@example.com',
       name: 'Admin User',
       password: passwordHash,
     },
   });
+  console.log('✅ Created admin:', admin.id);
 
   const teacher = await prisma.user.create({
     data: {
@@ -23,6 +25,7 @@ async function main() {
       password: passwordHash,
     },
   });
+  console.log('✅ Created teacher:', teacher.id);
 
   const student = await prisma.user.create({
     data: {
@@ -31,21 +34,18 @@ async function main() {
       password: passwordHash,
     },
   });
+  console.log('✅ Created student:', student.id);
 
+  // Categories
   const fiction = await prisma.category.create({
-    data: {
-      name: 'Fiction',
-      description: 'Fictional books',
-    },
+    data: { name: 'Fiction', description: 'Fictional books' },
   });
-
   const science = await prisma.category.create({
-    data: {
-      name: 'Science',
-      description: 'Scientific books',
-    },
+    data: { name: 'Science', description: 'Scientific books' },
   });
+  console.log('✅ Created categories:', fiction.id, science.id);
 
+  // Authors
   const author1 = await prisma.author.create({
     data: {
       name: 'J. K. Rowling',
@@ -64,7 +64,9 @@ async function main() {
       deathDate: '2018-03-14',
     },
   });
+  console.log('✅ Created authors:', author1.id, author2.id);
 
+  // Books
   const book1 = await prisma.book.create({
     data: {
       name: 'Harry Potter and the Philosopher’s Stone',
@@ -88,37 +90,34 @@ async function main() {
       isNew: true,
     },
   });
+  console.log('✅ Created books:', book1.id, book2.id);
 
-  await prisma.bookTag.create({
+  // Book tags
+  const tagFantasy = await prisma.bookTag.create({
     data: {
       name: 'Fantasy',
       books: { connect: [{ id: book1.id }] },
     },
   });
 
-  await prisma.bookTag.create({
+  const tagScience = await prisma.bookTag.create({
     data: {
       name: 'Science',
       books: { connect: [{ id: book2.id }] },
     },
   });
+  console.log('✅ Created book tags:', tagFantasy.id, tagScience.id);
 
-  await prisma.rating.create({
-    data: {
-      bookId: book1.id,
-      value: 5,
-      comment: 'Amazing book!',
-    },
+  // Ratings
+  await prisma.rating.createMany({
+    data: [
+      { bookId: book1.id, value: 5, comment: 'Amazing book!' },
+      { bookId: book2.id, value: 4, comment: 'Very insightful.' },
+    ],
   });
+  console.log('✅ Created ratings');
 
-  await prisma.rating.create({
-    data: {
-      bookId: book2.id,
-      value: 4,
-      comment: 'Very insightful.',
-    },
-  });
-  
+  // Orders
   await prisma.order.create({
     data: {
       userId: student.id,
@@ -138,15 +137,14 @@ async function main() {
       userId: teacher.id,
       status: OrderStatus.COMPLETED,
       items: {
-        create: [
-          { bookId: book2.id, quantity: 1 },
-        ],
+        create: [{ bookId: book2.id, quantity: 1 }],
       },
     },
     include: { items: true },
   });
+  console.log('✅ Created orders');
 
-  console.log('✅ Seeding completed!');
+  console.log('🎉 Seeding completed!');
 }
 
 main()
