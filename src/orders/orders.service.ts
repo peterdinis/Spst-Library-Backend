@@ -12,7 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private async validateBookExists(bookId: number) {
     if (!bookId || bookId < 1) {
@@ -102,6 +102,24 @@ export class OrdersService {
       });
     } catch (error) {
       throw new InternalServerErrorException('Failed to create order');
+    }
+  }
+
+  async getOrdersForUser(userId: number): Promise<Order[]> {
+    this.validateUserId(userId);
+
+    try {
+      return await this.prisma.order.findMany({
+        where: { userId },
+        include: {
+          items: true
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch orders for user ID ${userId}`,
+      );
     }
   }
 
