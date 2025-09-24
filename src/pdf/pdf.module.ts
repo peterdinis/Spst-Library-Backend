@@ -6,6 +6,6 @@ import { PdfController } from './pdf.controller';
 @Module({
   imports: [PrismaModule],
   providers: [PdfService],
-  controllers: [PdfController]
+  controllers: [PdfController],
 })
 export class PdfModule {}

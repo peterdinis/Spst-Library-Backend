@@ -15,7 +15,11 @@ export class PdfController {
     description: 'The entity to generate PDF for',
     enum: ['books', 'authors', 'categories', 'users', 'orders'],
   })
-  @ApiResponse({ status: 200, description: 'PDF file returned successfully', content: { 'application/pdf': {} } })
+  @ApiResponse({
+    status: 200,
+    description: 'PDF file returned successfully',
+    content: { 'application/pdf': {} },
+  })
   @ApiResponse({ status: 400, description: 'Unknown entity' })
   async downloadPdf(@Param('entity') entity: string, @Res() res: Response) {
     let pdfBuffer: Buffer;
