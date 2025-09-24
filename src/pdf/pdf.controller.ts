@@ -34,9 +34,6 @@ export class PdfController {
       case 'categories':
         pdfBuffer = await this.pdfService.generateCategoriesPdf();
         break;
-      case 'users':
-        pdfBuffer = await this.pdfService.generateUsersPdf();
-        break;
       case 'orders':
         pdfBuffer = await this.pdfService.generateOrdersPdf();
         break;
