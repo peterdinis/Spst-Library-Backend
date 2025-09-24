@@ -7,5 +7,6 @@ import { RatingController } from './rating.controller';
   imports: [PrismaModule],
   providers: [RatingService],
   controllers: [RatingController],
+  exports: [RatingService],
 })
 export class RatingModule {}

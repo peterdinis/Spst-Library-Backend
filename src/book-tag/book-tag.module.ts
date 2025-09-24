@@ -7,5 +7,6 @@ import { BookTagService } from './book-tag.service';
   imports: [PrismaModule],
   controllers: [BookTagController],
   providers: [BookTagService],
+  exports: [BookTagService],
 })
 export class BookTagModule {}
