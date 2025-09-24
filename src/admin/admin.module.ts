@@ -9,4 +9,4 @@ import { AdminController } from "./admin.controller";
     controllers: [AdminController]
 })
 
-export class AdminModule {}
+export class AdminModule {} 
