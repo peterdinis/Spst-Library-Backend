@@ -105,6 +105,24 @@ export class OrdersService {
     }
   }
 
+  async getOrdersForUser(userId: number): Promise<Order[]> {
+    this.validateUserId(userId);
+
+    try {
+      return await this.prisma.order.findMany({
+        where: { userId },
+        include: {
+          items: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch orders for user ID ${userId}`,
+      );
+    }
+  }
+
   async getOrderById(orderId: number): Promise<Order> {
     return await this.validateOrderExists(orderId);
   }

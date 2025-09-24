@@ -16,14 +16,14 @@ export class AuthorSuggestionService {
    * Create a new author suggestion.
    * Non-authenticated users can also create suggestions by providing suggestedByName.
    */
-  async create(dto: CreateAuthorSuggestionDto, userId?: number) {
+  async create(dto: CreateAuthorSuggestionDto) {
     if (!dto.name || !dto.litPeriod || !dto.bornDate) {
       throw new BadRequestException(
         'Missing required fields: name, litPeriod, bornDate',
       );
     }
 
-    if (!userId && !dto.suggestedByName) {
+    if (dto.suggestedByName) {
       throw new BadRequestException(
         'Non-authenticated users must provide suggestedByName',
       );
@@ -37,8 +37,7 @@ export class AuthorSuggestionService {
         authorImage: dto.authorImage,
         bornDate: dto.bornDate,
         deathDate: dto.deathDate,
-        suggestedById: userId ?? null,
-        suggestedByName: userId ? null : dto.suggestedByName,
+        suggestedByName: dto.suggestedByName,
         status: SuggestionStatus.PENDING,
       },
     });
@@ -104,7 +103,7 @@ export class AuthorSuggestionService {
       throw new NotFoundException('Author suggestion not found');
     }
 
-    if (!isAdmin && suggestion.suggestedById !== userId) {
+    if (!isAdmin) {
       throw new ForbiddenException(
         'You do not have permission to delete this suggestion',
       );

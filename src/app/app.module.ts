@@ -9,7 +9,6 @@ import { CategoryModule } from 'src/category/category.module';
 import { AuthorsModule } from 'src/authors/authors.module';
 import { GlobalCacheModule } from 'src/cache/global.cache.module';
 import { BooksModule } from 'src/books/books.module';
-import { AuthModule } from 'src/auth/auth.module';
 import { OrdersModule } from 'src/orders/orders.module';
 import { ArcjetModule } from '@arcjet/nest';
 import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.module';
@@ -28,7 +27,6 @@ import { PdfModule } from 'src/pdf/pdf.module';
     CategoryModule,
     AuthorsModule,
     BooksModule,
-    AuthModule,
     OrdersModule,
     ArcjetModule.forRoot({
       isGlobal: true,

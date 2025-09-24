@@ -11,7 +11,7 @@ export class PdfService {
     const chunks: Uint8Array[] = [];
 
     doc.on('data', (chunk: Uint8Array<ArrayBufferLike>) => chunks.push(chunk));
-    doc.on('end', () => {});
+    doc.on('end', () => { });
 
     doc.fontSize(20).text(title, { underline: true });
     doc.moveDown();
@@ -67,28 +67,13 @@ export class PdfService {
     return this.generatePdf('Categories List', rows);
   }
 
-  async generateUsersPdf(): Promise<Buffer> {
-    const users = await this.prisma.user.findMany({
-      include: { role: true },
-    });
-
-    const rows = users.map((u) => [
-      `Name: ${u.name}`,
-      `Email: ${u.email}`,
-      `Role: ${u.role.name}`,
-    ]);
-
-    return this.generatePdf('Users List', rows);
-  }
-
   async generateOrdersPdf(): Promise<Buffer> {
     const orders = await this.prisma.order.findMany({
-      include: { user: true, items: { include: { book: true } } },
+      include: { items: { include: { book: true } } },
     });
 
     const rows = orders.map((o) => [
       `Order ID: ${o.id}`,
-      `User: ${o.user.name}`,
       `Status: ${o.status}`,
       `Items: ${o.items.map((i) => `${i.book.name} x${i.quantity}`).join(', ')}`,
     ]);
