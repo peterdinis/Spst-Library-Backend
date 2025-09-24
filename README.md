@@ -20,11 +20,6 @@ A modern school library management system built with NestJS framework, TypeScrip
 - Flexible tag system for detailed marking
 - Multiple tagging capability for single books
 
-### 👤 User System
-- User registration and authentication
-- Role system (admin, student, librarian, etc.)
-- JWT tokens for security
-
 ### 📋 Orders and Borrowing
 - Book ordering system
 - Order status tracking (pending, completed, cancelled, returned)
@@ -36,7 +31,6 @@ A modern school library management system built with NestJS framework, TypeScrip
 - **Language**: TypeScript
 - **Database**: SQLite
 - **ORM**: Prisma
-- **Authentication**: JWT (JSON Web Tokens)
 - **Package Manager**: PNPM
 
 ## Database Structure
@@ -46,8 +40,6 @@ A modern school library management system built with NestJS framework, TypeScrip
 - **Author** - authors and their biographical data
 - **Category** - book categories
 - **BookTag** - tags for books (many-to-many)
-- **User** - system users
-- **Role** - user roles
 - **Order/OrderItem** - orders and their items
 - **Rating** - book ratings
 - **Token** - refresh tokens for authentication
@@ -75,8 +67,6 @@ A modern school library management system built with NestJS framework, TypeScrip
    Create a `.env` file in the root directory:
    ```env
    DATABASE_URL="file:./dev.db"
-   JWT_SECRET="your-secret-key"
-   JWT_EXPIRES_IN="7d"
    ```
 
 4. **Database Initialization**

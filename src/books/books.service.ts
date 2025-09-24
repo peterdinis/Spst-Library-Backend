@@ -236,7 +236,7 @@ export class BooksService {
       throw new BadRequestException('Limit must be between 1 and 50');
 
     return this.prisma.book.findMany({
-      take: limit,
+      take: Number(limit),
       include: { author: true, ratings: true },
     });
   }
