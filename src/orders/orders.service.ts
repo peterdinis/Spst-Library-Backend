@@ -12,7 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   private async validateBookExists(bookId: number) {
     if (!bookId || bookId < 1) {
@@ -112,7 +112,7 @@ export class OrdersService {
       return await this.prisma.order.findMany({
         where: { userId },
         include: {
-          items: true
+          items: true,
         },
         orderBy: { createdAt: 'desc' },
       });

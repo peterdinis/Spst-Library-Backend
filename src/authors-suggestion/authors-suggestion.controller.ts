@@ -30,7 +30,10 @@ export class AuthorSuggestionController {
   @ApiOperation({
     summary: 'Suggest a new author (available for non-logged-in users as well)',
   })
-  @ApiResponse({ status: 201, description: 'Author suggestion successfully created' })
+  @ApiResponse({
+    status: 201,
+    description: 'Author suggestion successfully created',
+  })
   @ApiResponse({ status: 400, description: 'Validation error' })
   async create(@Body() dto: CreateAuthorSuggestionDto) {
     return this.service.create(dto);
@@ -39,7 +42,9 @@ export class AuthorSuggestionController {
   @Patch(':id/status')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Approve or reject an author suggestion (admin only)' })
+  @ApiOperation({
+    summary: 'Approve or reject an author suggestion (admin only)',
+  })
   @ApiResponse({ status: 200, description: 'Suggestion status updated' })
   @ApiResponse({ status: 403, description: 'Unauthorized' })
   async updateStatus(

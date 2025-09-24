@@ -11,13 +11,19 @@ import {
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ArcjetGuard } from '@arcjet/nest';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private ordersService: OrdersService) { }
+  constructor(private ordersService: OrdersService) {}
 
   @Post()
   @UseGuards(ArcjetGuard)
@@ -55,9 +61,7 @@ export class OrdersController {
   @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Get all orders by user' })
   @ApiParam({ name: 'userId', type: Number })
-  async getOrdersByUserWithFilter(
-    @Param('userId') userId: string,
-  ) {
+  async getOrdersByUserWithFilter(@Param('userId') userId: string) {
     const numericUserId = Number(userId);
     return this.ordersService.getOrdersByUser(numericUserId);
   }
