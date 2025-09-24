@@ -7,8 +7,6 @@ import {
   Patch,
   Param,
   Get,
-  Req,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -30,21 +28,25 @@ export class AuthorSuggestionController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   @ApiOperation({
-    summary: 'Navrhnúť nového autora (aj pre nepřihláseného používateľa)',
+    summary: 'Suggest a new author (available for non-logged-in users as well)',
   })
-  @ApiResponse({ status: 201, description: 'Návrh autora úspešne vytvorený' })
-  @ApiResponse({ status: 400, description: 'Chyba vo validácii' })
-  async create(@Body() dto: CreateAuthorSuggestionDto, @Req() req: any) {
-    const userId = req.user?.id;
-    return this.service.create(dto, userId);
+  @ApiResponse({
+    status: 201,
+    description: 'Author suggestion successfully created',
+  })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  async create(@Body() dto: CreateAuthorSuggestionDto) {
+    return this.service.create(dto);
   }
 
   @Patch(':id/status')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Schváliť alebo zamietnuť návrh autora (admin)' })
-  @ApiResponse({ status: 200, description: 'Status návrhu aktualizovaný' })
-  @ApiResponse({ status: 403, description: 'Nie ste autorizovaní' })
+  @ApiOperation({
+    summary: 'Approve or reject an author suggestion (admin only)',
+  })
+  @ApiResponse({ status: 200, description: 'Suggestion status updated' })
+  @ApiResponse({ status: 403, description: 'Unauthorized' })
   async updateStatus(
     @Param('id') id: string,
     @Body() dto: UpdateAuthorSuggestionStatusDto,
@@ -54,8 +56,8 @@ export class AuthorSuggestionController {
 
   @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Zobraziť všetky návrhy autorov (admin)' })
-  @ApiResponse({ status: 200, description: 'Zoznam návrhov autorov' })
+  @ApiOperation({ summary: 'Get all author suggestions (admin only)' })
+  @ApiResponse({ status: 200, description: 'List of author suggestions' })
   async findAll() {
     return this.service.findAll();
   }

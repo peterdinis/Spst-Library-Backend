@@ -11,7 +11,7 @@ services:
       REDIS_PORT: 6379
     volumes:
       - ./:/usr/src/app
-      - /usr/src/app/node_modules   # aby node_modules neprepisoval bind mount
+      - /usr/src/app/node_modules
     command: >
       sh -c "npx prisma migrate deploy &&
              npm run start:dev"
