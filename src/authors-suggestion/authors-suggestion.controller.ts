@@ -7,8 +7,6 @@ import {
   Patch,
   Param,
   Get,
-  Req,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -34,9 +32,8 @@ export class AuthorSuggestionController {
   })
   @ApiResponse({ status: 201, description: 'Návrh autora úspešne vytvorený' })
   @ApiResponse({ status: 400, description: 'Chyba vo validácii' })
-  async create(@Body() dto: CreateAuthorSuggestionDto, @Req() req: any) {
-    const userId = req.user?.id;
-    return this.service.create(dto, userId);
+  async create(@Body() dto: CreateAuthorSuggestionDto) {
+    return this.service.create(dto);
   }
 
   @Patch(':id/status')
