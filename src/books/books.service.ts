@@ -18,6 +18,8 @@ import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
+  private readonly cacheKeyAll = 'books:all';
+
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,

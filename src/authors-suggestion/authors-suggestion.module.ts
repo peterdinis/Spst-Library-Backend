@@ -7,5 +7,6 @@ import { AuthorSuggestionController } from './authors-suggestion.controller';
   imports: [PrismaModule],
   providers: [AuthorSuggestionService],
   controllers: [AuthorSuggestionController],
+  exports: [AuthorSuggestionService],
 })
-export class AuthorsSuggestion {}
+export class AuthorsSuggestionModule {}

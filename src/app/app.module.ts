@@ -11,8 +11,9 @@ import { GlobalCacheModule } from 'src/cache/global.cache.module';
 import { BooksModule } from 'src/books/books.module';
 import { OrdersModule } from 'src/orders/orders.module';
 import { ArcjetModule } from '@arcjet/nest';
-import { AuthorsSuggestion } from 'src/authors-suggestion/authors-suggestion.module';
+import { AuthorsSuggestionModule } from 'src/authors-suggestion/authors-suggestion.module';
 import { PdfModule } from 'src/pdf/pdf.module';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
@@ -33,8 +34,9 @@ import { PdfModule } from 'src/pdf/pdf.module';
       key: process.env.ARCJET_KEY!,
       rules: [],
     }),
-    AuthorsSuggestion,
+    AuthorsSuggestionModule,
     PdfModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

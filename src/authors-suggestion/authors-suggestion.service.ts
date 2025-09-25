@@ -113,4 +113,58 @@ export class AuthorSuggestionService {
       where: { id },
     });
   }
+
+  async approveSuggestion(id: number) {
+    // Find the suggestion
+    const suggestion = await this.prisma.authorSuggestion.findUnique({
+      where: { id },
+    });
+
+    if (!suggestion) {
+      throw new NotFoundException('Author suggestion not found');
+    }
+
+    if (suggestion.status !== SuggestionStatus.PENDING) {
+      throw new BadRequestException('Only PENDING suggestions can be approved');
+    }
+
+    // Update the suggestion status to APPROVED
+    await this.prisma.authorSuggestion.update({
+      where: { id },
+      data: { status: SuggestionStatus.APPROVED },
+    });
+
+    // Create a new author based on the suggestion
+    const newAuthor = await this.prisma.author.create({
+      data: {
+        name: suggestion.name,
+        bio: suggestion.bio,
+        litPeriod: suggestion.litPeriod,
+        authorImage: suggestion.authorImage,
+        bornDate: suggestion.bornDate,
+        deathDate: suggestion.deathDate,
+      },
+    });
+
+    return newAuthor;
+  }
+
+  async rejectSuggestion(id: number) {
+    const suggestion = await this.prisma.authorSuggestion.findUnique({
+      where: { id },
+    });
+
+    if (!suggestion) {
+      throw new NotFoundException('Author suggestion not found');
+    }
+
+    if (suggestion.status !== SuggestionStatus.PENDING) {
+      throw new BadRequestException('Only PENDING suggestions can be rejected');
+    }
+
+    return this.prisma.authorSuggestion.update({
+      where: { id },
+      data: { status: SuggestionStatus.REJECTED },
+    });
+  }
 }
