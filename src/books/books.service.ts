@@ -18,13 +18,12 @@ import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
-
   private readonly cacheKeyAll = 'books:all';
 
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-  ) { }
+  ) {}
 
   private async validateAuthorExists(authorId: number) {
     if (!authorId || authorId < 1)
@@ -108,11 +107,11 @@ export class BooksService {
 
     const where: Prisma.BookWhereInput = search
       ? {
-        OR: [
-          { name: { contains: search } },
-          { description: { contains: search } },
-        ],
-      }
+          OR: [
+            { name: { contains: search } },
+            { description: { contains: search } },
+          ],
+        }
       : {};
 
     const [books, total] = await this.prisma.$transaction([

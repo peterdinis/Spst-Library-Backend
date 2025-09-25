@@ -9,4 +9,4 @@ import { AuthorSuggestionController } from './authors-suggestion.controller';
   controllers: [AuthorSuggestionController],
   exports: [AuthorSuggestionService],
 })
-export class AuthorsSuggestion {}
+export class AuthorsSuggestionModule {}

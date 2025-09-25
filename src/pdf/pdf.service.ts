@@ -11,7 +11,7 @@ export class PdfService {
     const chunks: Uint8Array[] = [];
 
     doc.on('data', (chunk: Uint8Array<ArrayBufferLike>) => chunks.push(chunk));
-    doc.on('end', () => { });
+    doc.on('end', () => {});
 
     doc.fontSize(20).text(title, { underline: true });
     doc.moveDown();
