@@ -17,12 +17,12 @@ import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class OrdersService {
-  private readonly cacheKeyAll = 'orders:all'
+  private readonly cacheKeyAll = 'orders:all';
 
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   private async validateBookExists(bookId: number) {
     if (!bookId || bookId < 1) {
@@ -90,10 +90,20 @@ export class OrdersService {
   }
 
   async getAllCreatedOrders(pagination: OrderPaginationDto) {
-    const { page = 1, limit = 10, status, userId, dateFrom, dateTo, search } = pagination;
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      userId,
+      dateFrom,
+      dateTo,
+      search,
+    } = pagination;
 
-    if (page < 1) throw new BadRequestException('Page must be a positive integer');
-    if (limit < 1 || limit > 100) throw new BadRequestException('Limit must be between 1 and 100');
+    if (page < 1)
+      throw new BadRequestException('Page must be a positive integer');
+    if (limit < 1 || limit > 100)
+      throw new BadRequestException('Limit must be between 1 and 100');
 
     const skip = (page - 1) * limit;
     const cacheKey = `${this.cacheKeyAll}:page=${page}:limit=${limit}:status=${status || ''}:userId=${userId || ''}:dateFrom=${dateFrom || ''}:dateTo=${dateTo || ''}:search=${search || ''}`;
@@ -147,8 +157,6 @@ export class OrdersService {
     await this.cacheManager.set(cacheKey, DEFAULT_CACHE_TTL);
     return result;
   }
-
-
 
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     this.validateUserId(dto.userId);

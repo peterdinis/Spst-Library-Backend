@@ -10,7 +10,7 @@ import { SuggestionStatus } from '@prisma/client';
 
 @Injectable()
 export class AuthorSuggestionService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   /**
    * Create a new author suggestion.

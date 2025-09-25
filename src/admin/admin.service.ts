@@ -9,8 +9,8 @@ export class AdminService {
   constructor(
     private readonly clerkService: ClerkService,
     private readonly ordersService: OrdersService,
-    private readonly authorSuggestionService: AuthorSuggestionService
-  ) { }
+    private readonly authorSuggestionService: AuthorSuggestionService,
+  ) {}
 
   async getActiveUsers() {
     return this.clerkService.getActiveUsers();

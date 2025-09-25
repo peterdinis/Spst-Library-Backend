@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsInt, Min, IsString, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsOptional,
+  IsInt,
+  Min,
+  IsString,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 import { OrderStatus } from '@prisma/client';
 
 export class OrderPaginationDto {

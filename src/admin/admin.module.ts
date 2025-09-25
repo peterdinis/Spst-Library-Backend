@@ -6,10 +6,7 @@ import { OrdersModule } from 'src/orders/orders.module';
 import { AuthorsSuggestionModule } from 'src/authors-suggestion/authors-suggestion.module';
 
 @Module({
-  imports: [
-    OrdersModule,
-    AuthorsSuggestionModule
-  ],
+  imports: [OrdersModule, AuthorsSuggestionModule],
   providers: [AdminService, ClerkService],
   controllers: [AdminController],
 })
