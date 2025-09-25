@@ -83,12 +83,6 @@ export class OrdersService {
     }
   }
 
-  private validateUserId(userId: number) {
-    if (!userId || userId < 1) {
-      throw new BadRequestException('User ID must be a positive number');
-    }
-  }
-
   async getAllCreatedOrders(pagination: OrderPaginationDto) {
     const {
       page = 1,
@@ -159,7 +153,6 @@ export class OrdersService {
   }
 
   async createOrder(dto: CreateOrderDto): Promise<Order> {
-    this.validateUserId(dto.userId);
     this.validateOrderItems(dto.items);
 
     for (const item of dto.items) {
@@ -185,7 +178,6 @@ export class OrdersService {
   }
 
   async getOrdersForUser(userId: number): Promise<Order[]> {
-    this.validateUserId(userId);
 
     try {
       return await this.prisma.order.findMany({
@@ -207,7 +199,6 @@ export class OrdersService {
   }
 
   async getOrdersByUser(userId: number): Promise<Order[]> {
-    this.validateUserId(userId);
 
     return this.prisma.order.findMany({
       where: { userId },
