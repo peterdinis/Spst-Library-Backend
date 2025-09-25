@@ -12,6 +12,8 @@ import { Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { OrderPaginationDto } from './dto/pagination-order.dto';
+import { Cache } from 'cache-manager';
+import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class OrdersService {
@@ -19,7 +21,7 @@ export class OrdersService {
 
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) { }
 
   private async validateBookExists(bookId: number) {
@@ -96,7 +98,7 @@ export class OrdersService {
     const skip = (page - 1) * limit;
     const cacheKey = `${this.cacheKeyAll}:page=${page}:limit=${limit}:status=${status || ''}:userId=${userId || ''}:dateFrom=${dateFrom || ''}:dateTo=${dateTo || ''}:search=${search || ''}`;
 
-    const cached = await this.cacheManager.match(cacheKey);
+    const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
     const where: Prisma.OrderWhereInput = {};
@@ -142,7 +144,7 @@ export class OrdersService {
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
 
-    await this.cacheManager.add(cacheKey);
+    await this.cacheManager.set(cacheKey, DEFAULT_CACHE_TTL);
     return result;
   }
 
