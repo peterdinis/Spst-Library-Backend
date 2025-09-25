@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -16,7 +15,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { ArcjetGuard } from '@arcjet/nest';
 

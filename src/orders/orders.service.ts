@@ -4,15 +4,23 @@ import {
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
+  Inject,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.status.dto';
-import { Order, OrderStatus } from '@prisma/client';
+import { Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { OrderPaginationDto } from './dto/pagination-order.dto';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  private readonly cacheKeyAll = 'orders:all'
+
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) { }
 
   private async validateBookExists(bookId: number) {
     if (!bookId || bookId < 1) {
@@ -78,6 +86,67 @@ export class OrdersService {
       throw new BadRequestException('User ID must be a positive number');
     }
   }
+
+  async getAllCreatedOrders(pagination: OrderPaginationDto) {
+    const { page = 1, limit = 10, status, userId, dateFrom, dateTo, search } = pagination;
+
+    if (page < 1) throw new BadRequestException('Page must be a positive integer');
+    if (limit < 1 || limit > 100) throw new BadRequestException('Limit must be between 1 and 100');
+
+    const skip = (page - 1) * limit;
+    const cacheKey = `${this.cacheKeyAll}:page=${page}:limit=${limit}:status=${status || ''}:userId=${userId || ''}:dateFrom=${dateFrom || ''}:dateTo=${dateTo || ''}:search=${search || ''}`;
+
+    const cached = await this.cacheManager.match(cacheKey);
+    if (cached) return cached;
+
+    const where: Prisma.OrderWhereInput = {};
+
+    if (status) where.status = status;
+    if (userId) where.userId = userId;
+    if (dateFrom || dateTo) {
+      where.createdAt = {};
+      if (dateFrom) where.createdAt.gte = new Date(dateFrom);
+      if (dateTo) where.createdAt.lte = new Date(dateTo);
+    }
+
+    if (search) {
+      where.items = {
+        some: {
+          book: {
+            name: {
+              contains: search,
+            },
+          },
+        },
+      };
+    }
+
+    const [items, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        skip,
+        take: Number(limit),
+        include: {
+          items: {
+            include: {
+              book: true,
+            },
+          },
+        },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    const result = {
+      data: items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+
+    await this.cacheManager.add(cacheKey);
+    return result;
+  }
+
+
 
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     this.validateUserId(dto.userId);
