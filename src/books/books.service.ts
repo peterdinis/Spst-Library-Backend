@@ -63,18 +63,6 @@ export class BooksService {
     }
   }
 
-  async findAllCached() {
-    const cacheKey = `${this.cacheKeyAll}:full`;
-    const cached = await this.cacheManager.get(cacheKey);
-    if (cached) return cached;
-
-    const books = await this.prisma.book.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
-    await this.cacheManager.set(cacheKey, books, DEFAULT_CACHE_TTL);
-    return books;
-  }
-
   async create(dto: CreateBookDto): Promise<Book> {
     await this.validateAuthorExists(dto.authorId);
     if (dto.categoryId) await this.validateCategoryExists(dto.categoryId);

@@ -6,7 +6,6 @@ import { RatingController } from './rating.controller';
 @Module({
   imports: [PrismaModule],
   providers: [RatingService],
-  controllers: [RatingController],
-  exports: [RatingService],
+  controllers: [RatingController]
 })
 export class RatingModule {}

@@ -59,21 +59,6 @@ export class CategoryService {
       );
   }
 
-  async findAllCached() {
-    const cacheKey = `${this.cacheKeyAll}:full`;
-    const cached = await this.cacheManager.get(cacheKey);
-    if (cached) return cached;
-
-    const categories = await this.prisma.category.findMany({
-      include: {
-        books: { select: { id: true, name: true, categoryId: true } },
-      },
-    });
-
-    await this.cacheManager.set(cacheKey, categories, DEFAULT_CACHE_TTL);
-    return categories;
-  }
-
   async findAll(pagination: PaginationDto) {
     const { page = 1, limit = 10, search } = pagination;
 

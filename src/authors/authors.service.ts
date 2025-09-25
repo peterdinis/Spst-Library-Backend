@@ -15,6 +15,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthorsService {
+  private readonly cacheKeyAll = 'authors:all';
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
