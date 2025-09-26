@@ -178,7 +178,6 @@ export class OrdersService {
   }
 
   async getOrdersForUser(userId: string): Promise<Order[]> {
-
     try {
       return await this.prisma.order.findMany({
         where: { userId },
@@ -199,9 +198,8 @@ export class OrdersService {
   }
 
   async getOrdersByUser(userId: string): Promise<Order[]> {
-
     return this.prisma.order.findMany({
-      where: { userId},
+      where: { userId },
       include: { items: { include: { book: true } } },
       orderBy: { createdAt: 'desc' },
     });

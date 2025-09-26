@@ -18,8 +18,6 @@ import { DEFAULT_CACHE_TTL } from 'src/shared/constants/applicationConstants';
 
 @Injectable()
 export class BooksService {
-  private readonly cacheKeyAll = 'books:all';
-
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
@@ -82,25 +80,33 @@ export class BooksService {
   }
 
   async findAll(query: QueryBooksDto) {
-    const { search, page = 1, limit = 10 } = query;
-    if (!Number.isInteger(page) || page < 1)
+    const { search, page = 1, limit = 10, categoryId } = query;
+
+    if (!Number.isInteger(page) || page < 1) {
       throw new BadRequestException('Page must be a positive integer');
-    if (!Number.isInteger(limit) || limit < 1 || limit > 100)
+    }
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
       throw new BadRequestException('Limit must be between 1 and 100');
+    }
 
     const skip = (page - 1) * limit;
-    const cacheKey = `books:list:${search || 'all'}:${page}:${limit}`;
+
+    const cacheKey = `books:list:${search || 'all'}:${categoryId || 'all'}:${page}:${limit}`;
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const where: Prisma.BookWhereInput = search
-      ? {
-          OR: [
-            { name: { contains: search } },
-            { description: { contains: search } },
-          ],
-        }
-      : {};
+    const where: Prisma.BookWhereInput = {};
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { description: { contains: search } },
+      ];
+    }
+
+    if (categoryId) {
+      where.categoryId = Number(categoryId);
+    }
 
     const [books, total] = await this.prisma.$transaction([
       this.prisma.book.findMany({
@@ -118,7 +124,9 @@ export class BooksService {
       this.prisma.book.count({ where }),
     ]);
 
-    if (total === 0) throw new NotFoundException('No books found');
+    if (total === 0) {
+      throw new NotFoundException('No books found');
+    }
 
     const result = {
       data: books,
@@ -126,7 +134,9 @@ export class BooksService {
       page,
       lastPage: Math.ceil(total / limit),
     };
+
     await this.cacheManager.set(cacheKey, result, DEFAULT_CACHE_TTL);
+
     return result;
   }
 
