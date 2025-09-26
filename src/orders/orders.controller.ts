@@ -38,7 +38,7 @@ export class OrdersController {
   @Get('user/:userId')
   @UseGuards(ArcjetGuard)
   @ApiOperation({ summary: 'Get all orders by user' })
-  @ApiParam({ name: 'userId', type: Number })
+  @ApiParam({ name: 'userId', type: String })
   async getOrdersByUser(@Param('userId') userId: string) {
     return this.ordersService.getOrdersByUser(userId);
   }
@@ -48,14 +48,6 @@ export class OrdersController {
   @ApiOperation({ summary: 'Update order status' })
   async updateStatus(@Body() dto: UpdateOrderStatusDto) {
     return this.ordersService.updateOrderStatus(dto);
-  }
-
-  @Get('user/:userId/filter')
-  @UseGuards(ArcjetGuard)
-  @ApiOperation({ summary: 'Get all orders by user' })
-  @ApiParam({ name: 'userId', type: Number })
-  async getOrdersByUserWithFilter(@Param('userId') userId: string) {
-    return this.ordersService.getOrdersByUser(userId);
   }
 
   @Patch(':id/return')
