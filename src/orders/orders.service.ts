@@ -267,7 +267,7 @@ export class OrdersService {
     try {
       return await this.prisma.order.update({
         where: { id: orderId },
-        data: { status: OrderStatus.CANCELLED }, // or OrderStatus.CANCELLATION_REQUESTED if you want a request flow
+        data: { status: OrderStatus.CANCELLED },
         include: { items: { include: { book: true } } },
       });
     } catch (err) {
