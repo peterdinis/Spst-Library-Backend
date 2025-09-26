@@ -67,7 +67,7 @@ model Rating {
 
 model Order {
   id        Int         @id @default(autoincrement())
-  userId    Int
+  userId    String      
   items     OrderItem[]
   status    OrderStatus @default(PENDING)
   createdAt DateTime    @default(now())

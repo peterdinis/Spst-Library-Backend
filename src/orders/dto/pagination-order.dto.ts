@@ -27,10 +27,10 @@ export class OrderPaginationDto {
   @IsEnum(OrderStatus)
   status?: OrderStatus;
 
-  @ApiProperty({ example: 123, required: false })
+  @ApiProperty({ example: "user_**********", required: false })
   @IsOptional()
-  @IsInt()
-  userId?: number;
+  @IsString()
+  userId?: string;
 
   @ApiProperty({ example: '2025-01-01', required: false })
   @IsOptional()

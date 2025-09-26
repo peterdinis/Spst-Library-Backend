@@ -177,7 +177,7 @@ export class OrdersService {
     }
   }
 
-  async getOrdersForUser(userId: number): Promise<Order[]> {
+  async getOrdersForUser(userId: string): Promise<Order[]> {
 
     try {
       return await this.prisma.order.findMany({
@@ -198,7 +198,7 @@ export class OrdersService {
     return await this.validateOrderExists(orderId);
   }
 
-  async getOrdersByUser(userId: number): Promise<Order[]> {
+  async getOrdersByUser(userId: string): Promise<Order[]> {
 
     return this.prisma.order.findMany({
       where: { userId },

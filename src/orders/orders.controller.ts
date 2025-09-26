@@ -40,7 +40,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get all orders by user' })
   @ApiParam({ name: 'userId', type: Number })
   async getOrdersByUser(@Param('userId') userId: string) {
-    return this.ordersService.getOrdersByUser(Number(userId));
+    return this.ordersService.getOrdersByUser(userId);
   }
 
   @Patch('status')
@@ -55,8 +55,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get all orders by user' })
   @ApiParam({ name: 'userId', type: Number })
   async getOrdersByUserWithFilter(@Param('userId') userId: string) {
-    const numericUserId = Number(userId);
-    return this.ordersService.getOrdersByUser(numericUserId);
+    return this.ordersService.getOrdersByUser(userId);
   }
 
   @Patch(':id/return')
