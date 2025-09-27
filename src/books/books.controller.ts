@@ -20,7 +20,7 @@ import { ArcjetGuard } from '@arcjet/nest';
 @ApiTags('books')
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksService: BooksService) { }
 
   @Post()
   @UseGuards(ArcjetGuard)
@@ -32,18 +32,19 @@ export class BooksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all books with pagination & search' })
+  @ApiOperation({ summary: 'Get all books with pagination, search & category filter' })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'categoryId', required: false, type: Number })
   findAll(
     @Query('search') search?: string,
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('limit', ParseIntPipe) limit: number = 10,
+    @Query('categoryId') categoryId?: string
   ) {
-    return this.booksService.findAll({ search, page, limit });
+    return this.booksService.findAll({ search, page, limit, categoryId });
   }
-
   @Get('filter/custom')
   @ApiOperation({ summary: 'Filter books by custom conditions' })
   @ApiResponse({ status: 200, description: 'Filtered books retrieved' })

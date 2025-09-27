@@ -20,7 +20,6 @@ export class QueryBooksDto {
   limit?: number = 10;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  categoryId?: number;
+  @IsString()
+  categoryId?: string;
 }
