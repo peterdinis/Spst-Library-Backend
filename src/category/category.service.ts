@@ -22,12 +22,16 @@ export class CategoryService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   private async validateCategoryExists(id: number) {
     if (!id || id < 1)
       throw new BadRequestException('Category ID must be a positive number');
-    const category = await this.prisma.category.findUnique({ where: { id } });
+    const category = await this.prisma.category.findUnique({
+      where: { id }, include: {
+        books: true
+      }
+    });
     if (!category)
       throw new NotFoundException(`Category with ID ${id} not found`);
     return category;
@@ -89,11 +93,11 @@ export class CategoryService {
 
     const where: Prisma.CategoryWhereInput = search
       ? {
-          OR: [
-            { name: { contains: search } },
-            { description: { contains: search } },
-          ],
-        }
+        OR: [
+          { name: { contains: search } },
+          { description: { contains: search } },
+        ],
+      }
       : {};
 
     const [items, total] = await Promise.all([
