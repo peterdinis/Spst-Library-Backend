@@ -10,6 +10,15 @@
   "monorepo": true,
   "root": "apps/library-backend-app",
   "projects": {
+    "author-suggestion": {
+      "type": "application",
+      "root": "apps/author-suggestion",
+      "entryFile": "main",
+      "sourceRoot": "apps/author-suggestion/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/author-suggestion/tsconfig.app.json"
+      }
+    },
     "authors": {
       "type": "application",
       "root": "apps/authors",
