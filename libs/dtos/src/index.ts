@@ -12,3 +12,7 @@ export * from "./authors/query-author.dto";
 export * from "./authors/update-author.dto"
 
 export * from "./author-suggestion/create-author-suggestion.dto"
+
+export * from "./book-tag/create-book-tag.dto";
+export * from "./book-tag/search-book-tag.dto";
+export * from "./book-tag/update-book.tag.dto";
