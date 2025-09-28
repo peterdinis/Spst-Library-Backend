@@ -6,10 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { CreateAuthorSuggestionDto } from './dto/create-author-suggestion.dto';
-import { UpdateSuggestionStatusDto } from './dto/update-suggestion-status.dto';
-import { AuthorSuggestion, AuthorSuggestionDocument, SuggestionStatus } from './schemas/author-suggestion.schema';
-import { Author, AuthorDocument } from '../authors/schemas/author.schema';
+import { AuthorSuggestion, AuthorSuggestionDocument, SuggestionStatus } from './model/author-suggestion.model';
+import { Author, AuthorDocument } from 'apps/authors/src/models/author.model';
+import { CreateAuthorSuggestionDto } from '@app/dtos';
 
 @Injectable()
 export class AuthorSuggestionService {
