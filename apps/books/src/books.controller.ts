@@ -7,12 +7,11 @@ import {
   Delete,
   Query,
   Put,
-  ParseIntPipe,
-  UseGuards,
+  ParseIntPipe
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BooksService } from './books.service';
-import { CreateBookDto, UpdateBookDto, FilterBooksDto, QueryBooksDto } from '@app/dtos';
+import { CreateBookDto, UpdateBookDto, FilterBooksDto} from '@app/dtos';
 
 @ApiTags('books')
 @Controller('books')
@@ -97,7 +96,7 @@ export class BooksController {
   @ApiResponse({ status: 200, description: 'Book retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Invalid ID' })
   @ApiResponse({ status: 404, description: 'Book not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.booksService.findOne(id);
   }
 
@@ -107,7 +106,7 @@ export class BooksController {
   @ApiResponse({ status: 400, description: 'Validation failed or invalid ID' })
   @ApiResponse({ status: 404, description: 'Book not found' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
   ) {
     return this.booksService.update(id, updateBookDto);
@@ -117,7 +116,7 @@ export class BooksController {
   @ApiOperation({ summary: 'Delete a book by ID' })
   @ApiResponse({ status: 200, description: 'Book deleted successfully' })
   @ApiResponse({ status: 404, description: 'Book not found' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id:string) {
     return this.booksService.remove(id);
   }
 }
