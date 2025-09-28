@@ -21,9 +21,7 @@ import {
   ApiNotFoundResponse,
   ApiConflictResponse,
 } from '@nestjs/swagger';
-import { CreateAuthorDto } from '@app/dtos/authors/create-author.dto';
-import { QueryAuthorDto } from '@app/dtos/authors/query-author.dto';
-import { UpdateAuthorDto } from '@app/dtos/authors/update-author.dto';
+import { CreateAuthorDto, QueryAuthorDto, UpdateAuthorDto } from '@app/dtos';
 
 @ApiTags('authors')
 @Controller('authors')

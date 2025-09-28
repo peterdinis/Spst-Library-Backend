@@ -14,9 +14,8 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CreateAuthorSuggestionDto, UpdateAuthorSuggestionStatusDto } from '@app/dtos';
+import { CreateAuthorSuggestionDto } from '@app/dtos';
 import { AuthorSuggestionService } from './author-suggestion.service';
-import { SuggestionStatus } from './model/author-suggestion.model';
 
 @ApiTags('Author Suggestions')
 @Controller('author-suggestions')
