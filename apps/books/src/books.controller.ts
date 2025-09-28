@@ -10,8 +10,8 @@ import {
   ParseIntPipe
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { BooksService } from './books.service';
 import { CreateBookDto, UpdateBookDto, FilterBooksDto} from '@app/dtos';
+import { BooksService } from './books.service';
 
 @ApiTags('books')
 @Controller('books')
