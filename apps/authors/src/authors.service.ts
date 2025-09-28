@@ -1,4 +1,3 @@
-// authors.service.ts
 import {
   Injectable,
   NotFoundException,
@@ -8,9 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { Author, AuthorDocument } from './models/author.model';
-import { CreateAuthorDto } from '@app/dtos/authors/create-author.dto';
-import { QueryAuthorDto } from '@app/dtos/authors/query-author.dto';
-import { UpdateAuthorDto } from '@app/dtos/authors/update-author.dto';
+import { CreateAuthorDto, QueryAuthorDto, UpdateAuthorDto } from '@app/dtos';
 
 export interface PaginatedResult<T> {
   data: T[];

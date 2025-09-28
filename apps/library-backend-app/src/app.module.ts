@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { AuthorSuggestionModule } from 'apps/author-suggestion/src/author-suggestion.module';
+import { AuthorsModule } from 'apps/authors/src/authors.module';
 import { BooksModule } from 'apps/books/src/books.module';
 import { CategoriesModule } from 'apps/categories/src/categories.module';
 
 @Module({
-  imports: [BooksModule, CategoriesModule],
+  imports: [BooksModule, CategoriesModule, AuthorsModule, AuthorSuggestionModule],
 })
 export class AppModule {}

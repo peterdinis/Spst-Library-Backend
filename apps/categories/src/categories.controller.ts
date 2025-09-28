@@ -1,5 +1,3 @@
-import { CategoriesPaginationDto } from '@app/dtos/categories/categories-pagination.dto';
-import { CreateCategoryDto } from '@app/dtos/categories/create-category.dto';
 import {
   Controller,
   Get,
@@ -12,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './categories.service';
-import { UpdateCategoryDto } from '@app/dtos/categories/update-categories.dto';
+import { CategoriesPaginationDto, CreateCategoryDto, UpdateCategoryDto } from '@app/dtos';
 
 @ApiTags('Categories')
 @Controller('categories')
