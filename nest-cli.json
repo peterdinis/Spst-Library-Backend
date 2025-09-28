@@ -19,6 +19,15 @@
         "tsConfigPath": "apps/authors/tsconfig.app.json"
       }
     },
+    "book-tag": {
+      "type": "application",
+      "root": "apps/book-tag",
+      "entryFile": "main",
+      "sourceRoot": "apps/book-tag/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/book-tag/tsconfig.app.json"
+      }
+    },
     "books": {
       "type": "application",
       "root": "apps/books",
@@ -44,6 +53,42 @@
       "sourceRoot": "apps/library-backend-app/src",
       "compilerOptions": {
         "tsConfigPath": "apps/library-backend-app/tsconfig.app.json"
+      }
+    },
+    "notifications": {
+      "type": "application",
+      "root": "apps/notifications",
+      "entryFile": "main",
+      "sourceRoot": "apps/notifications/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notifications/tsconfig.app.json"
+      }
+    },
+    "orders": {
+      "type": "application",
+      "root": "apps/orders",
+      "entryFile": "main",
+      "sourceRoot": "apps/orders/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/orders/tsconfig.app.json"
+      }
+    },
+    "pdf": {
+      "type": "application",
+      "root": "apps/pdf",
+      "entryFile": "main",
+      "sourceRoot": "apps/pdf/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pdf/tsconfig.app.json"
+      }
+    },
+    "ratings": {
+      "type": "application",
+      "root": "apps/ratings",
+      "entryFile": "main",
+      "sourceRoot": "apps/ratings/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ratings/tsconfig.app.json"
       }
     }
   }
