@@ -9,8 +9,6 @@ import {
   Param,
   Body,
   Query,
-  ParseIntPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './categories.service';
@@ -27,18 +25,10 @@ export class CategoryController {
     return this.categoryService.findAll(pagination);
   }
 
-  @Get('all')
-  @ApiOperation({
-    summary: 'Get all categories (cached, no pagination or search)',
-  })
-  findAllCached() {
-    return this.categoryService.findAllCached();
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get a category by ID' })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.categoryService.findOne(id);
   }
 
@@ -51,7 +41,7 @@ export class CategoryController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a category' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() body: UpdateCategoryDto,
   ) {
     return this.categoryService.update(id, body);
@@ -59,7 +49,7 @@ export class CategoryController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a category' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
   }
 }
