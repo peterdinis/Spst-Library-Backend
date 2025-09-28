@@ -1,12 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { 
-  NotFoundException, 
-  BadRequestException, 
-  ConflictException 
+import {
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
-import { CreateBookDto, UpdateBookDto, FilterBooksDto, QueryBooksDto } from '@app/dtos';
+import {
+  CreateBookDto,
+  UpdateBookDto,
+  FilterBooksDto,
+  QueryBooksDto,
+} from '@app/dtos';
 import { BooksService } from '../books.service';
 import { Book, BookDocument } from '../model/book.model';
 
@@ -21,7 +26,10 @@ interface MockQuery<T> {
 
 // Mock collection interface
 interface MockCollection {
-  findOne: jest.Mock<Promise<Record<string, unknown> | null>, [Record<string, unknown>]>;
+  findOne: jest.Mock<
+    Promise<Record<string, unknown> | null>,
+    [Record<string, unknown>]
+  >;
 }
 
 // Mock database interface
@@ -34,9 +42,15 @@ interface MockBookModel extends Partial<Model<BookDocument>> {
   db: MockDatabase;
   create: jest.Mock<Promise<BookDocument>, [Partial<BookDocument>]>;
   findOne: jest.Mock<Promise<BookDocument | null>, [Record<string, unknown>]>;
-  findById: jest.Mock<MockQuery<BookDocument | null> | Promise<BookDocument | null>, [string]>;
+  findById: jest.Mock<
+    MockQuery<BookDocument | null> | Promise<BookDocument | null>,
+    [string]
+  >;
   find: jest.Mock<MockQuery<BookDocument[]>, [Record<string, unknown>?]>;
-  findByIdAndUpdate: jest.Mock<Promise<BookDocument | null>, [string, Partial<BookDocument>, Record<string, unknown>]>;
+  findByIdAndUpdate: jest.Mock<
+    Promise<BookDocument | null>,
+    [string, Partial<BookDocument>, Record<string, unknown>]
+  >;
   findByIdAndDelete: jest.Mock<Promise<BookDocument | null>, [string]>;
   countDocuments: jest.Mock<Promise<number>, [Record<string, unknown>]>;
 }
@@ -86,11 +100,13 @@ describe('BooksService', () => {
 
     // Mock database
     mockDb = {
-      collection: jest.fn().mockImplementation((name: string): MockCollection => {
-        if (name === 'authors') return mockAuthorsCollection;
-        if (name === 'categories') return mockCategoriesCollection;
-        throw new Error(`Unknown collection: ${name}`);
-      }),
+      collection: jest
+        .fn()
+        .mockImplementation((name: string): MockCollection => {
+          if (name === 'authors') return mockAuthorsCollection;
+          if (name === 'categories') return mockCategoriesCollection;
+          throw new Error(`Unknown collection: ${name}`);
+        }),
     };
 
     // Mock Mongoose model
@@ -115,7 +131,9 @@ describe('BooksService', () => {
     });
 
     mockBookModel.find.mockReturnValue(createMockQuery<BookDocument[]>());
-    mockBookModel.findById.mockReturnValue(createMockQuery<BookDocument | null>());
+    mockBookModel.findById.mockReturnValue(
+      createMockQuery<BookDocument | null>(),
+    );
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -136,9 +154,9 @@ describe('BooksService', () => {
 
   describe('validateAuthorExists', () => {
     it('should throw BadRequestException for invalid author ID', async () => {
-      await expect(service['validateAuthorExists']('invalid-id')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service['validateAuthorExists']('invalid-id'),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException for empty author ID', async () => {
@@ -166,9 +184,9 @@ describe('BooksService', () => {
 
   describe('validateCategoryExists', () => {
     it('should throw BadRequestException for invalid category ID', async () => {
-      await expect(service['validateCategoryExists']('invalid-id')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service['validateCategoryExists']('invalid-id'),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw NotFoundException when category does not exist', async () => {
@@ -214,7 +232,9 @@ describe('BooksService', () => {
     it('should return book when it exists', async () => {
       mockBookModel.findById = jest.fn().mockResolvedValue(mockBook);
 
-      const result = await service['validateBookExists'](mockObjectId.toString());
+      const result = await service['validateBookExists'](
+        mockObjectId.toString(),
+      );
       expect(result).toEqual(mockBook);
     });
   });
@@ -247,7 +267,10 @@ describe('BooksService', () => {
     });
 
     it('should create a book without categoryId', async () => {
-      const dtoWithoutCategory: CreateBookDto = { ...createBookDto, categoryId: undefined };
+      const dtoWithoutCategory: CreateBookDto = {
+        ...createBookDto,
+        categoryId: undefined,
+      };
       mockAuthorsCollection.findOne.mockResolvedValue(mockAuthor);
       mockBookModel.findOne.mockResolvedValue(null);
       mockBookModel.create.mockResolvedValue(mockBook);
@@ -265,13 +288,17 @@ describe('BooksService', () => {
       mockAuthorsCollection.findOne.mockResolvedValue(mockAuthor);
       mockBookModel.findOne.mockResolvedValue(mockBook);
 
-      await expect(service.create(createBookDto)).rejects.toThrow(ConflictException);
+      await expect(service.create(createBookDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('should throw NotFoundException for invalid author', async () => {
       mockAuthorsCollection.findOne.mockResolvedValue(null);
 
-      await expect(service.create(createBookDto)).rejects.toThrow(NotFoundException);
+      await expect(service.create(createBookDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -316,19 +343,25 @@ describe('BooksService', () => {
       mockBookModel.find.mockReturnValue(mockQuery);
       mockBookModel.countDocuments.mockResolvedValue(0);
 
-      await expect(service.findAll(queryDto)).rejects.toThrow(NotFoundException);
+      await expect(service.findAll(queryDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException for invalid page', async () => {
       const invalidQuery: QueryBooksDto = { ...queryDto, page: 0 };
 
-      await expect(service.findAll(invalidQuery)).rejects.toThrow(BadRequestException);
+      await expect(service.findAll(invalidQuery)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException for invalid limit', async () => {
       const invalidQuery: QueryBooksDto = { ...queryDto, limit: 0 };
 
-      await expect(service.findAll(invalidQuery)).rejects.toThrow(BadRequestException);
+      await expect(service.findAll(invalidQuery)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should handle search without results', async () => {
@@ -344,7 +377,9 @@ describe('BooksService', () => {
       mockBookModel.find.mockReturnValue(mockQuery);
       mockBookModel.countDocuments.mockResolvedValue(0);
 
-      await expect(service.findAll(searchQuery)).rejects.toThrow(NotFoundException);
+      await expect(service.findAll(searchQuery)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -393,7 +428,10 @@ describe('BooksService', () => {
       mockBookModel.findById = jest.fn().mockResolvedValue(mockBook);
       mockBookModel.findByIdAndUpdate.mockResolvedValue(updatedBook);
 
-      const result = await service.update(mockObjectId.toString(), updateBookDto);
+      const result = await service.update(
+        mockObjectId.toString(),
+        updateBookDto,
+      );
 
       expect(mockBookModel.findByIdAndUpdate).toHaveBeenCalledWith(
         mockObjectId.toString(),
@@ -478,7 +516,9 @@ describe('BooksService', () => {
 
       mockBookModel.find.mockReturnValue(mockQuery);
 
-      await expect(service.filter(filterDto)).rejects.toThrow(NotFoundException);
+      await expect(service.filter(filterDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -551,7 +591,9 @@ describe('BooksService', () => {
 
       mockBookModel.find.mockReturnValue(mockQuery);
 
-      await expect(service.findUnavailable()).rejects.toThrow(NotFoundException);
+      await expect(service.findUnavailable()).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -590,8 +632,12 @@ describe('BooksService', () => {
     });
 
     it('should throw BadRequestException for invalid limit', async () => {
-      await expect(service.findTopRated(0)).rejects.toThrow(BadRequestException);
-      await expect(service.findTopRated(51)).rejects.toThrow(BadRequestException);
+      await expect(service.findTopRated(0)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.findTopRated(51)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -629,8 +675,12 @@ describe('BooksService', () => {
     });
 
     it('should throw BadRequestException for invalid days', async () => {
-      await expect(service.findRecentlyAdded(0)).rejects.toThrow(BadRequestException);
-      await expect(service.findRecentlyAdded(366)).rejects.toThrow(BadRequestException);
+      await expect(service.findRecentlyAdded(0)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.findRecentlyAdded(366)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });

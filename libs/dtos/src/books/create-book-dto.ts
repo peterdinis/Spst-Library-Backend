@@ -29,7 +29,7 @@ export class CreateBookDto {
   @ApiPropertyOptional({ example: '64fa1c2b3f1e2a6b8d123456' })
   @IsString()
   @IsOptional()
-  categoryId?: string; 
+  categoryId?: string;
 
   @ApiProperty({ example: '64fa1c2b3f1e2a6b8d123457' })
   @IsString()

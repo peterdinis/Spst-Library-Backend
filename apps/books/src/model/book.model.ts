@@ -19,7 +19,7 @@ export class Book {
 
   @Prop({ default: false })
   isNew: boolean;
-  
+
   @Prop({ type: Types.ObjectId, ref: 'Category', required: false })
   categoryId?: Types.ObjectId;
 

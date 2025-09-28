@@ -7,7 +7,12 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, FilterQuery } from 'mongoose';
 import { Book, BookDocument } from './model/book.model';
-import { CreateBookDto, UpdateBookDto, FilterBooksDto, QueryBooksDto } from '@app/dtos';
+import {
+  CreateBookDto,
+  UpdateBookDto,
+  FilterBooksDto,
+  QueryBooksDto,
+} from '@app/dtos';
 
 @Injectable()
 export class BooksService {
@@ -62,7 +67,9 @@ export class BooksService {
     return this.bookModel.create({
       ...dto,
       authorId: new Types.ObjectId(dto.authorId),
-      categoryId: dto.categoryId ? new Types.ObjectId(dto.categoryId) : undefined,
+      categoryId: dto.categoryId
+        ? new Types.ObjectId(dto.categoryId)
+        : undefined,
     });
   }
 
@@ -129,7 +136,9 @@ export class BooksService {
       {
         ...dto,
         authorId: dto.authorId ? new Types.ObjectId(dto.authorId) : undefined,
-        categoryId: dto.categoryId ? new Types.ObjectId(dto.categoryId) : undefined,
+        categoryId: dto.categoryId
+          ? new Types.ObjectId(dto.categoryId)
+          : undefined,
       },
       { new: true },
     );
@@ -144,8 +153,10 @@ export class BooksService {
     const filter: FilterQuery<BookDocument> = {};
 
     if (query.authorId) filter.authorId = new Types.ObjectId(query.authorId);
-    if (query.categoryId) filter.categoryId = new Types.ObjectId(query.categoryId);
-    if (typeof query.isAvailable === 'boolean') filter.isAvailable = query.isAvailable;
+    if (query.categoryId)
+      filter.categoryId = new Types.ObjectId(query.categoryId);
+    if (typeof query.isAvailable === 'boolean')
+      filter.isAvailable = query.isAvailable;
     if (typeof query.isNew === 'boolean') filter.isNew = query.isNew;
     if (query.yearMin || query.yearMax) {
       filter.year = {};
@@ -189,7 +200,8 @@ export class BooksService {
       .sort({ createdAt: -1 })
       .exec();
 
-    if (!books.length) throw new NotFoundException('No unavailable books found');
+    if (!books.length)
+      throw new NotFoundException('No unavailable books found');
     return { data: books, total: books.length };
   }
 

@@ -21,7 +21,10 @@ export class CategoryService {
   private async validateCategoryExists(id: string) {
     if (!id) throw new BadRequestException('Category ID is required');
 
-    const category = await this.categoryModel.findById(id).populate('books').exec();
+    const category = await this.categoryModel
+      .findById(id)
+      .populate('books')
+      .exec();
     if (!category)
       throw new NotFoundException(`Category with ID ${id} not found`);
     return category;
@@ -72,7 +75,12 @@ export class CategoryService {
       : {};
 
     const [items, total] = await Promise.all([
-      this.categoryModel.find(filter).skip(skip).limit(limit).populate('books').exec(),
+      this.categoryModel
+        .find(filter)
+        .skip(skip)
+        .limit(limit)
+        .populate('books')
+        .exec(),
       this.categoryModel.countDocuments(filter),
     ]);
 
@@ -89,7 +97,9 @@ export class CategoryService {
   async create(data: CreateCategoryDto) {
     this.validateCreateData(data);
 
-    const existing = await this.categoryModel.findOne({ name: data.name }).exec();
+    const existing = await this.categoryModel
+      .findOne({ name: data.name })
+      .exec();
     if (existing)
       throw new ConflictException(`Category "${data.name}" already exists`);
 

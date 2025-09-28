@@ -40,10 +40,7 @@ export class CategoryController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a category' })
-  update(
-    @Param('id') id: string,
-    @Body() body: UpdateCategoryDto,
-  ) {
+  update(@Param('id') id: string, @Body() body: UpdateCategoryDto) {
     return this.categoryService.update(id, body);
   }
 
