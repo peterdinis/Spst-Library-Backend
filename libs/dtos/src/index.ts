@@ -1,2 +1,4 @@
-export * from './dtos.module';
-export * from './dtos.service';
+export * from "./books/create-book-dto";
+export * from "./books/filter-book.dto";
+export * from "./books/query-book.dto";
+export * from "./books/update-book.dto";
