@@ -4,7 +4,10 @@ import { AuthorSuggestionService } from './author-suggestion.service';
 import { DatabaseModule } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Author, AuthorSchema } from 'apps/authors/src/models/author.model';
-import { AuthorSuggestion, AuthorSuggestionSchema } from './model/author-suggestion.model';
+import {
+  AuthorSuggestion,
+  AuthorSuggestionSchema,
+} from './model/author-suggestion.model';
 
 @Module({
   imports: [

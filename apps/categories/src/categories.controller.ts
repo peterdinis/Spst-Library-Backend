@@ -10,7 +10,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './categories.service';
-import { CategoriesPaginationDto, CreateCategoryDto, UpdateCategoryDto } from '@app/dtos';
+import {
+  CategoriesPaginationDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from '@app/dtos';
 
 @ApiTags('Categories')
 @Controller('categories')

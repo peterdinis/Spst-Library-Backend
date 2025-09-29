@@ -46,7 +46,7 @@ export class AuthorSuggestionController {
   @ApiResponse({ status: 403, description: 'Unauthorized' })
   async updateStatus(
     @Param('id') id: string,
-    @Body() dto: any // TODO: Fix me later
+    @Body() dto: any, // TODO: Fix me later
   ) {
     return this.service.updateStatus(id, dto.status);
   }

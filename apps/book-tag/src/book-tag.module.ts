@@ -6,10 +6,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BookTag, BookTagSchema } from './models/book-tag.model';
 
 @Module({
-  imports: [DatabaseModule, MongooseModule.forFeature([{
-    name: BookTag.name,
-    schema: BookTagSchema
-  }])],
+  imports: [
+    DatabaseModule,
+    MongooseModule.forFeature([
+      {
+        name: BookTag.name,
+        schema: BookTagSchema,
+      },
+    ]),
+  ],
   controllers: [BookTagController],
   providers: [BookTagService],
 })

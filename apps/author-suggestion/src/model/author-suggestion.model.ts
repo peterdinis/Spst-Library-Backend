@@ -3,7 +3,6 @@ import { Document } from 'mongoose';
 
 export type AuthorSuggestionDocument = AuthorSuggestion & Document;
 
-
 export enum SuggestionStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',

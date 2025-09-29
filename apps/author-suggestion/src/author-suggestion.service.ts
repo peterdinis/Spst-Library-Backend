@@ -6,14 +6,19 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { AuthorSuggestion, AuthorSuggestionDocument, SuggestionStatus } from './model/author-suggestion.model';
+import {
+  AuthorSuggestion,
+  AuthorSuggestionDocument,
+  SuggestionStatus,
+} from './model/author-suggestion.model';
 import { Author, AuthorDocument } from 'apps/authors/src/models/author.model';
 import { CreateAuthorSuggestionDto } from '@app/dtos';
 
 @Injectable()
 export class AuthorSuggestionService {
   constructor(
-    @InjectModel(AuthorSuggestion.name) private suggestionModel: Model<AuthorSuggestionDocument>,
+    @InjectModel(AuthorSuggestion.name)
+    private suggestionModel: Model<AuthorSuggestionDocument>,
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
   ) {}
 
