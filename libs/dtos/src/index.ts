@@ -16,3 +16,12 @@ export * from "./author-suggestion/create-author-suggestion.dto"
 export * from "./book-tag/create-book-tag.dto";
 export * from "./book-tag/search-book-tag.dto";
 export * from "./book-tag/update-book.tag.dto";
+
+export * from "./ratings/create-rating.dto";
+export * from "./ratings/rating-pagination.dto";
+export * from "./ratings/update-rating.dto";
+
+export * from "./order/create-order-item.dto";
+export * from "./order/create-order.dto";
+export * from "./order/pagination-order.dto";
+export * from "./order/update-order.status.dto"
