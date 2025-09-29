@@ -25,3 +25,5 @@ export * from './order/create-order-item.dto';
 export * from './order/create-order.dto';
 export * from './order/pagination-order.dto';
 export * from './order/update-order.status.dto';
+
+export * from "./notifications/create-notification.dto"

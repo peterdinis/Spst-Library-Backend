@@ -1,12 +1,7 @@
 import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
-
-class CreateNotificationDto {
-  userId: string;
-  message: string;
-  type?: string;
-}
+import { CreateNotificationDto } from '@app/dtos';
 
 @ApiTags('notifications')
 @Controller('notifications')
