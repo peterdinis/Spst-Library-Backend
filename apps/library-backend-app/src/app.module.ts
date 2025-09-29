@@ -7,6 +7,7 @@ import { CategoriesModule } from 'apps/categories/src/categories.module';
 import { NotificationsModule } from 'apps/notifications/src/notifications.module';
 import { PdfModule } from 'apps/pdf/src/pdf.module';
 import { RatingsModule } from 'apps/ratings/src/ratings.module';
+import { MessagesModule } from 'libs/messages/messages.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { RatingsModule } from 'apps/ratings/src/ratings.module';
     BookTagModule,
     RatingsModule,
     PdfModule,
-    NotificationsModule
+    NotificationsModule,
+    MessagesModule
   ],
 })
 export class AppModule {}
