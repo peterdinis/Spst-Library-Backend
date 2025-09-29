@@ -26,10 +26,12 @@ export class AuthorsService {
   ) {}
 
   async create(dto: CreateAuthorDto): Promise<Author> {
-    const existing = await this.authorModel.findOne({
-      name: dto.name,
-      bornDate: dto.bornDate,
-    }).exec();
+    const existing = await this.authorModel
+      .findOne({
+        name: dto.name,
+        bornDate: dto.bornDate,
+      })
+      .exec();
 
     if (existing) {
       throw new ConflictException(
@@ -97,11 +99,13 @@ export class AuthorsService {
     if (!exists) throw new NotFoundException(`Author ${id} not found`);
 
     if (dto.name || dto.bornDate) {
-      const duplicate = await this.authorModel.findOne({
-        _id: { $ne: id },
-        name: dto.name ?? exists.name,
-        bornDate: dto.bornDate ?? exists.bornDate,
-      }).exec();
+      const duplicate = await this.authorModel
+        .findOne({
+          _id: { $ne: id },
+          name: dto.name ?? exists.name,
+          bornDate: dto.bornDate ?? exists.bornDate,
+        })
+        .exec();
 
       if (duplicate) {
         throw new ConflictException(

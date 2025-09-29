@@ -8,7 +8,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Category, CategoryDocument } from './model/category.model';
-import { CreateCategoryDto, UpdateCategoryDto, CategoriesPaginationDto } from '@app/dtos';
+import {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  CategoriesPaginationDto,
+} from '@app/dtos';
 
 @Injectable()
 export class CategoryService {

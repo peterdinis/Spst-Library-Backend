@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Rating, RatingDocument } from './model/rating.model';
@@ -7,17 +11,21 @@ import { PaginationDto } from '@app/dtos/ratings/rating-pagination.dto';
 import { UpdateRatingDto } from '@app/dtos/ratings/update-rating.dto';
 @Injectable()
 export class RatingService {
-  constructor(@InjectModel(Rating.name) private ratingModel: Model<RatingDocument>) {}
+  constructor(
+    @InjectModel(Rating.name) private ratingModel: Model<RatingDocument>,
+  ) {}
 
   async findAll(pagination: PaginationDto) {
     const page = pagination.page ?? 1;
     const limit = pagination.limit ?? 10;
-    if (page < 1 || limit < 1) throw new BadRequestException('Page and limit must be positive');
+    if (page < 1 || limit < 1)
+      throw new BadRequestException('Page and limit must be positive');
 
     const skip = (page - 1) * limit;
 
     const [items, total] = await Promise.all([
-      this.ratingModel.find()
+      this.ratingModel
+        .find()
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -37,20 +45,23 @@ export class RatingService {
   }
 
   async findOne(id: string) {
-    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid rating ID');
+    if (!Types.ObjectId.isValid(id))
+      throw new BadRequestException('Invalid rating ID');
     const rating = await this.ratingModel.findById(id).populate('bookId');
     if (!rating) throw new NotFoundException(`Rating ${id} not found`);
     return rating;
   }
 
   async create(dto: CreateRatingDto) {
-    if (!Types.ObjectId.isValid(dto.bookId)) throw new BadRequestException('Invalid book ID');
+    if (!Types.ObjectId.isValid(dto.bookId))
+      throw new BadRequestException('Invalid book ID');
     const rating = new this.ratingModel(dto);
     return rating.save();
   }
 
   async update(id: string, dto: UpdateRatingDto) {
-    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid rating ID');
+    if (!Types.ObjectId.isValid(id))
+      throw new BadRequestException('Invalid rating ID');
     const rating = await this.ratingModel.findById(id);
     if (!rating) throw new NotFoundException(`Rating ${id} not found`);
 
@@ -61,7 +72,8 @@ export class RatingService {
   }
 
   async remove(id: string) {
-    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid rating ID');
+    if (!Types.ObjectId.isValid(id))
+      throw new BadRequestException('Invalid rating ID');
     const rating = await this.ratingModel.findById(id);
     if (!rating) throw new NotFoundException(`Rating ${id} not found`);
 

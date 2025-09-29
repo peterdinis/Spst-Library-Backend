@@ -7,6 +7,13 @@ import { CategoriesModule } from 'apps/categories/src/categories.module';
 import { RatingsModule } from 'apps/ratings/src/ratings.module';
 
 @Module({
-  imports: [BooksModule, CategoriesModule, AuthorsModule, AuthorSuggestionModule, BookTagModule, RatingsModule],
+  imports: [
+    BooksModule,
+    CategoriesModule,
+    AuthorsModule,
+    AuthorSuggestionModule,
+    BookTagModule,
+    RatingsModule,
+  ],
 })
-export class AppModule { }
+export class AppModule {}

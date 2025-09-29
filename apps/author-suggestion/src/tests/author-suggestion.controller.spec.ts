@@ -11,7 +11,9 @@ describe('AuthorSuggestionController', () => {
       providers: [AuthorSuggestionService],
     }).compile();
 
-    authorSuggestionController = app.get<AuthorSuggestionController>(AuthorSuggestionController);
+    authorSuggestionController = app.get<AuthorSuggestionController>(
+      AuthorSuggestionController,
+    );
   });
 
   describe('root', () => {
