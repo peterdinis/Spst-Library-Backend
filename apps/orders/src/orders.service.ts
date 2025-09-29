@@ -29,13 +29,13 @@ export class OrdersService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItemDocument>,
     @InjectModel(Book.name) private bookModel: Model<BookDocument>
-  ) {}
+  ) { }
 
   private async validateBookExists(bookId: string) {
     if (!bookId) {
       throw new BadRequestException('Book ID must be provided');
     }
-     const book = await this.bookModel.findById(bookId);
+    const book = await this.bookModel.findById(bookId);
     if (!book) throw new NotFoundException(`Book with ID ${bookId} does not exist`);
   }
 
@@ -118,61 +118,87 @@ export class OrdersService {
   }
 
   async updateOrderStatus(dto: UpdateOrderStatusDto): Promise<Order> {
-  const order = await this.getOrderById(dto.orderId);
+    const order = await this.getOrderById(dto.orderId);
 
-  // Validácia statusu
-  if (!Object.values(OrderStatus).includes(dto.status)) {
-    throw new BadRequestException(`Invalid order status: ${dto.status}`);
+    if (!Object.values(OrderStatus).includes(dto.status)) {
+      throw new BadRequestException(`Invalid order status: ${dto.status}`);
+    }
+
+    this.validateOrderStatusTransition(order.status, dto.status);
+
+    try {
+      const updatedOrder = await this.orderModel.findByIdAndUpdate(
+        dto.orderId,
+        { status: dto.status },
+        { new: true } // vráti aktualizovaný dokument
+      )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
+
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${dto.orderId} not found`);
+      }
+
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to update order status');
+    }
   }
 
-  // Validácia prechodov
-  this.validateOrderStatusTransition(order.status, dto.status);
+  async cancelOrder(orderId: string): Promise<Order> {
+    const order = await this.getOrderById(orderId);
 
-  // Aktualizácia statusu
-  order.status = dto.status;
+    if ([OrderStatus.CANCELLED, OrderStatus.COMPLETED].includes(order.status)) {
+      throw new ConflictException(`Cannot cancel order with status: ${order.status}`);
+    }
 
-  try {
-    return await order.save();
-  } catch (err) {
-    throw new InternalServerErrorException('Failed to update order status');
-  }
-}
+    try {
+      const updatedOrder = await this.orderModel.findByIdAndUpdate(
+        orderId,
+        { status: OrderStatus.CANCELLED },
+        { new: true }
+      )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
 
-async cancelOrder(orderId: string): Promise<Order> {
-  const order = await this.getOrderById(orderId);
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
 
-  if ([OrderStatus.CANCELLED, OrderStatus.COMPLETED].includes(order.status)) {
-    throw new ConflictException(`Cannot cancel order with status: ${order.status}`);
-  }
-
-  order.status = OrderStatus.CANCELLED;
-
-  try {
-    return await order.save();
-  } catch (err) {
-    throw new InternalServerErrorException('Failed to cancel order');
-  }
-}
-
-async returnOrder(orderId: string): Promise<Order> {
-  const order = await this.getOrderById(orderId);
-
-  if (order.status !== OrderStatus.COMPLETED) {
-    throw new ConflictException(
-      `Only completed orders can be returned. Current status: ${order.status}`,
-    );
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to cancel order');
+    }
   }
 
-  order.status = OrderStatus.PENDING;
+  async returnOrder(orderId: string): Promise<Order> {
+    const order = await this.getOrderById(orderId);
 
-  try {
-    return await order.save();
-  } catch (err) {
-    throw new InternalServerErrorException('Failed to return order');
+    if (order.status !== OrderStatus.COMPLETED) {
+      throw new ConflictException(
+        `Only completed orders can be returned. Current status: ${order.status}`,
+      );
+    }
+
+    try {
+      const updatedOrder = await this.orderModel.findByIdAndUpdate(
+        orderId,
+        { status: OrderStatus.PENDING },
+        { new: true }
+      )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
+
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to return order');
+    }
   }
-}
-
-
+  
   async getAllCreatedOrders(pagination: OrderPaginationDto): Promise<PaginatedOrders> {
     const { page = 1, limit = 10, status, userId, dateFrom, dateTo } = pagination;
 
