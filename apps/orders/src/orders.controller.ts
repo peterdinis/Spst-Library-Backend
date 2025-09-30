@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   Patch,
-  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
@@ -64,5 +63,27 @@ export class OrdersController {
   })
   async cancelOrder(@Param('id') id: string) {
     return this.ordersService.cancelOrder(id);
+  }
+
+  @Patch(':id/approve')
+  @ApiOperation({ summary: 'Approve an order (set status to APPROVED)' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID of the order to approve',
+  })
+  async approveOrder(@Param('id') id: string) {
+    return this.ordersService.approveOrder(id);
+  }
+
+  @Patch(':id/decline')
+  @ApiOperation({ summary: 'Decline an order (set status to DECLINED)' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID of the order to decline',
+  })
+  async declineOrder(@Param('id') id: string) {
+    return this.ordersService.declineOrder(id);
   }
 }

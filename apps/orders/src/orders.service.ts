@@ -220,7 +220,7 @@ export class OrdersService {
       if (!updatedOrder) {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
-      
+
       for (const item of updatedOrder.items as any[]) {
         await this.notifyBookReturned(item.bookId._id.toString());
       }
@@ -263,6 +263,72 @@ export class OrdersService {
       throw new InternalServerErrorException('Failed to return order');
     }
   }
+
+  async approveOrder(orderId: string): Promise<Order> {
+    const order = await this.getOrderById(orderId);
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new ConflictException(
+        `Only PENDING orders can be approved. Current status: ${order.status}`,
+      );
+    }
+
+    try {
+      const updatedOrder = await this.orderModel
+        .findByIdAndUpdate(
+          orderId,
+          { status: OrderStatus.COMPLETED },
+          { new: true },
+        )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
+
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      for (const item of updatedOrder.items as unknown as OrderItemDocument[]) {
+        await this.notifyBookBorrowed(item.bookId._id.toString());
+      }
+
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to approve order');
+    }
+  }
+
+  async declineOrder(orderId: string): Promise<Order> {
+    const order = await this.getOrderById(orderId);
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new ConflictException(
+        `Only PENDING orders can be declined. Current status: ${order.status}`,
+      );
+    }
+
+    try {
+      const updatedOrder = await this.orderModel
+        .findByIdAndUpdate(
+          orderId,
+          { status: OrderStatus.CANCELLED },
+          { new: true },
+        )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
+
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+      for (const item of updatedOrder.items as unknown as OrderItemDocument[]) {
+        await this.notifyBookReturned(item.bookId._id.toString());
+      }
+
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to decline order');
+    }
+  }
+
 
   async getAllCreatedOrders(
     pagination: OrderPaginationDto,
