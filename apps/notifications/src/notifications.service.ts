@@ -5,14 +5,26 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId } from 'mongoose';
+import { Model, isValidObjectId, Document } from 'mongoose';
 import { MessagesService } from 'libs/messages/messages.service'; 
+import { Notification } from './model/notification.model';
+
+export interface NotificationDocument extends Document {
+  _id: string;
+  userId: string;
+  message: string;
+  type: string;
+  isRead?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  __v?: number;
+}
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectModel(Notification.name)
-    private notificationModel: Model<Notification>,
+    private notificationModel: Model<NotificationDocument>,
     private messagesService: MessagesService,
   ) {}
 
@@ -28,8 +40,7 @@ export class NotificationsService {
         type,
       });
       const saved = await notification.save();
-
-      // 🔹 po uložení pošli Kafka event
+      
       await this.messagesService.sendKafkaMessage('notification.created', {
         id: saved._id.toString(),
         userId,

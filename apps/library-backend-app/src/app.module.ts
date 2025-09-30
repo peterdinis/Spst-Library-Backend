@@ -1,3 +1,4 @@
+import { DatabaseModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { AuthorSuggestionModule } from 'apps/author-suggestion/src/author-suggestion.module';
 import { AuthorsModule } from 'apps/authors/src/authors.module';
@@ -11,6 +12,7 @@ import { MessagesModule } from 'libs/messages/messages.module';
 
 @Module({
   imports: [
+    DatabaseModule,
     BooksModule,
     CategoriesModule,
     AuthorsModule,
