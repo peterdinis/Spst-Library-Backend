@@ -32,6 +32,9 @@ importers:
       amqplib:
         specifier: ^0.10.9
         version: 0.10.9
+      express:
+        specifier: ^5.1.0
+        version: 5.1.0
       kafkajs:
         specifier: ^2.2.4
         version: 2.2.4
