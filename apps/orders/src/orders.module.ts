@@ -6,9 +6,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './model/orders.model';
 import { OrderItem, OrderItemSchema } from './model/order-item.model';
 import { Book, BookSchema } from 'apps/books/src/model/book.model';
+import { MessagesModule } from 'libs/messages/messages.module';
 
 @Module({
   imports: [DatabaseModule,
+    MessagesModule,
     MongooseModule.forFeature([
       { name: Order.name, schema: OrderSchema },
       { name: OrderItem.name, schema: OrderItemSchema },
