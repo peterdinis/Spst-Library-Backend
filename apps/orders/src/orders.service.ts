@@ -16,16 +16,7 @@ import {
   OrderPaginationDto,
   UpdateOrderStatusDto,
 } from '@app/dtos';
-
-interface PaginatedOrders {
-  data: Order[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+import { PaginatedOrders } from './types/pagination-result.type';
 
 @Injectable()
 export class OrdersService {

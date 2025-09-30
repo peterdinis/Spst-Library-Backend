@@ -7,8 +7,6 @@ import {
   Param,
   Delete,
   Query,
-  ParseIntPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 import {
