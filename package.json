@@ -8,8 +8,9 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
-    "start": "nest start",
+    "start": "nest start library-backend-app",
     "start:dev": "nest start --watch",
+    "start:all": "concurrently \"pmpm run --filter ./apps/author-suggestion start:dev\" \"pmpm run --filter ./apps/authors start:dev\" \"pmpm run --filter ./apps/book-tag start:dev\" \"pmpm run --filter ./apps/books start:dev\" \"pmpm run --filter ./apps/categories start:dev\" \"pmpm run --filter ./apps/library-backend-app start:dev\" \"pmpm run --filter ./apps/notifications start:dev\" \"pmpm run --filter ./apps/orders start:dev\" \"pmpm run --filter ./apps/pdf start:dev\" \"pmpm run --filter ./apps/ratings start:dev\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/library-backend-app/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -47,6 +48,7 @@
     "@types/supertest": "^6.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "concurrently": "^9.2.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
