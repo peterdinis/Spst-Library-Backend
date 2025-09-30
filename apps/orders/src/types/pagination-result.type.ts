@@ -1,4 +1,4 @@
-import { Order } from "../model/orders.model";
+import { Order } from '../model/orders.model';
 
 export interface PaginatedOrders {
   data: Order[];

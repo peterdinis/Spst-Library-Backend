@@ -21,7 +21,10 @@ export class PdfController {
     content: { 'application/pdf': {} },
   })
   @ApiResponse({ status: 400, description: 'Unknown entity' })
-  async downloadPdf(@Param('entity') entity: string, @Res() res: express.Response) {
+  async downloadPdf(
+    @Param('entity') entity: string,
+    @Res() res: express.Response,
+  ) {
     let pdfBuffer: Buffer;
 
     switch (entity) {

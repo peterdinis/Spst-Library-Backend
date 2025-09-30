@@ -4,10 +4,8 @@ import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class MessagesService {
-  constructor(
-    @Inject('KAFKA_SERVICE') private kafkaClient: ClientProxy,
-  ) {}
-  
+  constructor(@Inject('KAFKA_SERVICE') private kafkaClient: ClientProxy) {}
+
   async sendKafkaMessage(topic: string, message: any) {
     await firstValueFrom(this.kafkaClient.emit(topic, message));
   }

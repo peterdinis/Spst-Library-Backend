@@ -1,11 +1,17 @@
-import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectModel(Notification.name) private notificationModel: Model<Notification>,
+    @InjectModel(Notification.name)
+    private notificationModel: Model<Notification>,
   ) {}
 
   async create(userId: string, message: string, type = 'info') {
@@ -14,7 +20,11 @@ export class NotificationsService {
     }
 
     try {
-      const notification = new this.notificationModel({ userId, message, type });
+      const notification = new this.notificationModel({
+        userId,
+        message,
+        type,
+      });
       return await notification.save();
     } catch (error) {
       throw new InternalServerErrorException('Failed to create notification');

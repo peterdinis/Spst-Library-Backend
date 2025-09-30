@@ -9,15 +9,16 @@ import { Book, BookSchema } from 'apps/books/src/model/book.model';
 import { MessagesModule } from 'libs/messages/messages.module';
 
 @Module({
-  imports: [DatabaseModule,
+  imports: [
+    DatabaseModule,
     MessagesModule,
     MongooseModule.forFeature([
       { name: Order.name, schema: OrderSchema },
       { name: OrderItem.name, schema: OrderItemSchema },
-      { name: Book.name, schema: BookSchema}
+      { name: Book.name, schema: BookSchema },
     ]),
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
 })
-export class OrdersModule { }
+export class OrdersModule {}

@@ -148,8 +148,11 @@ export class BooksService {
     await this.validateBookExists(id);
     return this.bookModel.findByIdAndDelete(id);
   }
-  
-  async updateAvailability(bookId: string, isAvailable: boolean): Promise<BookDocument> {
+
+  async updateAvailability(
+    bookId: string,
+    isAvailable: boolean,
+  ): Promise<BookDocument> {
     if (!Types.ObjectId.isValid(bookId)) {
       throw new BadRequestException('Invalid Book ID');
     }

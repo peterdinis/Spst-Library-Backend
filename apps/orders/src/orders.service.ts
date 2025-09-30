@@ -27,7 +27,7 @@ export class OrdersService {
     private orderItemModel: Model<OrderItemDocument>,
     @InjectModel(Book.name) private bookModel: Model<BookDocument>,
     private messagesService: MessagesService,
-  ) { }
+  ) {}
 
   private async validateBookExists(bookId: string) {
     if (!bookId) {
@@ -166,11 +166,7 @@ export class OrdersService {
 
     try {
       const updatedOrder = await this.orderModel
-        .findByIdAndUpdate(
-          dto.orderId,
-          { status: dto.status },
-          { new: true },
-        )
+        .findByIdAndUpdate(dto.orderId, { status: dto.status }, { new: true })
         .populate({ path: 'items', populate: { path: 'bookId' } })
         .exec();
 
@@ -328,7 +324,6 @@ export class OrdersService {
       throw new InternalServerErrorException('Failed to decline order');
     }
   }
-
 
   async getAllCreatedOrders(
     pagination: OrderPaginationDto,
