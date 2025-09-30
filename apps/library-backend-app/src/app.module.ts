@@ -19,7 +19,7 @@ import { MessagesModule } from 'libs/messages/messages.module';
     RatingsModule,
     PdfModule,
     NotificationsModule,
-    MessagesModule
+    MessagesModule,
   ],
 })
 export class AppModule {}

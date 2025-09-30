@@ -1,4 +1,5 @@
 onlyBuiltDependencies:
+  - '@clerk/shared'
   - '@nestjs/core'
   - '@scarf/scarf'
   - unrs-resolver

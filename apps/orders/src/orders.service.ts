@@ -16,16 +16,8 @@ import {
   OrderPaginationDto,
   UpdateOrderStatusDto,
 } from '@app/dtos';
-
-interface PaginatedOrders {
-  data: Order[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+import { PaginatedOrders } from './types/pagination-result.type';
+import { MessagesService } from 'libs/messages/messages.service';
 
 @Injectable()
 export class OrdersService {
@@ -34,6 +26,7 @@ export class OrdersService {
     @InjectModel(OrderItem.name)
     private orderItemModel: Model<OrderItemDocument>,
     @InjectModel(Book.name) private bookModel: Model<BookDocument>,
+    private messagesService: MessagesService,
   ) {}
 
   private async validateBookExists(bookId: string) {
@@ -81,6 +74,31 @@ export class OrdersService {
     }
   }
 
+  private async notifyBookBorrowed(bookId: string) {
+    try {
+      await this.messagesService.sendKafkaMessage('book.borrowed', {
+        bookId,
+        isAvailable: false,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error(`Failed to send Kafka message for book ${bookId}:`, error);
+      // Neblokujeme vytvorenie objednávky, len logujeme chybu
+    }
+  }
+
+  private async notifyBookReturned(bookId: string) {
+    try {
+      await this.messagesService.sendKafkaMessage('book.returned', {
+        bookId,
+        isAvailable: true,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error(`Failed to send Kafka message for book ${bookId}:`, error);
+    }
+  }
+
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     this.validateOrderItems(dto.items);
 
@@ -102,7 +120,14 @@ export class OrdersService {
         status: OrderStatus.PENDING,
       });
 
-      return order.save();
+      const savedOrder = await order.save();
+
+      // Poslať Kafka notifikácie pre všetky knihy v objednávke
+      for (const item of dto.items) {
+        await this.notifyBookBorrowed(item.bookId);
+      }
+
+      return savedOrder;
     } catch (err) {
       throw new InternalServerErrorException('Failed to create order');
     }
@@ -141,16 +166,26 @@ export class OrdersService {
 
     try {
       const updatedOrder = await this.orderModel
-        .findByIdAndUpdate(
-          dto.orderId,
-          { status: dto.status },
-          { new: true }, // vráti aktualizovaný dokument
-        )
+        .findByIdAndUpdate(dto.orderId, { status: dto.status }, { new: true })
         .populate({ path: 'items', populate: { path: 'bookId' } })
         .exec();
 
       if (!updatedOrder) {
         throw new NotFoundException(`Order with ID ${dto.orderId} not found`);
+      }
+
+      // Ak sa objednávka dokončí, oznám vrátenie kníh
+      if (dto.status === OrderStatus.COMPLETED) {
+        const populatedOrder = await this.orderModel
+          .findById(dto.orderId)
+          .populate({ path: 'items', populate: { path: 'bookId' } })
+          .exec();
+
+        if (populatedOrder) {
+          for (const item of populatedOrder.items as any[]) {
+            await this.notifyBookReturned(item.bookId._id.toString());
+          }
+        }
       }
 
       return updatedOrder;
@@ -182,6 +217,10 @@ export class OrdersService {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
 
+      for (const item of updatedOrder.items as any[]) {
+        await this.notifyBookReturned(item.bookId._id.toString());
+      }
+
       return updatedOrder;
     } catch {
       throw new InternalServerErrorException('Failed to cancel order');
@@ -211,9 +250,78 @@ export class OrdersService {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
 
+      for (const item of updatedOrder.items as any[]) {
+        await this.notifyBookReturned(item.bookId._id.toString());
+      }
+
       return updatedOrder;
     } catch {
       throw new InternalServerErrorException('Failed to return order');
+    }
+  }
+
+  async approveOrder(orderId: string): Promise<Order> {
+    const order = await this.getOrderById(orderId);
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new ConflictException(
+        `Only PENDING orders can be approved. Current status: ${order.status}`,
+      );
+    }
+
+    try {
+      const updatedOrder = await this.orderModel
+        .findByIdAndUpdate(
+          orderId,
+          { status: OrderStatus.COMPLETED },
+          { new: true },
+        )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
+
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      for (const item of updatedOrder.items as unknown as OrderItemDocument[]) {
+        await this.notifyBookBorrowed(item.bookId._id.toString());
+      }
+
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to approve order');
+    }
+  }
+
+  async declineOrder(orderId: string): Promise<Order> {
+    const order = await this.getOrderById(orderId);
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new ConflictException(
+        `Only PENDING orders can be declined. Current status: ${order.status}`,
+      );
+    }
+
+    try {
+      const updatedOrder = await this.orderModel
+        .findByIdAndUpdate(
+          orderId,
+          { status: OrderStatus.CANCELLED },
+          { new: true },
+        )
+        .populate({ path: 'items', populate: { path: 'bookId' } })
+        .exec();
+
+      if (!updatedOrder) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+      for (const item of updatedOrder.items as unknown as OrderItemDocument[]) {
+        await this.notifyBookReturned(item.bookId._id.toString());
+      }
+
+      return updatedOrder;
+    } catch {
+      throw new InternalServerErrorException('Failed to decline order');
     }
   }
 

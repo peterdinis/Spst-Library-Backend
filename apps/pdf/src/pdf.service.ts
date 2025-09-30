@@ -4,8 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Book, BookDocument } from 'apps/books/src/model/book.model';
 import { Author, AuthorDocument } from 'apps/authors/src/models/author.model';
-import { Category, CategoryDocument } from 'apps/categories/src/model/category.model';
-import { OrderItem, OrderItemDocument } from 'apps/orders/src/model/order-item.model';
+import {
+  Category,
+  CategoryDocument,
+} from 'apps/categories/src/model/category.model';
+import {
+  OrderItem,
+  OrderItemDocument,
+} from 'apps/orders/src/model/order-item.model';
 import { Order, OrderDocument } from 'apps/orders/src/model/orders.model';
 
 @Injectable()
@@ -15,7 +21,8 @@ export class PdfService {
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
-    @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItemDocument>,
+    @InjectModel(OrderItem.name)
+    private orderItemModel: Model<OrderItemDocument>,
   ) {}
 
   private async generatePdf(title: string, rows: string[][]): Promise<Buffer> {
@@ -39,7 +46,8 @@ export class PdfService {
   }
 
   async generateBooksPdf(): Promise<Buffer> {
-    const books = await this.bookModel.find()
+    const books = await this.bookModel
+      .find()
       .populate('author')
       .populate('category')
       .exec();
@@ -79,7 +87,8 @@ export class PdfService {
   }
 
   async generateOrdersPdf(): Promise<Buffer> {
-    const orders = await this.orderModel.find()
+    const orders = await this.orderModel
+      .find()
       .populate({
         path: 'items',
         populate: { path: 'bookId' },

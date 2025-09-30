@@ -8,16 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { Author, AuthorDocument } from './models/author.model';
 import { CreateAuthorDto, QueryAuthorDto, UpdateAuthorDto } from '@app/dtos';
-
-export interface PaginatedResult<T> {
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+import { PaginatedResult } from './types/pagination.types';
 
 @Injectable()
 export class AuthorsService {

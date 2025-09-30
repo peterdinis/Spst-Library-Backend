@@ -1,5 +1,11 @@
 import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from '@app/dtos';
 
@@ -11,10 +17,17 @@ export class NotificationsController {
   @Post()
   @ApiOperation({ summary: 'Create a new notification' })
   @ApiBody({ type: CreateNotificationDto })
-  @ApiResponse({ status: 201, description: 'Notification created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Notification created successfully',
+  })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   async create(@Body() body: CreateNotificationDto) {
-    return this.notificationService.create(body.userId, body.message, body.type);
+    return this.notificationService.create(
+      body.userId,
+      body.message,
+      body.type,
+    );
   }
 
   @Get(':userId')

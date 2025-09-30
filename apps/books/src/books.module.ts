@@ -4,10 +4,12 @@ import { BooksController } from './books.controller';
 import { DatabaseModule } from '@app/common';
 import { Book, BookSchema } from './model/book.model';
 import { BooksService } from './books.service';
+import { NotificationsModule } from 'apps/notifications/src/notifications.module';
 
 @Module({
   imports: [
     DatabaseModule,
+    NotificationsModule,
     MongooseModule.forFeature([{ name: Book.name, schema: BookSchema }]),
   ],
   controllers: [BooksController],

@@ -149,6 +149,27 @@ export class BooksService {
     return this.bookModel.findByIdAndDelete(id);
   }
 
+  async updateAvailability(
+    bookId: string,
+    isAvailable: boolean,
+  ): Promise<BookDocument> {
+    if (!Types.ObjectId.isValid(bookId)) {
+      throw new BadRequestException('Invalid Book ID');
+    }
+
+    const book = await this.bookModel.findByIdAndUpdate(
+      bookId,
+      { isAvailable },
+      { new: true },
+    );
+
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${bookId} not found`);
+    }
+
+    return book;
+  }
+
   async filter(query: FilterBooksDto) {
     const filter: FilterQuery<BookDocument> = {};
 

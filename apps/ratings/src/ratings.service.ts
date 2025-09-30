@@ -9,6 +9,7 @@ import { Rating, RatingDocument } from './model/rating.model';
 import { CreateRatingDto } from '@app/dtos/ratings/create-rating.dto';
 import { PaginationDto } from '@app/dtos/ratings/rating-pagination.dto';
 import { UpdateRatingDto } from '@app/dtos/ratings/update-rating.dto';
+
 @Injectable()
 export class RatingService {
   constructor(
