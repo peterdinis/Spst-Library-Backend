@@ -27,7 +27,7 @@ export class OrdersService {
     private orderItemModel: Model<OrderItemDocument>,
     @InjectModel(Book.name) private bookModel: Model<BookDocument>,
     private messagesService: MessagesService,
-  ) {}
+  ) { }
 
   private async validateBookExists(bookId: string) {
     if (!bookId) {
@@ -184,7 +184,7 @@ export class OrdersService {
           .findById(dto.orderId)
           .populate({ path: 'items', populate: { path: 'bookId' } })
           .exec();
-        
+
         if (populatedOrder) {
           for (const item of populatedOrder.items as any[]) {
             await this.notifyBookReturned(item.bookId._id.toString());
@@ -220,8 +220,7 @@ export class OrdersService {
       if (!updatedOrder) {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
-
-      // Pri zrušení objednávky vráť dostupnosť kníh
+      
       for (const item of updatedOrder.items as any[]) {
         await this.notifyBookReturned(item.bookId._id.toString());
       }
@@ -253,6 +252,10 @@ export class OrdersService {
 
       if (!updatedOrder) {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      for (const item of updatedOrder.items as any[]) {
+        await this.notifyBookReturned(item.bookId._id.toString());
       }
 
       return updatedOrder;
