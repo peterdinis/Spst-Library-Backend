@@ -46,6 +46,48 @@ describe('PdfService', () => {
     jest.clearAllMocks();
   });
 
+  it('should generate combined PDF with all data', async () => {
+  // Mock Books
+  const books = [
+    { _id: new Types.ObjectId(), name: 'Book 1', year: 2020, isAvailable: true, authorId: new Types.ObjectId(), categoryId: new Types.ObjectId() },
+  ];
+  const mockBookExec = jest.fn().mockResolvedValue(books);
+  const mockBookPopulate = jest.fn().mockReturnValue({ populate: jest.fn().mockReturnValue({ exec: mockBookExec }) });
+  mockBookModel.find.mockReturnValue({ populate: mockBookPopulate });
+
+  // Mock Authors
+  const authors = [{ _id: new Types.ObjectId(), name: 'Author 1', bio: 'Bio 1' }];
+  const mockAuthorExec = jest.fn().mockResolvedValue(authors);
+  mockAuthorModel.find.mockReturnValue({ exec: mockAuthorExec });
+
+  // Mock Categories
+  const categories = [{ _id: new Types.ObjectId(), name: 'Category 1', description: 'Description' }];
+  const mockCategoryExec = jest.fn().mockResolvedValue(categories);
+  mockCategoryModel.find.mockReturnValue({ exec: mockCategoryExec });
+
+  // Mock Orders
+  const orders = [
+    {
+      _id: new Types.ObjectId(),
+      status: 'pending',
+      items: [{ bookId: { name: 'Book X' }, quantity: 2 }],
+    },
+  ];
+  const mockOrderExec = jest.fn().mockResolvedValue(orders);
+  const mockOrderPopulate = jest.fn().mockReturnValue({ exec: mockOrderExec });
+  mockOrderModel.find.mockReturnValue({ populate: jest.fn().mockReturnValue({ populate: mockOrderPopulate }) });
+
+  const result = await service.generateAllDataPdf();
+
+  expect(mockBookModel.find).toHaveBeenCalled();
+  expect(mockAuthorModel.find).toHaveBeenCalled();
+  expect(mockCategoryModel.find).toHaveBeenCalled();
+  expect(mockOrderModel.find).toHaveBeenCalled();
+  expect(Buffer.isBuffer(result)).toBe(true);
+  expect(result.length).toBeGreaterThan(0);
+});
+
+
   it('should generate Books PDF', async () => {
     const books = [
       { _id: new Types.ObjectId(), name: 'Book 1', year: 2020, isAvailable: true },

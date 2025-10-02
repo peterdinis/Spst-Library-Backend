@@ -36,6 +36,23 @@ describe('PdfController', () => {
     };
   });
 
+  describe('downloadAllPdf', () => {
+  it('should call generateAllDataPdf and return PDF', async () => {
+    pdfService.generateAllDataPdf = jest.fn().mockResolvedValue(sampleBuffer);
+
+    await controller.downloadAllPdf(mockResponse as Response);
+    
+    expect(pdfService.generateAllDataPdf).toHaveBeenCalled();
+    expect(mockResponse.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': expect.stringContaining('all_data.pdf'),
+      }),
+    );
+    expect(mockResponse.send).toHaveBeenCalledWith(sampleBuffer);
+  });
+});
+
   describe('downloadPdf', () => {
     it('should call generateBooksPdf and return PDF', async () => {
       await controller.downloadPdf('books', mockResponse as Response);
