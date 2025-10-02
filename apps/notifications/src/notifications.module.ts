@@ -5,6 +5,7 @@ import { DatabaseModule } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Notification, NotificationSchema } from './model/notification.model';
 import { MessagesModule } from 'libs/messages/messages.module';
+import { TwilioService } from 'libs/twilio';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { MessagesModule } from 'libs/messages/messages.module';
     ]),
   ],
   controllers: [NotificationsController],
-  providers: [NotificationsService],
+  providers: [NotificationsService, TwilioService],
   exports: [NotificationsService],
 })
 export class NotificationsModule {}
