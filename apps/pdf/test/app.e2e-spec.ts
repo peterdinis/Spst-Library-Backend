@@ -13,6 +13,7 @@ describe('PdfController (e2e)', () => {
     generateAuthorsPdf: jest.fn().mockResolvedValue(fakeBuffer),
     generateCategoriesPdf: jest.fn().mockResolvedValue(fakeBuffer),
     generateOrdersPdf: jest.fn().mockResolvedValue(fakeBuffer),
+    generateAllDataPdf: jest.fn().mockResolvedValue(fakeBuffer)
   };
 
   beforeEach(async () => {
@@ -54,5 +55,21 @@ describe('PdfController (e2e)', () => {
       .get('/pdf/unknown')
       .expect(400)
       .expect('Unknown entity');
+  });
+
+  it('GET /pdf/all should return a combined PDF', async () => {
+    // Mock the new method in PdfService
+    mockPdfService.generateAllDataPdf = jest.fn().mockResolvedValue(fakeBuffer);
+
+    return request(app.getHttpServer())
+      .get('/pdf/all')
+      .expect(200)
+      .expect('Content-Type', /application\/pdf/)
+      .expect('Content-Disposition', /all_data.pdf/)
+      .expect((res) => {
+        expect(res.body).toBeInstanceOf(Buffer);
+        expect(Buffer.from(res.body).toString()).toContain('fake-pdf');
+        expect(mockPdfService.generateAllDataPdf).toHaveBeenCalled();
+      });
   });
 });
