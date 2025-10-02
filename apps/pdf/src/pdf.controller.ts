@@ -53,7 +53,7 @@ export class PdfController {
 
     res.send(pdfBuffer);
   }
-  
+
   @Get('all')
   @ApiOperation({ summary: 'Download PDF with all entities combined' })
   @ApiResponse({

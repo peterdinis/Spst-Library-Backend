@@ -1,11 +1,17 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Author, AuthorDocument } from "apps/authors/src/models/author.model";
-import { Book, BookDocument } from "apps/books/src/model/book.model";
-import { Category, CategoryDocument } from "apps/categories/src/model/category.model";
-import { OrderItem, OrderItemDocument } from "apps/orders/src/model/order-item.model";
-import { Order, OrderDocument } from "apps/orders/src/model/orders.model";
-import { Model } from "mongoose";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Author, AuthorDocument } from 'apps/authors/src/models/author.model';
+import { Book, BookDocument } from 'apps/books/src/model/book.model';
+import {
+  Category,
+  CategoryDocument,
+} from 'apps/categories/src/model/category.model';
+import {
+  OrderItem,
+  OrderItemDocument,
+} from 'apps/orders/src/model/order-item.model';
+import { Order, OrderDocument } from 'apps/orders/src/model/orders.model';
+import { Model } from 'mongoose';
 import PDFDocument from 'pdfkit';
 
 @Injectable()
@@ -15,7 +21,8 @@ export class PdfService {
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
-    @InjectModel(OrderItem.name)  private orderItemModel: Model<OrderItemDocument>,
+    @InjectModel(OrderItem.name)
+    private orderItemModel: Model<OrderItemDocument>,
   ) {}
 
   private async generatePdf(title: string, rows: string[][]): Promise<Buffer> {
@@ -167,7 +174,7 @@ export class PdfService {
       doc.text(
         `Items: ${(o.items as unknown as OrderItemDocument[])
           .map((i) => `${(i.bookId as any)?.name ?? 'N/A'} x${i.quantity}`)
-          .join(', ')}`
+          .join(', ')}`,
       );
       doc.moveDown();
     });

@@ -35,7 +35,10 @@ describe('PdfService', () => {
         { provide: getModelToken(Author.name), useValue: mockAuthorModel },
         { provide: getModelToken(Category.name), useValue: mockCategoryModel },
         { provide: getModelToken(Order.name), useValue: mockOrderModel },
-        { provide: getModelToken(OrderItem.name), useValue: mockOrderItemModel },
+        {
+          provide: getModelToken(OrderItem.name),
+          useValue: mockOrderItemModel,
+        },
       ],
     }).compile();
 
@@ -47,54 +50,85 @@ describe('PdfService', () => {
   });
 
   it('should generate combined PDF with all data', async () => {
-  // Mock Books
-  const books = [
-    { _id: new Types.ObjectId(), name: 'Book 1', year: 2020, isAvailable: true, authorId: new Types.ObjectId(), categoryId: new Types.ObjectId() },
-  ];
-  const mockBookExec = jest.fn().mockResolvedValue(books);
-  const mockBookPopulate = jest.fn().mockReturnValue({ populate: jest.fn().mockReturnValue({ exec: mockBookExec }) });
-  mockBookModel.find.mockReturnValue({ populate: mockBookPopulate });
+    // Mock Books
+    const books = [
+      {
+        _id: new Types.ObjectId(),
+        name: 'Book 1',
+        year: 2020,
+        isAvailable: true,
+        authorId: new Types.ObjectId(),
+        categoryId: new Types.ObjectId(),
+      },
+    ];
+    const mockBookExec = jest.fn().mockResolvedValue(books);
+    const mockBookPopulate = jest
+      .fn()
+      .mockReturnValue({
+        populate: jest.fn().mockReturnValue({ exec: mockBookExec }),
+      });
+    mockBookModel.find.mockReturnValue({ populate: mockBookPopulate });
 
-  // Mock Authors
-  const authors = [{ _id: new Types.ObjectId(), name: 'Author 1', bio: 'Bio 1' }];
-  const mockAuthorExec = jest.fn().mockResolvedValue(authors);
-  mockAuthorModel.find.mockReturnValue({ exec: mockAuthorExec });
+    // Mock Authors
+    const authors = [
+      { _id: new Types.ObjectId(), name: 'Author 1', bio: 'Bio 1' },
+    ];
+    const mockAuthorExec = jest.fn().mockResolvedValue(authors);
+    mockAuthorModel.find.mockReturnValue({ exec: mockAuthorExec });
 
-  // Mock Categories
-  const categories = [{ _id: new Types.ObjectId(), name: 'Category 1', description: 'Description' }];
-  const mockCategoryExec = jest.fn().mockResolvedValue(categories);
-  mockCategoryModel.find.mockReturnValue({ exec: mockCategoryExec });
+    // Mock Categories
+    const categories = [
+      {
+        _id: new Types.ObjectId(),
+        name: 'Category 1',
+        description: 'Description',
+      },
+    ];
+    const mockCategoryExec = jest.fn().mockResolvedValue(categories);
+    mockCategoryModel.find.mockReturnValue({ exec: mockCategoryExec });
 
-  // Mock Orders
-  const orders = [
-    {
-      _id: new Types.ObjectId(),
-      status: 'pending',
-      items: [{ bookId: { name: 'Book X' }, quantity: 2 }],
-    },
-  ];
-  const mockOrderExec = jest.fn().mockResolvedValue(orders);
-  const mockOrderPopulate = jest.fn().mockReturnValue({ exec: mockOrderExec });
-  mockOrderModel.find.mockReturnValue({ populate: jest.fn().mockReturnValue({ populate: mockOrderPopulate }) });
+    // Mock Orders
+    const orders = [
+      {
+        _id: new Types.ObjectId(),
+        status: 'pending',
+        items: [{ bookId: { name: 'Book X' }, quantity: 2 }],
+      },
+    ];
+    const mockOrderExec = jest.fn().mockResolvedValue(orders);
+    const mockOrderPopulate = jest
+      .fn()
+      .mockReturnValue({ exec: mockOrderExec });
+    mockOrderModel.find.mockReturnValue({
+      populate: jest.fn().mockReturnValue({ populate: mockOrderPopulate }),
+    });
 
-  const result = await service.generateAllDataPdf();
+    const result = await service.generateAllDataPdf();
 
-  expect(mockBookModel.find).toHaveBeenCalled();
-  expect(mockAuthorModel.find).toHaveBeenCalled();
-  expect(mockCategoryModel.find).toHaveBeenCalled();
-  expect(mockOrderModel.find).toHaveBeenCalled();
-  expect(Buffer.isBuffer(result)).toBe(true);
-  expect(result.length).toBeGreaterThan(0);
-});
-
+    expect(mockBookModel.find).toHaveBeenCalled();
+    expect(mockAuthorModel.find).toHaveBeenCalled();
+    expect(mockCategoryModel.find).toHaveBeenCalled();
+    expect(mockOrderModel.find).toHaveBeenCalled();
+    expect(Buffer.isBuffer(result)).toBe(true);
+    expect(result.length).toBeGreaterThan(0);
+  });
 
   it('should generate Books PDF', async () => {
     const books = [
-      { _id: new Types.ObjectId(), name: 'Book 1', year: 2020, isAvailable: true },
+      {
+        _id: new Types.ObjectId(),
+        name: 'Book 1',
+        year: 2020,
+        isAvailable: true,
+      },
     ];
 
     const mockExec = jest.fn().mockResolvedValue(books);
-    const mockPopulate = jest.fn().mockReturnValue({ populate: jest.fn().mockReturnValue({ exec: mockExec }) });
+    const mockPopulate = jest
+      .fn()
+      .mockReturnValue({
+        populate: jest.fn().mockReturnValue({ exec: mockExec }),
+      });
     mockBookModel.find.mockReturnValue({ populate: mockPopulate });
 
     const result = await service.generateBooksPdf();
@@ -121,7 +155,11 @@ describe('PdfService', () => {
 
   it('should generate Categories PDF', async () => {
     const categories = [
-      { _id: new Types.ObjectId(), name: 'Category 1', description: 'Description' },
+      {
+        _id: new Types.ObjectId(),
+        name: 'Category 1',
+        description: 'Description',
+      },
     ];
 
     const mockExec = jest.fn().mockResolvedValue(categories);
@@ -139,15 +177,15 @@ describe('PdfService', () => {
       {
         _id: new Types.ObjectId(),
         status: 'pending',
-        items: [
-          { bookId: { name: 'Book X' }, quantity: 2 },
-        ],
+        items: [{ bookId: { name: 'Book X' }, quantity: 2 }],
       },
     ];
 
     const mockExec = jest.fn().mockResolvedValue(orders);
     const mockPopulate = jest.fn().mockReturnValue({ exec: mockExec });
-    mockOrderModel.find.mockReturnValue({ populate: jest.fn().mockReturnValue({ populate: mockPopulate }) });
+    mockOrderModel.find.mockReturnValue({
+      populate: jest.fn().mockReturnValue({ populate: mockPopulate }),
+    });
 
     const result = await service.generateOrdersPdf();
 

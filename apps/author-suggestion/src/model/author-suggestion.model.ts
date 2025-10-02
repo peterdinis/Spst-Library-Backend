@@ -32,7 +32,11 @@ export class AuthorSuggestion {
   @Prop()
   suggestedByName?: string;
 
-  @Prop({ type: String, enum: SuggestionStatus, default: SuggestionStatus.PENDING })
+  @Prop({
+    type: String,
+    enum: SuggestionStatus,
+    default: SuggestionStatus.PENDING,
+  })
   status: SuggestionStatus;
 }
 

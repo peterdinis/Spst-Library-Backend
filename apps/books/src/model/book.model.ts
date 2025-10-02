@@ -22,7 +22,7 @@ export class Book {
 
   @Prop({ type: Types.ObjectId, ref: 'Category', required: false })
   categoryId?: Types.ObjectId;
-  
+
   @Prop({ type: Types.ObjectId, ref: 'Author', required: true })
   authorId: Types.ObjectId;
 
