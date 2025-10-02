@@ -26,16 +26,27 @@ describe('RatingsController (E2E)', () => {
     })
       .overrideProvider(RatingService)
       .useValue({
-        findAll: jest.fn().mockResolvedValue({ data: [rating], meta: { total: 1, page: 1, limit: 10, totalPages: 1 } }),
+        findAll: jest
+          .fn()
+          .mockResolvedValue({
+            data: [rating],
+            meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+          }),
         findOne: jest.fn().mockResolvedValue(rating),
         create: jest.fn().mockResolvedValue({ ...rating }),
         update: jest.fn().mockResolvedValue({ ...rating, value: 5 }),
-        remove: jest.fn().mockResolvedValue({ message: `Rating ${ratingId} deleted successfully` }),
+        remove: jest
+          .fn()
+          .mockResolvedValue({
+            message: `Rating ${ratingId} deleted successfully`,
+          }),
       })
       .compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+    );
     await app.init();
 
     ratingService = moduleFixture.get<RatingService>(RatingService);
@@ -51,7 +62,7 @@ describe('RatingsController (E2E)', () => {
     return request(app.getHttpServer())
       .get('/ratings')
       .expect(200)
-      .expect(res => {
+      .expect((res) => {
         expect(res.body.data).toHaveLength(1);
         expect(res.body.meta).toHaveProperty('total', 1);
       });
@@ -62,16 +73,14 @@ describe('RatingsController (E2E)', () => {
     return request(app.getHttpServer())
       .get(`/ratings/${ratingId}`)
       .expect(200)
-      .expect(res => {
+      .expect((res) => {
         expect(res.body._id).toEqual(ratingId);
         expect(res.body.value).toEqual(rating.value);
       });
   });
 
   it('GET /ratings/:id should return 400 for invalid id', async () => {
-    return request(app.getHttpServer())
-      .get('/ratings/invalid')
-      .expect(400);
+    return request(app.getHttpServer()).get('/ratings/invalid').expect(400);
   });
 
   // ------------------- POST /ratings -------------------
@@ -86,7 +95,7 @@ describe('RatingsController (E2E)', () => {
       .post('/ratings')
       .send(dto)
       .expect(201)
-      .expect(res => {
+      .expect((res) => {
         expect(res.body.value).toEqual(dto.value);
         expect(res.body.comment).toEqual(dto.comment);
       });
@@ -107,7 +116,7 @@ describe('RatingsController (E2E)', () => {
       .patch(`/ratings/${ratingId}`)
       .send(dto)
       .expect(200)
-      .expect(res => {
+      .expect((res) => {
         expect(res.body.value).toEqual(dto.value);
       });
   });
@@ -124,14 +133,14 @@ describe('RatingsController (E2E)', () => {
     return request(app.getHttpServer())
       .delete(`/ratings/${ratingId}`)
       .expect(200)
-      .expect(res => {
-        expect(res.body.message).toEqual(`Rating ${ratingId} deleted successfully`);
+      .expect((res) => {
+        expect(res.body.message).toEqual(
+          `Rating ${ratingId} deleted successfully`,
+        );
       });
   });
 
   it('DELETE /ratings/:id should return 400 for invalid id', async () => {
-    return request(app.getHttpServer())
-      .delete('/ratings/invalid')
-      .expect(400);
+    return request(app.getHttpServer()).delete('/ratings/invalid').expect(400);
   });
 });
