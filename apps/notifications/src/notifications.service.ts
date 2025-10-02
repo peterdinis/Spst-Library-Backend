@@ -5,20 +5,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId, Document } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { MessagesService } from 'libs/messages/messages.service';
 import { Notification } from './model/notification.model';
-
-export interface NotificationDocument extends Document {
-  _id: string;
-  userId: string;
-  message: string;
-  type: string;
-  isRead?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-  __v?: number;
-}
+import { NotificationDocument } from './types/NotificationTypes';
 
 @Injectable()
 export class NotificationsService {
