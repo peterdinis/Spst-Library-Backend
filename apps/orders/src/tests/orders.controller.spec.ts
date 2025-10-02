@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersController } from '../orders.controller';
 import { OrdersService } from '../orders.service';
-import { CreateOrderDto, UpdateOrderStatusDto } from '@app/dtos';
+import { CreateOrderDto, CreateOrderItemDto, UpdateOrderStatusDto } from '@app/dtos';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -36,13 +36,16 @@ describe('OrdersController', () => {
   });
 
   describe('createOrder', () => {
-    it('should call ordersService.createOrder and return result', async () => {
-      const dto: CreateOrderDto = { userId: '123', items: [] };
-      const result = { id: 'order1' };
+    it('should call ordersService.createOrder with valid DTO and return result', async () => {
+      const items: CreateOrderItemDto[] = [{ bookId: 'book123', quantity: 2 }];
+      const dto: CreateOrderDto = { userId: 'user123', items };
+      const result = { id: 'order1', ...dto };
       service.createOrder.mockResolvedValue(result);
 
-      expect(await controller.createOrder(dto)).toEqual(result);
+      const response = await controller.createOrder(dto);
+
       expect(service.createOrder).toHaveBeenCalledWith(dto);
+      expect(response).toEqual(result);
     });
   });
 
@@ -51,8 +54,10 @@ describe('OrdersController', () => {
       const result = { id: 'order1' };
       service.getOrderById.mockResolvedValue(result);
 
-      expect(await controller.getOrder('order1')).toEqual(result);
+      const response = await controller.getOrder('order1');
+
       expect(service.getOrderById).toHaveBeenCalledWith('order1');
+      expect(response).toEqual(result);
     });
   });
 
@@ -61,8 +66,10 @@ describe('OrdersController', () => {
       const result = [{ id: 'order1' }];
       service.getOrdersForUser.mockResolvedValue(result);
 
-      expect(await controller.getOrdersByUser('user1')).toEqual(result);
+      const response = await controller.getOrdersByUser('user1');
+
       expect(service.getOrdersForUser).toHaveBeenCalledWith('user1');
+      expect(response).toEqual(result);
     });
   });
 
@@ -72,8 +79,10 @@ describe('OrdersController', () => {
       const result = { success: true };
       service.updateOrderStatus.mockResolvedValue(result);
 
-      expect(await controller.updateStatus(dto)).toEqual(result);
+      const response = await controller.updateStatus(dto);
+
       expect(service.updateOrderStatus).toHaveBeenCalledWith(dto);
+      expect(response).toEqual(result);
     });
   });
 
@@ -82,8 +91,10 @@ describe('OrdersController', () => {
       const result = { success: true };
       service.returnOrder.mockResolvedValue(result);
 
-      expect(await controller.returnOrder('order1')).toEqual(result);
+      const response = await controller.returnOrder('order1');
+
       expect(service.returnOrder).toHaveBeenCalledWith('order1');
+      expect(response).toEqual(result);
     });
   });
 
@@ -92,8 +103,10 @@ describe('OrdersController', () => {
       const result = { success: true };
       service.cancelOrder.mockResolvedValue(result);
 
-      expect(await controller.cancelOrder('order1')).toEqual(result);
+      const response = await controller.cancelOrder('order1');
+
       expect(service.cancelOrder).toHaveBeenCalledWith('order1');
+      expect(response).toEqual(result);
     });
   });
 
@@ -102,8 +115,10 @@ describe('OrdersController', () => {
       const result = { success: true };
       service.approveOrder.mockResolvedValue(result);
 
-      expect(await controller.approveOrder('order1')).toEqual(result);
+      const response = await controller.approveOrder('order1');
+
       expect(service.approveOrder).toHaveBeenCalledWith('order1');
+      expect(response).toEqual(result);
     });
   });
 
@@ -112,8 +127,10 @@ describe('OrdersController', () => {
       const result = { success: true };
       service.declineOrder.mockResolvedValue(result);
 
-      expect(await controller.declineOrder('order1')).toEqual(result);
+      const response = await controller.declineOrder('order1');
+
       expect(service.declineOrder).toHaveBeenCalledWith('order1');
+      expect(response).toEqual(result);
     });
   });
 });
