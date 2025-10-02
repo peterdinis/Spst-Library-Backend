@@ -22,8 +22,7 @@ export class Book {
 
   @Prop({ type: Types.ObjectId, ref: 'Category', required: false })
   categoryId?: Types.ObjectId;
-
-  // Author reference (required)
+  
   @Prop({ type: Types.ObjectId, ref: 'Author', required: true })
   authorId: Types.ObjectId;
 
