@@ -9,6 +9,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { MessagesService } from 'libs/messages/messages.service';
 import { Notification } from './model/notification.model';
 import { NotificationDocument } from './types/NotificationTypes';
+import { TwilioService } from 'libs/twilio';
 
 @Injectable()
 export class NotificationsService {
@@ -16,7 +17,60 @@ export class NotificationsService {
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
     private messagesService: MessagesService,
-  ) {}
+    private twilioService: TwilioService
+  ) { }
+
+  async createOrderNotification(userId: string, message: string, type = 'info') {
+    if (!userId || !message) {
+      throw new BadRequestException('userId and message are required');
+    }
+
+    try {
+      const notification = new this.notificationModel({
+        userId,
+        message,
+        type,
+      });
+      const saved = await notification.save();
+
+      await this.messagesService.sendKafkaMessage('notification.created', {
+        id: saved._id.toString(),
+        userId,
+        message,
+        type,
+      });
+
+      return saved;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create notification');
+    }
+  }
+
+  async createReturnOrderNotification(userId: string, message: string, type = 'info') {
+    if (!userId || !message) {
+      throw new BadRequestException('userId and message are required');
+    }
+
+    try {
+      const notification = new this.notificationModel({
+        userId,
+        message,
+        type,
+      });
+      const saved = await notification.save();
+
+      await this.messagesService.sendKafkaMessage('notification.created', {
+        id: saved._id.toString(),
+        userId,
+        message,
+        type,
+      });
+
+      return saved;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create notification');
+    }
+  }
 
   async create(userId: string, message: string, type = 'info') {
     if (!userId || !message) {
