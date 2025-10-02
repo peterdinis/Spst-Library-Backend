@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId, Document } from 'mongoose';
-import { MessagesService } from 'libs/messages/messages.service'; 
+import { MessagesService } from 'libs/messages/messages.service';
 import { Notification } from './model/notification.model';
 
 export interface NotificationDocument extends Document {
@@ -40,7 +40,7 @@ export class NotificationsService {
         type,
       });
       const saved = await notification.save();
-      
+
       await this.messagesService.sendKafkaMessage('notification.created', {
         id: saved._id.toString(),
         userId,
@@ -85,7 +85,7 @@ export class NotificationsService {
       if (!notification) {
         throw new NotFoundException('Notification not found');
       }
-      
+
       await this.messagesService.sendKafkaMessage('notification.read', {
         id: notification._id.toString(),
         isRead: true,
