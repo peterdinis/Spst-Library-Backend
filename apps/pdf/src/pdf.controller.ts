@@ -53,4 +53,23 @@ export class PdfController {
 
     res.send(pdfBuffer);
   }
+
+  @Get('all')
+  @ApiOperation({ summary: 'Download PDF with all entities combined' })
+  @ApiResponse({
+    status: 200,
+    description: 'Combined PDF file returned successfully',
+    content: { 'application/pdf': {} },
+  })
+  async downloadAllPdf(@Res() res: express.Response) {
+    const pdfBuffer = await this.pdfService.generateAllDataPdf();
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=all_data.pdf',
+      'Content-Length': pdfBuffer.length,
+    });
+
+    res.send(pdfBuffer);
+  }
 }

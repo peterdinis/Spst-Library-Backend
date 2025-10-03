@@ -11,7 +11,7 @@ export enum SuggestionStatus {
 
 @Schema({ timestamps: true })
 export class AuthorSuggestion {
-  @Prop({ required: true })
+  @Prop()
   name: string;
 
   @Prop()
@@ -32,7 +32,11 @@ export class AuthorSuggestion {
   @Prop()
   suggestedByName?: string;
 
-  @Prop({ enum: SuggestionStatus, default: SuggestionStatus.PENDING })
+  @Prop({
+    type: String,
+    enum: SuggestionStatus,
+    default: SuggestionStatus.PENDING,
+  })
   status: SuggestionStatus;
 }
 

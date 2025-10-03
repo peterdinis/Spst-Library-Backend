@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersController } from '../orders.controller';
 import { OrdersService } from '../orders.service';
 import {
-  CreateOrderDto,
   CreateOrderItemDto,
+  CreateOrderDto,
   UpdateOrderStatusDto,
 } from '@app/dtos';
 
@@ -40,7 +40,7 @@ describe('OrdersController', () => {
   });
 
   describe('createOrder', () => {
-    it('should call ordersService.createOrder with valid DTO and return result', async () => {
+    it('should call createOrder with valid DTO and return result', async () => {
       const items: CreateOrderItemDto[] = [{ bookId: 'book123', quantity: 2 }];
       const dto: CreateOrderDto = { userId: 'user123', items };
       const result = { id: 'order1', ...dto };
@@ -54,31 +54,27 @@ describe('OrdersController', () => {
   });
 
   describe('getOrder', () => {
-    it('should call ordersService.getOrderById and return result', async () => {
+    it('should call getOrderById and return result', async () => {
       const result = { id: 'order1' };
       service.getOrderById.mockResolvedValue(result);
 
-      const response = await controller.getOrder('order1');
-
+      expect(await controller.getOrder('order1')).toEqual(result);
       expect(service.getOrderById).toHaveBeenCalledWith('order1');
-      expect(response).toEqual(result);
     });
   });
 
   describe('getOrdersByUser', () => {
-    it('should call ordersService.getOrdersForUser and return result', async () => {
+    it('should call getOrdersForUser and return result', async () => {
       const result = [{ id: 'order1' }];
       service.getOrdersForUser.mockResolvedValue(result);
 
-      const response = await controller.getOrdersByUser('user1');
-
+      expect(await controller.getOrdersByUser('user1')).toEqual(result);
       expect(service.getOrdersForUser).toHaveBeenCalledWith('user1');
-      expect(response).toEqual(result);
     });
   });
 
   describe('updateStatus', () => {
-    it('should call ordersService.updateOrderStatus and return result', async () => {
+    it('should call updateOrderStatus and return result', async () => {
       const dto: UpdateOrderStatusDto = {
         orderId: 'order1',
         status: 'APPROVED',
@@ -86,58 +82,48 @@ describe('OrdersController', () => {
       const result = { success: true };
       service.updateOrderStatus.mockResolvedValue(result);
 
-      const response = await controller.updateStatus(dto);
-
+      expect(await controller.updateStatus(dto)).toEqual(result);
       expect(service.updateOrderStatus).toHaveBeenCalledWith(dto);
-      expect(response).toEqual(result);
     });
   });
 
   describe('returnOrder', () => {
-    it('should call ordersService.returnOrder and return result', async () => {
+    it('should call returnOrder and return result', async () => {
       const result = { success: true };
       service.returnOrder.mockResolvedValue(result);
 
-      const response = await controller.returnOrder('order1');
-
+      expect(await controller.returnOrder('order1')).toEqual(result);
       expect(service.returnOrder).toHaveBeenCalledWith('order1');
-      expect(response).toEqual(result);
     });
   });
 
   describe('cancelOrder', () => {
-    it('should call ordersService.cancelOrder and return result', async () => {
+    it('should call cancelOrder and return result', async () => {
       const result = { success: true };
       service.cancelOrder.mockResolvedValue(result);
 
-      const response = await controller.cancelOrder('order1');
-
+      expect(await controller.cancelOrder('order1')).toEqual(result);
       expect(service.cancelOrder).toHaveBeenCalledWith('order1');
-      expect(response).toEqual(result);
     });
   });
 
   describe('approveOrder', () => {
-    it('should call ordersService.approveOrder and return result', async () => {
+    it('should call approveOrder and return result', async () => {
       const result = { success: true };
       service.approveOrder.mockResolvedValue(result);
 
-      const response = await controller.approveOrder('order1');
-
+      expect(await controller.approveOrder('order1')).toEqual(result);
       expect(service.approveOrder).toHaveBeenCalledWith('order1');
-      expect(response).toEqual(result);
     });
   });
 
   describe('declineOrder', () => {
-    it('should call ordersService.declineOrder and return result', async () => {
+    it('should call declineOrder and return result', async () => {
       const result = { success: true };
       service.declineOrder.mockResolvedValue(result);
 
-      const response = await controller.declineOrder('order1');
-
+      expect(await controller.declineOrder('order1')).toEqual(result);
       expect(service.declineOrder).toHaveBeenCalledWith('order1');
-      expect(response).toEqual(result);
     });
   });
 });
