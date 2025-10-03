@@ -3,7 +3,6 @@ import { CreateOrderItemDto } from './create-order-item.dto';
 import {
   ArrayMinSize,
   IsArray,
-  IsInt,
   IsNotEmpty,
   IsString,
 } from 'class-validator';
