@@ -41,7 +41,6 @@ A modern school library management system built with NestJS framework, TypeScrip
 - **BookTag** - tags for books (many-to-many)
 - **Order/OrderItem** - orders and their items
 - **Rating** - book ratings
-- **Token** - refresh tokens for authentication
 
 ## Installation and Setup
 
@@ -60,31 +59,4 @@ A modern school library management system built with NestJS framework, TypeScrip
 2. **Install Dependencies**
    ```bash
    pnpm install
-   ```
-
-3. **Environment Setup**
-   Create a `.env` file in the root directory:
-   ```env
-   DATABASE_URL="file:./dev.db"
-   ```
-
-4. **Database Initialization**
-   ```bash
-   # Generate Prisma client
-   npx prisma generate
-   
-   # Database migration
-   npx prisma migrate dev --name init
-   
-   # (Optional) Seed with test data
-   npx prisma db seed
-   ```
-
-5. **Run Application**
-   ```bash
-   # Development environment
-   pnpm run start:dev
-   
-   # Production environment
-   pnpm run start:prod
    ```
