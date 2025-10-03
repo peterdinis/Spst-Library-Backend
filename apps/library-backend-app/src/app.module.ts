@@ -17,6 +17,7 @@ import { MessagesModule } from 'libs/messages/messages.module';
     CategoriesModule,
     AuthorsModule,
     AuthorSuggestionModule,
+    NotificationsModule,
     BookTagModule,
     RatingsModule,
     PdfModule,
