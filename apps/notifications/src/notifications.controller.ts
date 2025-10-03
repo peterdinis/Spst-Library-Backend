@@ -1,10 +1,5 @@
 import { Controller, Get, Param, Patch, Post, Body } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import {
   CreateNotificationDto,
@@ -37,7 +32,10 @@ export class NotificationsController {
 
   @Post('return-order')
   @ApiOperation({ summary: 'Create a return order notification' })
-  @ApiResponse({ status: 201, description: 'Return order notification created' })
+  @ApiResponse({
+    status: 201,
+    description: 'Return order notification created',
+  })
   async createReturnOrder(
     @Body() returnOrderNotificationDto: ReturnOrderNotificationDto,
   ) {

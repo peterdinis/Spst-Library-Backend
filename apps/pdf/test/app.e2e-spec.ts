@@ -13,7 +13,7 @@ describe('PdfController (e2e)', () => {
     generateAuthorsPdf: jest.fn().mockResolvedValue(fakeBuffer),
     generateCategoriesPdf: jest.fn().mockResolvedValue(fakeBuffer),
     generateOrdersPdf: jest.fn().mockResolvedValue(fakeBuffer),
-    generateAllDataPdf: jest.fn().mockResolvedValue(fakeBuffer)
+    generateAllDataPdf: jest.fn().mockResolvedValue(fakeBuffer),
   };
 
   beforeEach(async () => {

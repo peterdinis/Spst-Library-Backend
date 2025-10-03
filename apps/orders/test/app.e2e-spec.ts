@@ -3,7 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { OrdersModule } from './../src/orders.module';
 import { OrdersService } from './../src/orders.service';
-import { CreateOrderDto, CreateOrderItemDto, UpdateOrderStatusDto } from '@app/dtos';
+import {
+  CreateOrderDto,
+  CreateOrderItemDto,
+  UpdateOrderStatusDto,
+} from '@app/dtos';
 import { OrderStatus } from '../src/types/order-status.enum';
 
 describe('OrdersController (e2e)', () => {
@@ -13,7 +17,10 @@ describe('OrdersController (e2e)', () => {
   const fakeOrderId = 'order123';
   const fakeUserId = 'user123';
   const fakeOrderItem: CreateOrderItemDto = { bookId: 'book123', quantity: 2 };
-  const fakeOrderDto: CreateOrderDto = { userId: fakeUserId, items: [fakeOrderItem] };
+  const fakeOrderDto: CreateOrderDto = {
+    userId: fakeUserId,
+    items: [fakeOrderItem],
+  };
   const fakeOrderResponse = { id: fakeOrderId, ...fakeOrderDto };
 
   const mockOrdersService = {
@@ -77,7 +84,10 @@ describe('OrdersController (e2e)', () => {
   });
 
   it('PATCH /orders/status - should update order status', async () => {
-    const dto: UpdateOrderStatusDto = { orderId: fakeOrderId, status: OrderStatus.RETURNED };
+    const dto: UpdateOrderStatusDto = {
+      orderId: fakeOrderId,
+      status: OrderStatus.RETURNED,
+    };
 
     return request(app.getHttpServer())
       .patch('/orders/status')

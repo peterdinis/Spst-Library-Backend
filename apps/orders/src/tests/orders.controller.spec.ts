@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersController } from '../orders.controller';
 import { OrdersService } from '../orders.service';
-import { CreateOrderDto, CreateOrderItemDto, UpdateOrderStatusDto } from '@app/dtos';
+import {
+  CreateOrderDto,
+  CreateOrderItemDto,
+  UpdateOrderStatusDto,
+} from '@app/dtos';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -75,7 +79,10 @@ describe('OrdersController', () => {
 
   describe('updateStatus', () => {
     it('should call ordersService.updateOrderStatus and return result', async () => {
-      const dto: UpdateOrderStatusDto = { orderId: 'order1', status: 'APPROVED' };
+      const dto: UpdateOrderStatusDto = {
+        orderId: 'order1',
+        status: 'APPROVED',
+      };
       const result = { success: true };
       service.updateOrderStatus.mockResolvedValue(result);
 

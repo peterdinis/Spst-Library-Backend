@@ -62,11 +62,9 @@ describe('PdfService', () => {
       },
     ];
     const mockBookExec = jest.fn().mockResolvedValue(books);
-    const mockBookPopulate = jest
-      .fn()
-      .mockReturnValue({
-        populate: jest.fn().mockReturnValue({ exec: mockBookExec }),
-      });
+    const mockBookPopulate = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnValue({ exec: mockBookExec }),
+    });
     mockBookModel.find.mockReturnValue({ populate: mockBookPopulate });
 
     // Mock Authors
@@ -124,11 +122,9 @@ describe('PdfService', () => {
     ];
 
     const mockExec = jest.fn().mockResolvedValue(books);
-    const mockPopulate = jest
-      .fn()
-      .mockReturnValue({
-        populate: jest.fn().mockReturnValue({ exec: mockExec }),
-      });
+    const mockPopulate = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnValue({ exec: mockExec }),
+    });
     mockBookModel.find.mockReturnValue({ populate: mockPopulate });
 
     const result = await service.generateBooksPdf();
