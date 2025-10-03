@@ -9,7 +9,11 @@ import { Model, isValidObjectId } from 'mongoose';
 import { MessagesService } from 'libs/messages/messages.service';
 import { Notification } from './model/notification.model';
 import { NotificationDocument } from './types/NotificationTypes';
-import { CreateNotificationDto } from '@app/dtos';
+import {
+  CreateNotificationDto,
+  CreateOrderNotificationDto,
+  ReturnOrderNotificationDto,
+} from '@app/dtos';
 
 @Injectable()
 export class NotificationsService {
@@ -17,16 +21,16 @@ export class NotificationsService {
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
     private messagesService: MessagesService,
-  ) { }
+  ) {}
 
-  async createOrderNotification(notificationDto: CreateNotificationDto) {
-    if (!notificationDto.userId || !notificationDto.message) {
-      throw new BadRequestException('userId and message are required');
+  async createOrderNotification(notificationDto: CreateOrderNotificationDto) {
+    if (!notificationDto.userEmail || !notificationDto.message) {
+      throw new BadRequestException('Email and message are required');
     }
 
     try {
       const notification = new this.notificationModel({
-        userId: notificationDto.userId,
+        userEmail: notificationDto.userEmail,
         message: notificationDto.message,
         type: notificationDto.type,
       });
@@ -34,7 +38,7 @@ export class NotificationsService {
 
       await this.messagesService.sendKafkaMessage('notification.created', {
         id: saved._id.toString(),
-        userId: notificationDto.userId,
+        userEmail: notificationDto.userEmail,
         message: notificationDto.message,
         type: notificationDto.type,
       });
@@ -45,14 +49,16 @@ export class NotificationsService {
     }
   }
 
-  async createReturnOrderNotification(createReturnDto: CreateNotificationDto) {
-    if (!createReturnDto.userId || !createReturnDto.message) {
-      throw new BadRequestException('userId and message are required');
+  async createReturnOrderNotification(
+    createReturnDto: ReturnOrderNotificationDto,
+  ) {
+    if (!createReturnDto.userEmail || !createReturnDto.message) {
+      throw new BadRequestException('userEmail and message are required');
     }
 
     try {
       const notification = new this.notificationModel({
-        userId: createReturnDto.userId,
+        userEmail: createReturnDto.userEmail,
         message: createReturnDto.message,
         type: createReturnDto.type,
       });
@@ -60,7 +66,7 @@ export class NotificationsService {
 
       await this.messagesService.sendKafkaMessage('notification.created', {
         id: saved._id.toString(),
-        userId: createReturnDto.userId,
+        userEmail: createReturnDto.userEmail,
         message: createReturnDto.message,
         type: createReturnDto.type,
       });

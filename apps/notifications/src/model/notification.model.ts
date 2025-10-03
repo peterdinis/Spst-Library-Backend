@@ -6,6 +6,9 @@ export class Notification extends Document {
   @Prop({ required: true })
   userId: string;
 
+  @Prop()
+  userEmail: string;
+
   @Prop({ required: true })
   message: string;
 
