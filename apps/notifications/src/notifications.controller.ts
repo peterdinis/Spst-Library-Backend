@@ -1,17 +1,50 @@
-import { Controller, Get, Param, Patch } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Post, Body } from '@nestjs/common';
 import {
-  ApiBody,
   ApiOperation,
   ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
+import {
+  CreateNotificationDto,
+  CreateOrderNotificationDto,
+  ReturnOrderNotificationDto,
+} from '@app/dtos';
 
 @ApiTags('notifications')
 @Controller('notifications')
 export class NotificationsController {
   constructor(private readonly notificationService: NotificationsService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create a generic notification' })
+  @ApiResponse({ status: 201, description: 'Notification created' })
+  async create(@Body() createNotificationDto: CreateNotificationDto) {
+    return this.notificationService.create(createNotificationDto);
+  }
+
+  @Post('order')
+  @ApiOperation({ summary: 'Create an order notification' })
+  @ApiResponse({ status: 201, description: 'Order notification created' })
+  async createOrder(
+    @Body() createOrderNotificationDto: CreateOrderNotificationDto,
+  ) {
+    return this.notificationService.createOrderNotification(
+      createOrderNotificationDto,
+    );
+  }
+
+  @Post('return-order')
+  @ApiOperation({ summary: 'Create a return order notification' })
+  @ApiResponse({ status: 201, description: 'Return order notification created' })
+  async createReturnOrder(
+    @Body() returnOrderNotificationDto: ReturnOrderNotificationDto,
+  ) {
+    return this.notificationService.createReturnOrderNotification(
+      returnOrderNotificationDto,
+    );
+  }
 
   @Get(':userId')
   @ApiOperation({ summary: 'Get notifications for a user' })

@@ -26,20 +26,16 @@ describe('RatingsController (E2E)', () => {
     })
       .overrideProvider(RatingService)
       .useValue({
-        findAll: jest
-          .fn()
-          .mockResolvedValue({
-            data: [rating],
-            meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
-          }),
+        findAll: jest.fn().mockResolvedValue({
+          data: [rating],
+          meta: { total: 1, page: 1, limit: 10, totalPages: 1 },
+        }),
         findOne: jest.fn().mockResolvedValue(rating),
         create: jest.fn().mockResolvedValue({ ...rating }),
         update: jest.fn().mockResolvedValue({ ...rating, value: 5 }),
-        remove: jest
-          .fn()
-          .mockResolvedValue({
-            message: `Rating ${ratingId} deleted successfully`,
-          }),
+        remove: jest.fn().mockResolvedValue({
+          message: `Rating ${ratingId} deleted successfully`,
+        }),
       })
       .compile();
 
