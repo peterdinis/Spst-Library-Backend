@@ -5,11 +5,11 @@ export type BookTagDocument = BookTag & Document;
 
 @Schema({ timestamps: true })
 export class BookTag {
-  @Prop({ required: true, unique: true })
+  @Prop({ type: String, required: true, unique: true })
   name: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Book' }], default: [] })
-  books: Types.ObjectId[];
+  books: Types.Array<Types.ObjectId>;
 }
 
 export const BookTagSchema = SchemaFactory.createForClass(BookTag);

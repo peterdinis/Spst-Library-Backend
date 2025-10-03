@@ -5,19 +5,19 @@ export type BookDocument = Book & Document;
 
 @Schema({ timestamps: true })
 export class Book {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   name: string;
 
-  @Prop()
+  @Prop({ type: String })
   description?: string;
 
-  @Prop()
+  @Prop({ type: Number })
   year?: number;
 
-  @Prop({ default: true })
+  @Prop({ type: Boolean, default: true })
   isAvailable: boolean;
 
-  @Prop({ default: false })
+  @Prop({ type: Boolean, default: false })
   isNew: boolean;
 
   @Prop({ type: Types.ObjectId, ref: 'Category', required: false })
@@ -26,14 +26,14 @@ export class Book {
   @Prop({ type: Types.ObjectId, ref: 'Author', required: true })
   authorId: Types.ObjectId;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'BookTag' }] })
-  bookTags: Types.ObjectId[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'BookTag' }], default: [] })
+  bookTags: Types.Array<Types.ObjectId>;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Rating' }] })
-  ratings: Types.ObjectId[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Rating' }], default: [] })
+  ratings: Types.Array<Types.ObjectId>;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'OrderItem' }] })
-  orderItems: Types.ObjectId[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'OrderItem' }], default: [] })
+  orderItems: Types.Array<Types.ObjectId>;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

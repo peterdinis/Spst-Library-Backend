@@ -11,7 +11,7 @@ export class Rating {
   @Prop({ type: Number, required: true })
   value: number;
 
-  @Prop()
+  @Prop({ type: String })
   comment?: string;
 }
 

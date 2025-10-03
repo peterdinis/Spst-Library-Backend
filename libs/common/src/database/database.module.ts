@@ -11,7 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
+        uri: 'mongodb://localhost:27017/library',
         useNewUrlParser: true,
         useUnifiedTopology: true,
       }),
