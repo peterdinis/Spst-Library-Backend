@@ -1,5 +1,7 @@
 import { DatabaseModule } from '@app/common';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthorSuggestionModule } from 'apps/author-suggestion/src/author-suggestion.module';
 import { AuthorsModule } from 'apps/authors/src/authors.module';
 import { BookTagModule } from 'apps/book-tag/src/book-tag.module';
@@ -22,6 +24,19 @@ import { MessagesModule } from 'libs/messages/messages.module';
     RatingsModule,
     PdfModule,
     MessagesModule,
+    ThrottlerModule.forRoot([
+      {
+        limit: 10,
+        ttl: 60,
+        name: 'short',
+      },
+    ]),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
