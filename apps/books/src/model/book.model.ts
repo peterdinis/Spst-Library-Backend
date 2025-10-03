@@ -5,7 +5,7 @@ export type BookDocument = Book & Document;
 
 @Schema({ timestamps: true })
 export class Book {
-  @Prop({ type: String, required: true }) 
+  @Prop({ type: String, required: true })
   name: string;
 
   @Prop({ type: String })

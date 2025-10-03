@@ -26,9 +26,13 @@ describe('NotificationsController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+    );
     await app.init();
-    model = moduleFixture.get<Model<Notification>>(getModelToken(Notification.name));
+    model = moduleFixture.get<Model<Notification>>(
+      getModelToken(Notification.name),
+    );
   });
 
   afterAll(async () => {
@@ -39,7 +43,9 @@ describe('NotificationsController (e2e)', () => {
   it('POST /notifications - should create generic notification', async () => {
     const dto = { userId: '123', message: 'Hello', type: 'info' };
     const saved = { _id: '1', ...dto };
-    mockNotificationModel.create.mockReturnValue({ save: jest.fn().mockResolvedValue(saved) });
+    mockNotificationModel.create.mockReturnValue({
+      save: jest.fn().mockResolvedValue(saved),
+    });
 
     const response = await request(app.getHttpServer())
       .post('/notifications')
@@ -51,9 +57,15 @@ describe('NotificationsController (e2e)', () => {
 
   // -------------------- POST /notifications/order --------------------
   it('POST /notifications/order - should create order notification', async () => {
-    const dto = { userEmail: 'a@test.com', message: 'Order created', type: 'order' };
+    const dto = {
+      userEmail: 'a@test.com',
+      message: 'Order created',
+      type: 'order',
+    };
     const saved = { _id: '2', ...dto };
-    mockNotificationModel.create.mockReturnValue({ save: jest.fn().mockResolvedValue(saved) });
+    mockNotificationModel.create.mockReturnValue({
+      save: jest.fn().mockResolvedValue(saved),
+    });
 
     const response = await request(app.getHttpServer())
       .post('/notifications/order')
@@ -65,9 +77,15 @@ describe('NotificationsController (e2e)', () => {
 
   // -------------------- POST /notifications/return-order --------------------
   it('POST /notifications/return-order - should create return order notification', async () => {
-    const dto = { userEmail: 'b@test.com', message: 'Return initiated', type: 'return' };
+    const dto = {
+      userEmail: 'b@test.com',
+      message: 'Return initiated',
+      type: 'return',
+    };
     const saved = { _id: '3', ...dto };
-    mockNotificationModel.create.mockReturnValue({ save: jest.fn().mockResolvedValue(saved) });
+    mockNotificationModel.create.mockReturnValue({
+      save: jest.fn().mockResolvedValue(saved),
+    });
 
     const response = await request(app.getHttpServer())
       .post('/notifications/return-order')
@@ -80,7 +98,9 @@ describe('NotificationsController (e2e)', () => {
   // -------------------- GET /notifications/:userId --------------------
   it('GET /notifications/:userId - should return notifications', async () => {
     const userId = '123';
-    const notifications = [{ _id: '1', userId, message: 'Hello', type: 'info' }];
+    const notifications = [
+      { _id: '1', userId, message: 'Hello', type: 'info' },
+    ];
     const sortMock = jest.fn().mockResolvedValue(notifications);
     mockNotificationModel.find.mockReturnValue({ sort: sortMock });
 

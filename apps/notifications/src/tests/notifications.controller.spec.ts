@@ -27,13 +27,19 @@ describe('NotificationsController', () => {
     }).compile();
 
     controller = module.get<NotificationsController>(NotificationsController);
-    service = module.get(NotificationsService) as jest.Mocked<NotificationsService>;
+    service = module.get(
+      NotificationsService,
+    ) as jest.Mocked<NotificationsService>;
   });
 
   // -------------------- CREATE --------------------
   describe('create', () => {
     it('should call service.create with DTO and return result', async () => {
-      const dto: CreateNotificationDto = { userId: '123', message: 'Hello', type: 'info' };
+      const dto: CreateNotificationDto = {
+        userId: '123',
+        message: 'Hello',
+        type: 'info',
+      };
       const result = { id: 'abc', ...dto };
 
       service.create.mockResolvedValue(result);
@@ -46,7 +52,11 @@ describe('NotificationsController', () => {
   // -------------------- CREATE ORDER --------------------
   describe('createOrder', () => {
     it('should call service.createOrderNotification with DTO and return result', async () => {
-      const dto: CreateOrderNotificationDto = { userEmail: 'a@test.com', message: 'Order created', type: 'order' };
+      const dto: CreateOrderNotificationDto = {
+        userEmail: 'a@test.com',
+        message: 'Order created',
+        type: 'order',
+      };
       const result = { id: 'order1', ...dto };
 
       service.createOrderNotification.mockResolvedValue(result);
@@ -59,7 +69,11 @@ describe('NotificationsController', () => {
   // -------------------- CREATE RETURN ORDER --------------------
   describe('createReturnOrder', () => {
     it('should call service.createReturnOrderNotification with DTO and return result', async () => {
-      const dto: ReturnOrderNotificationDto = { userEmail: 'b@test.com', message: 'Return initiated', type: 'return' };
+      const dto: ReturnOrderNotificationDto = {
+        userEmail: 'b@test.com',
+        message: 'Return initiated',
+        type: 'return',
+      };
       const result = { id: 'return1', ...dto };
 
       service.createReturnOrderNotification.mockResolvedValue(result);
@@ -98,7 +112,9 @@ describe('NotificationsController', () => {
       const id = '507f191e810c19729de860ea';
       service.markAsRead.mockRejectedValue(new NotFoundException());
 
-      await expect(controller.markAsRead(id)).rejects.toThrow(NotFoundException);
+      await expect(controller.markAsRead(id)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
