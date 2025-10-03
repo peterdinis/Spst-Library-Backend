@@ -24,17 +24,19 @@ import { MessagesModule } from 'libs/messages/messages.module';
     RatingsModule,
     PdfModule,
     MessagesModule,
-    ThrottlerModule.forRoot([{
-      limit: 10,
-      ttl: 60,
-      name: "short"
-    }])
+    ThrottlerModule.forRoot([
+      {
+        limit: 10,
+        ttl: 60,
+        name: 'short',
+      },
+    ]),
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
-    }
-  ]
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
