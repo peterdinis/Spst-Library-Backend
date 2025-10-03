@@ -6,22 +6,22 @@ export type AuthorDocument = Author & Document;
 
 @Schema({ timestamps: true })
 export class Author {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   name: string;
 
-  @Prop()
+  @Prop({ type: String })
   bio?: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   litPeriod: string;
 
-  @Prop({ default: '' })
+  @Prop({ type: String, default: '' })
   authorImage: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   bornDate: string;
 
-  @Prop()
+  @Prop({ type: String })
   deathDate?: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Book' }] })

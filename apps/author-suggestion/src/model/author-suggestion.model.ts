@@ -11,25 +11,25 @@ export enum SuggestionStatus {
 
 @Schema({ timestamps: true })
 export class AuthorSuggestion {
-  @Prop()
+  @Prop({ type: String, required: true })
   name: string;
 
-  @Prop()
+  @Prop({ type: String })
   bio?: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   litPeriod: string;
 
-  @Prop({ default: '' })
+  @Prop({ type: String, default: '' })
   authorImage: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   bornDate: string;
 
-  @Prop()
+  @Prop({ type: String })
   deathDate?: string;
 
-  @Prop()
+  @Prop({ type: String })
   suggestedByName?: string;
 
   @Prop({
