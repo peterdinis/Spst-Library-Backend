@@ -24,8 +24,6 @@ export class MailService {
       text,
       html,
     });
-
-    console.log('Message sent: %s', info.messageId);
     return info;
   }
 }
