@@ -5,20 +5,11 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId, Document } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { MessagesService } from 'libs/messages/messages.service';
 import { Notification } from './model/notification.model';
-
-export interface NotificationDocument extends Document {
-  _id: string;
-  userId: string;
-  message: string;
-  type: string;
-  isRead?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-  __v?: number;
-}
+import { NotificationDocument } from './types/NotificationTypes';
+import { CreateNotificationDto } from '@app/dtos';
 
 @Injectable()
 export class NotificationsService {
@@ -26,26 +17,78 @@ export class NotificationsService {
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
     private messagesService: MessagesService,
-  ) {}
+  ) { }
 
-  async create(userId: string, message: string, type = 'info') {
-    if (!userId || !message) {
+  async createOrderNotification(notificationDto: CreateNotificationDto) {
+    if (!notificationDto.userId || !notificationDto.message) {
       throw new BadRequestException('userId and message are required');
     }
 
     try {
       const notification = new this.notificationModel({
-        userId,
-        message,
-        type,
+        userId: notificationDto.userId,
+        message: notificationDto.message,
+        type: notificationDto.type,
       });
       const saved = await notification.save();
 
       await this.messagesService.sendKafkaMessage('notification.created', {
         id: saved._id.toString(),
-        userId,
-        message,
-        type,
+        userId: notificationDto.userId,
+        message: notificationDto.message,
+        type: notificationDto.type,
+      });
+
+      return saved;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create notification');
+    }
+  }
+
+  async createReturnOrderNotification(createReturnDto: CreateNotificationDto) {
+    if (!createReturnDto.userId || !createReturnDto.message) {
+      throw new BadRequestException('userId and message are required');
+    }
+
+    try {
+      const notification = new this.notificationModel({
+        userId: createReturnDto.userId,
+        message: createReturnDto.message,
+        type: createReturnDto.type,
+      });
+      const saved = await notification.save();
+
+      await this.messagesService.sendKafkaMessage('notification.created', {
+        id: saved._id.toString(),
+        userId: createReturnDto.userId,
+        message: createReturnDto.message,
+        type: createReturnDto.type,
+      });
+
+      return saved;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create notification');
+    }
+  }
+
+  async create(notificationDto: CreateNotificationDto) {
+    if (!notificationDto.userId || !notificationDto.message) {
+      throw new BadRequestException('userId and message are required');
+    }
+
+    try {
+      const notification = new this.notificationModel({
+        userId: notificationDto.userId,
+        message: notificationDto.message,
+        type: notificationDto.type,
+      });
+      const saved = await notification.save();
+
+      await this.messagesService.sendKafkaMessage('notification.created', {
+        id: saved._id.toString(),
+        userId: notificationDto.userId,
+        message: notificationDto.message,
+        type: notificationDto.type,
       });
 
       return saved;

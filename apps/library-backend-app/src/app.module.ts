@@ -20,7 +20,6 @@ import { MessagesModule } from 'libs/messages/messages.module';
     BookTagModule,
     RatingsModule,
     PdfModule,
-    NotificationsModule,
     MessagesModule,
   ],
 })
