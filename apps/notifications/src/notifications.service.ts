@@ -9,7 +9,6 @@ import { Model, isValidObjectId } from 'mongoose';
 import { MessagesService } from 'libs/messages/messages.service';
 import { Notification } from './model/notification.model';
 import { NotificationDocument } from './types/NotificationTypes';
-import { TwilioService } from 'libs/twilio';
 import { CreateNotificationDto } from '@app/dtos';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class NotificationsService {
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
     private messagesService: MessagesService,
-    private twilioService: TwilioService
   ) { }
 
   async createOrderNotification(notificationDto: CreateNotificationDto) {
